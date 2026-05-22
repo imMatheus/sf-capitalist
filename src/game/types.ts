@@ -6,13 +6,15 @@ export type BusinessId =
   | "colocation-hall"
   | "asic-farm"
   | "cloud-region"
-  | "hyperscale-campus";
+  | "hyperscale-campus"
+  | "ai-supercomputer"
+  | "orbital-data-center";
 
-export type BuyMode = 1 | 10 | 100 | "max";
+export type BuyMode = 1 | 10 | 100 | "next" | "max";
 
 export type Currency = "cash" | "angels";
 
-export type ModifierKind = "profit" | "speed" | "angelEffectiveness";
+export type ModifierKind = "profit" | "speed";
 
 export type UpgradeTarget = BusinessId | "all";
 

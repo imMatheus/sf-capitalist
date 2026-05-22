@@ -47,6 +47,8 @@ export const formatCompact = (value: number, fractionDigits = 2): string => {
 
 export const formatMoney = (value: number) => `$${formatCompact(value)}`;
 
+export const formatLevel = (value: number) => String(Math.trunc(value));
+
 export const formatDuration = (seconds: number): string => {
   if (seconds < 1) {
     return `${Math.max(0.05, seconds).toFixed(2)}s`;

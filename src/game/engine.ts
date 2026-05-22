@@ -107,13 +107,7 @@ const getActiveUnlocks = (state: GameState) => {
   return [...activeBusinessUnlocks, ...activeAllUnlocks];
 };
 
-export const getAngelEffectiveness = (state: GameState) => {
-  const upgradeMultiplier = getOwnedUpgrades(state)
-    .filter((upgrade) => upgrade.kind === "angelEffectiveness")
-    .reduce((total, upgrade) => total * upgrade.multiplier, 1);
-
-  return BASE_ANGEL_BONUS * upgradeMultiplier;
-};
+export const getAngelEffectiveness = (_state: GameState) => BASE_ANGEL_BONUS;
 
 export const getClaimableAngels = (state: GameState) => {
   const potentialLifetimeAngels = Math.floor(
@@ -236,8 +230,20 @@ export const getMaxAffordableQuantity = (
 };
 
 export const getBuyQuantity = (state: GameState, business: BusinessDefinition, mode: BuyMode) => {
+  const owned = state.businesses[business.id].owned;
+
   if (mode === "max") {
-    return getMaxAffordableQuantity(business, state.businesses[business.id].owned, state.cash);
+    return getMaxAffordableQuantity(business, owned, state.cash);
+  }
+
+  if (mode === "next") {
+    const nextUnlock = getNextUnlock(state, business.id);
+
+    if (!nextUnlock) {
+      return 0;
+    }
+
+    return Math.max(0, nextUnlock.goal - owned);
   }
 
   return mode;
@@ -492,6 +498,7 @@ export const collectAchievements = (state: GameState): GameState => {
   const managerCount = Object.values(state.managers).filter(Boolean).length;
   const cashUpgradeCount = state.cashUpgrades.length;
   const claimableAngels = getClaimableAngels(state);
+  const allBusinessesOwned = businesses.every((business) => state.businesses[business.id].owned >= 1);
   const allBusinessHundred = businesses.every((business) => state.businesses[business.id].owned >= 100);
 
   if (state.businesses["single-gpu-rig"].owned >= 1) {
@@ -524,6 +531,14 @@ export const collectAchievements = (state: GameState): GameState => {
 
   if (allBusinessHundred) {
     unlocked.add("all-100");
+  }
+
+  if (allBusinessesOwned) {
+    unlocked.add("ten-businesses");
+  }
+
+  if (state.businesses["orbital-data-center"].owned >= 1) {
+    unlocked.add("orbital-operator");
   }
 
   if (state.lifetimeEarnings >= 1_000_000_000_000) {
