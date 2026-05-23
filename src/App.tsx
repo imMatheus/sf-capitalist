@@ -24,29 +24,41 @@ import {
 } from 'react'
 import chinaTravelImage from '../china.png'
 import earthTravelImage from '../san-francisco.png'
+import europeTravelImage from '../europe.png'
 import aiTutorAppImage from './assets/businesses/ai-tutor-app.svg'
 import aiSupercomputerImage from './assets/businesses/ai-supercomputer.svg'
+import alpineCheeseMineImage from './assets/businesses/alpine-cheese-mine.svg'
+import alpineGravityBoothImage from './assets/businesses/alpine-gravity-booth.svg'
 import asicFarmImage from './assets/businesses/asic-farm.svg'
+import cernGiantLaserImage from './assets/businesses/cern-giant-laser.svg'
 import cloudRegionImage from './assets/businesses/cloud-region.svg'
 import colocationHallImage from './assets/businesses/colocation-hall.svg'
+import continentalRailExpressImage from './assets/businesses/continental-rail-express.svg'
 import droneFactoryImage from './assets/businesses/drone-factory.svg'
+import dutchLithographyLabImage from './assets/businesses/dutch-lithography-lab.svg'
 import ecommerceMarketplaceImage from './assets/businesses/e-commerce-marketplace.svg'
+import europaParkResortImage from './assets/businesses/europa-park-resort.svg'
 import evPlantImage from './assets/businesses/ev-plant.svg'
 import firewallCloudImage from './assets/businesses/firewall-cloud.svg'
 import highSpeedRailGridImage from './assets/businesses/high-speed-rail-grid.svg'
 import hyperscaleCampusImage from './assets/businesses/hyperscale-campus.svg'
 import inferenceClusterImage from './assets/businesses/inference-cluster.svg'
 import livestreamAgencyImage from './assets/businesses/livestream-agency.svg'
+import nordicPayrollCloneImage from './assets/businesses/nordic-payroll-clone.svg'
+import northSeaHeliumFarmImage from './assets/businesses/north-sea-helium-farm.svg'
 import orbitalDataCenterImage from './assets/businesses/orbital-data-center.svg'
 import quickUpgradeImage from './assets/businesses/quick-upgrade.png'
 import rareEarthMineImage from './assets/businesses/rare-earth-mine.svg'
 import renderRackImage from './assets/businesses/render-rack.svg'
+import rivieraOxygenBarImage from './assets/businesses/riviera-oxygen-bar.svg'
 import semiconductorFoundryImage from './assets/businesses/semiconductor-foundry.svg'
 import singleGpuRigImage from './assets/businesses/single-gpu-rig.svg'
 import smartphoneCampusImage from './assets/businesses/smartphone-campus.svg'
 import trainingPodImage from './assets/businesses/training-pod.svg'
+import transylvanianDataColonyImage from './assets/businesses/transylvanian-data-colony.svg'
 import { worldList } from './game/economy'
 import {
+  canUnlockWorld,
   getActiveWorld,
   getActiveWorldState,
   getAngelEffectiveness,
@@ -102,6 +114,16 @@ const businessImages: Record<string, string> = {
   'smartphone-campus': smartphoneCampusImage,
   'semiconductor-foundry': semiconductorFoundryImage,
   'high-speed-rail-grid': highSpeedRailGridImage,
+  'dutch-lithography-lab': dutchLithographyLabImage,
+  'alpine-gravity-booth': alpineGravityBoothImage,
+  'nordic-payroll-clone': nordicPayrollCloneImage,
+  'continental-rail-express': continentalRailExpressImage,
+  'riviera-oxygen-bar': rivieraOxygenBarImage,
+  'north-sea-helium-farm': northSeaHeliumFarmImage,
+  'alpine-cheese-mine': alpineCheeseMineImage,
+  'europa-park-resort': europaParkResortImage,
+  'transylvanian-data-colony': transylvanianDataColonyImage,
+  'cern-giant-laser': cernGiantLaserImage,
 }
 
 const getBusinessImage = (business: BusinessDefinition) =>
@@ -172,14 +194,8 @@ const buyModes: BuyMode[] = [1, 10, 100, 'next', 'max']
 const travelImages: Record<WorldId, string> = {
   earth: earthTravelImage,
   china: chinaTravelImage,
+  europe: europeTravelImage,
 }
-
-const travelModes: Array<{ label: string; icon: LucideIcon }> = [
-  { label: 'Markets', icon: Globe2 },
-  { label: 'Exchange', icon: BadgeDollarSign },
-  { label: 'Events', icon: Trophy },
-  { label: 'Minigames', icon: Sparkles },
-]
 
 const getNextBuyMode = (current: BuyMode): BuyMode => {
   switch (current) {
@@ -837,6 +853,9 @@ const BusinessRow = ({
   const showProgress = businessState.running || automated
   const fastCycle = duration < 0.1 && showProgress
   const barPercent = fastCycle ? 100 : showProgress ? progressPercent : 0
+  const previousBarPercentRef = useRef(barPercent)
+  const shouldAnimateProgress =
+    showProgress && !fastCycle && barPercent >= previousBarPercentRef.current
   const canStart =
     businessState.owned > 0 && !businessState.running && !automated
   const timeRemaining =
@@ -864,6 +883,10 @@ const BusinessRow = ({
   const revenueLabel = automated
     ? `${formatMoney(getBusinessCashPerSecond(state, world, business), world.currencySymbol)} /sec`
     : `${formatMoney(revenue, world.currencySymbol)} /run`
+
+  useEffect(() => {
+    previousBarPercentRef.current = barPercent
+  }, [barPercent])
 
   if (businessState.owned === 0) {
     const firstPurchaseCost = getPurchaseCost(business, 0, 1)
@@ -948,7 +971,10 @@ const BusinessRow = ({
           title={canStart ? 'Start production' : business.caption}
           type="button"
         >
-          <span className="revenue-fill" style={{ width: `${barPercent}%` }} />
+          <span
+            className={`revenue-fill ${shouldAnimateProgress ? '' : 'snap'}`}
+            style={{ width: `${barPercent}%` }}
+          />
           <span className="revenue-text">{revenueLabel}</span>
           {canStart ? (
             <Play className="revenue-play h-4 w-4" fill="currentColor" />
@@ -1070,78 +1096,114 @@ interface TravelPanelProps {
   onSelect: (worldId: WorldId) => void
 }
 
+const getTravelUnlockLabel = (world: WorldDefinition, prefix = false) => {
+  if (world.unlockCost.currency === 'free') {
+    return 'Free'
+  }
+
+  const cost =
+    world.unlockCost.currency === 'megaBucks'
+      ? `${formatCompact(world.unlockCost.amount, 0)} MB`
+      : formatMoney(world.unlockCost.amount, '$')
+
+  return prefix ? `Unlock ${cost}` : cost
+}
+
 const TravelPanel = ({
   activeWorldId,
   gameState,
   onUnlock,
   onSelect,
-}: TravelPanelProps) => (
-  <div className="travel-panel">
-    <div className="travel-mode-row" aria-label="Adventure categories">
-      {travelModes.map((mode) => {
-        const Icon = mode.icon
+}: TravelPanelProps) => {
+  const [unlockingWorldId, setUnlockingWorldId] = useState<WorldId | null>(null)
+  const unlockTimerRef = useRef<number | null>(null)
 
-        return (
-          <span className="travel-mode" key={mode.label}>
-            <span className="travel-mode-icon">
-              <Icon className="h-8 w-8" />
-            </span>
-            <strong>{mode.label}</strong>
-          </span>
-        )
-      })}
+  useEffect(
+    () => () => {
+      if (unlockTimerRef.current !== null) {
+        window.clearTimeout(unlockTimerRef.current)
+      }
+    },
+    [],
+  )
+
+  const animateUnlock = (worldId: WorldId) => {
+    if (unlockTimerRef.current !== null) {
+      window.clearTimeout(unlockTimerRef.current)
+    }
+
+    setUnlockingWorldId(worldId)
+    onUnlock(worldId)
+    unlockTimerRef.current = window.setTimeout(() => {
+      setUnlockingWorldId(null)
+      unlockTimerRef.current = null
+    }, 1050)
+  }
+
+  return (
+    <div className="travel-panel">
+      <div className="mega-bucks-balance">
+        <Globe2 className="h-5 w-5" />
+        <span>{formatCompact(gameState.megaBucks, 0)} Mega Bucks</span>
+        <span>{formatMoney(gameState.worlds.earth.cash, '$')} Earth cash</span>
+      </div>
+
+      <div className="travel-destinations">
+        {worldList.map((world) => {
+          const active = activeWorldId === world.id
+          const unlocked = gameState.unlockedWorldIds.includes(world.id)
+          const canUnlock = canUnlockWorld(gameState, world)
+          const unlocking = unlockingWorldId === world.id
+          const statusLabel = unlocking
+            ? 'Unlocked!'
+            : active
+              ? 'Current'
+              : unlocked
+                ? 'Launch!'
+                : canUnlock
+                  ? getTravelUnlockLabel(world, true)
+                  : getTravelUnlockLabel(world)
+
+          return (
+            <button
+              aria-label={`${world.name}: ${statusLabel}`}
+              className={`travel-choice ${world.id} ${active ? 'active' : ''} ${
+                unlocked && !unlocking ? '' : 'locked'
+              } ${!unlocked && canUnlock ? 'affordable-locked' : ''} ${
+                unlocking ? 'unlocking' : ''
+              }`}
+              disabled={active || unlocking || (!unlocked && !canUnlock)}
+              key={world.id}
+              onClick={() => {
+                if (unlocked) {
+                  onSelect(world.id)
+                  return
+                }
+
+                animateUnlock(world.id)
+              }}
+              type="button"
+            >
+              <span className="travel-choice-ribbon">{world.name}</span>
+              <img
+                alt=""
+                className="travel-choice-image"
+                draggable={false}
+                src={travelImages[world.id]}
+              />
+              {!unlocked || unlocking ? (
+                <span className="travel-choice-lock" aria-hidden="true">
+                  <Lock className="travel-lock-svg" />
+                </span>
+              ) : null}
+              <span className="travel-choice-status">{statusLabel}</span>
+            </button>
+          )
+        })}
+      </div>
     </div>
-
-    <div className="mega-bucks-balance">
-      <Globe2 className="h-5 w-5" />
-      <span>{formatCompact(gameState.megaBucks, 0)} Mega Bucks</span>
-    </div>
-
-    <div className="travel-destinations">
-      {worldList.map((world) => {
-        const active = activeWorldId === world.id
-        const unlocked = gameState.unlockedWorldIds.includes(world.id)
-        const canUnlock = gameState.megaBucks >= world.unlockCostMegaBucks
-        const statusLabel = active
-          ? 'Current'
-          : unlocked
-            ? 'Launch!'
-            : canUnlock
-              ? `Unlock ${formatCompact(world.unlockCostMegaBucks, 0)} MB`
-              : `${formatCompact(world.unlockCostMegaBucks, 0)} MB`
-
-        return (
-          <button
-            aria-label={`${world.name}: ${statusLabel}`}
-            className={`travel-choice ${world.id} ${active ? 'active' : ''} ${
-              unlocked ? '' : 'locked'
-            }`}
-            disabled={active || (!unlocked && !canUnlock)}
-            key={world.id}
-            onClick={() => {
-              if (unlocked) {
-                onSelect(world.id)
-                return
-              }
-
-              onUnlock(world.id)
-            }}
-            type="button"
-          >
-            <span className="travel-choice-ribbon">{world.name}</span>
-            <img
-              alt=""
-              className="travel-choice-image"
-              draggable={false}
-              src={travelImages[world.id]}
-            />
-            <span className="travel-choice-status">{statusLabel}</span>
-          </button>
-        )
-      })}
-    </div>
-  </div>
-)
+  )
+}
 
 interface UpgradesPanelProps {
   state: WorldState

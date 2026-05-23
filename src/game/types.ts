@@ -1,4 +1,4 @@
-export type WorldId = "earth" | "china";
+export type WorldId = "earth" | "china" | "europe";
 
 export type BusinessId = string;
 
@@ -9,6 +9,11 @@ export type Currency = "cash" | "angels";
 export type ModifierKind = "profit" | "speed" | "angelEffectiveness" | "owned";
 
 export type UpgradeTarget = BusinessId | "all";
+
+export type WorldUnlockCost =
+  | { currency: "free"; amount: 0 }
+  | { currency: "megaBucks"; amount: number }
+  | { currency: "earthCash"; amount: number };
 
 export interface BusinessDefinition {
   id: BusinessId;
@@ -58,7 +63,7 @@ export interface WorldDefinition {
   description: string;
   currencyName: string;
   currencySymbol: string;
-  unlockCostMegaBucks: number;
+  unlockCost: WorldUnlockCost;
   startingCash: number;
   businesses: BusinessDefinition[];
   cashUpgrades: UpgradeDefinition[];

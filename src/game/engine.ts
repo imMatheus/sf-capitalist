@@ -144,6 +144,20 @@ export const getActiveWorld = (state: GameState) => getWorld(state.activeWorldId
 
 export const getActiveWorldState = (state: GameState) => state.worlds[state.activeWorldId];
 
+export const getWorldUnlockBalance = (state: GameState, world: WorldDefinition) => {
+  switch (world.unlockCost.currency) {
+    case "free":
+      return 0;
+    case "megaBucks":
+      return state.megaBucks;
+    case "earthCash":
+      return state.worlds.earth.cash;
+  }
+};
+
+export const canUnlockWorld = (state: GameState, world: WorldDefinition) =>
+  state.unlockedWorldIds.includes(world.id) || getWorldUnlockBalance(state, world) >= world.unlockCost.amount;
+
 const updateWorldState = (
   state: GameState,
   worldId: WorldId,
@@ -739,13 +753,34 @@ export const unlockWorld = (state: GameState, worldId: WorldId): GameState => {
 
   const world = getWorld(worldId);
 
-  if (state.megaBucks < world.unlockCostMegaBucks) {
+  if (!canUnlockWorld(state, world)) {
     return state;
+  }
+
+  if (world.unlockCost.currency === "earthCash") {
+    return {
+      ...state,
+      unlockedWorldIds: [...state.unlockedWorldIds, worldId],
+      worlds: {
+        ...state.worlds,
+        earth: {
+          ...state.worlds.earth,
+          cash: state.worlds.earth.cash - world.unlockCost.amount,
+        },
+      },
+    };
+  }
+
+  if (world.unlockCost.currency === "free") {
+    return {
+      ...state,
+      unlockedWorldIds: [...state.unlockedWorldIds, worldId],
+    };
   }
 
   return {
     ...state,
-    megaBucks: state.megaBucks - world.unlockCostMegaBucks,
+    megaBucks: state.megaBucks - world.unlockCost.amount,
     unlockedWorldIds: [...state.unlockedWorldIds, worldId],
   };
 };

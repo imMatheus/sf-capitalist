@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Riviera Oxygen Bar">
+  <circle cx="48" cy="48" r="43" fill="#ece7d7" stroke="#171717" stroke-width="5"/>
+  <path fill="#61a544" stroke="#171717" stroke-width="4" d="M24 51h48v20H24z"/>
+  <path fill="#9eeeb2" stroke="#171717" stroke-width="4" d="M30 30h36v22H30z"/>
+  <circle cx="39" cy="41" r="6" fill="#fff"/>
+  <circle cx="56" cy="41" r="6" fill="#fff"/>
+  <path stroke="#171717" stroke-width="4" d="M33 71v8M63 71v8M38 58h20"/>
+</svg>
