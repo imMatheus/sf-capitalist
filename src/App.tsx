@@ -25,6 +25,9 @@ import {
 import chinaTravelImage from '../china.png'
 import siliconValleyTravelImage from '../san-francisco.png'
 import europeTravelImage from '../europe.png'
+import jensenPlayerImage from '../jensen_huang_headshot_transparent.png'
+import jackMaImage from '../jack_ma_headshot_transparent.png'
+import ursulaPlayerImage from '../ursula_von_der_leyen_headshot_transparent.png'
 import { businessIconImages } from './assets/businessIcons'
 import quickUpgradeImage from './assets/businesses/quick-upgrade.png'
 import { worldList } from './game/economy'
@@ -136,6 +139,14 @@ const travelImages: Record<WorldId, string> = {
   china: chinaTravelImage,
   europe: europeTravelImage,
 }
+
+const playerPortraits: Record<WorldId, { image: string; mirrored?: boolean }> =
+  {
+    'silicon-valley': { image: jensenPlayerImage },
+    // Swap only this entry when the China-specific portrait is ready.
+    china: { image: jackMaImage },
+    europe: { image: ursulaPlayerImage, mirrored: true },
+  }
 
 const getNextBuyMode = (current: BuyMode): BuyMode => {
   switch (current) {
@@ -370,6 +381,9 @@ const App = () => {
         <Sidebar
           availability={sidebarAvailability}
           panel={panel}
+          playerPortrait={playerPortraits[world.id].image}
+          playerPortraitMirrored={playerPortraits[world.id].mirrored}
+          worldName={world.name}
           setPanel={setPanel}
         />
 
@@ -499,16 +513,28 @@ const App = () => {
 interface SidebarProps {
   availability: Partial<Record<Panel, boolean>>
   panel: Panel | null
+  playerPortrait: string
+  playerPortraitMirrored?: boolean
+  worldName: string
   setPanel: (panel: Panel) => void
 }
 
-const Sidebar = ({ availability, panel, setPanel }: SidebarProps) => (
+const Sidebar = ({
+  availability,
+  panel,
+  playerPortrait,
+  playerPortraitMirrored,
+  worldName,
+  setPanel,
+}: SidebarProps) => (
   <aside className="left-menu">
-    <div className="mascot-card" aria-label="GPU Capitalist mascot">
-      <div className="top-hat" />
-      <div className="mascot-face">
-        <Cpu className="h-12 w-12" strokeWidth={2.6} />
-      </div>
+    <div className="mascot-card" aria-label={`${worldName} player icon`}>
+      <img
+        alt=""
+        className={`mascot-portrait${playerPortraitMirrored ? ' mirrored' : ''}`}
+        draggable={false}
+        src={playerPortrait}
+      />
       <div className="ribbon">GPU & Stats</div>
     </div>
 
@@ -1085,7 +1111,10 @@ const TravelPanel = ({
       <div className="mega-bucks-balance">
         <Globe2 className="h-5 w-5" />
         <span>{formatCompact(gameState.megaBucks, 0)} Mega Bucks</span>
-        <span>{formatMoney(gameState.worlds['silicon-valley'].cash, '$')} Silicon Valley cash</span>
+        <span>
+          {formatMoney(gameState.worlds['silicon-valley'].cash, '$')} Silicon
+          Valley cash
+        </span>
       </div>
 
       <div className="travel-destinations">
