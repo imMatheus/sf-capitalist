@@ -249,7 +249,7 @@ const getUnlockTargetName = (
 
   return (
     world.businesses.find((business) => business.id === unlock.target)
-      ?.shortName ?? unlock.name
+      ?.name ?? unlock.name
   )
 }
 
@@ -296,7 +296,7 @@ const getUnlockDetailText = (
     triggerTarget === unlock.target || triggerTarget === 'all'
       ? targetName
       : (world.businesses.find((business) => business.id === triggerTarget)
-          ?.shortName ?? targetName)
+          ?.name ?? targetName)
 
   if (unlock.kind === 'reward') {
     return `${unlock.goal} ${triggerName} - ${unlock.reward ?? 'Reward'}!`
@@ -378,7 +378,7 @@ const getQuickBuyOption = (
       kind: 'manager',
       id: business.id,
       name: business.managerName,
-      description: `Automates ${business.shortName}`,
+      description: `Automates ${business.name}`,
       cost: business.managerCost,
       image: getBusinessImage(business),
       badge: 'Mgr',
@@ -1159,7 +1159,7 @@ const BusinessRow = ({
 
       <div className="investment-control">
         <div className="investment-name-row">
-          <h2>{business.shortName}</h2>
+          <h2>{business.name}</h2>
         </div>
         <button
           className={`revenue-arrow ${canStart ? 'ready' : ''} ${fastCycle ? 'fast-cycle' : ''}`}

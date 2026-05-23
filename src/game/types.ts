@@ -19,7 +19,6 @@ export interface BusinessDefinition {
   id: BusinessId;
   imageId?: BusinessId;
   name: string;
-  shortName: string;
   caption: string;
   baseCost: number;
   costMultiplier: number;
@@ -61,7 +60,6 @@ export interface AchievementDefinition {
 export interface WorldDefinition {
   id: WorldId;
   name: string;
-  shortName: string;
   description: string;
   currencyName: string;
   currencySymbol: string;

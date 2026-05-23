@@ -33,7 +33,6 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "bitcoin-miner",
     name: "Bitcoin Miner",
-    shortName: "Bitcoin Miner",
     caption: "Hash rates, cheap power, and a wallet full of upside.",
     baseCost: 4,
     costMultiplier: 1.07,
@@ -46,7 +45,6 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "yc",
     name: "YC",
-    shortName: "YC",
     caption: "Batch applications, demo days, and compounding cap tables.",
     baseCost: 60,
     costMultiplier: 1.15,
@@ -59,7 +57,6 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "waymo",
     name: "Waymo",
-    shortName: "Waymo",
     caption: "Autonomous miles with a premium per pickup.",
     baseCost: 720,
     costMultiplier: 1.14,
@@ -72,7 +69,6 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "stanford-dropout",
     name: "Stanford Dropout",
-    shortName: "Dropout",
     caption: "One unfinished degree and a very finished pitch deck.",
     baseCost: 8_640,
     costMultiplier: 1.13,
@@ -85,7 +81,6 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "h100-gpu-cluster",
     name: "H100 GPU Cluster",
-    shortName: "H100 Cluster",
     caption: "Scarce accelerators rented by the hour.",
     baseCost: 103_680,
     costMultiplier: 1.12,
@@ -98,7 +93,6 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "cursor-tab",
     name: "Cursor Tab",
-    shortName: "Cursor Tab",
     caption: "Autocomplete turns keystrokes into revenue.",
     baseCost: 1_244_160,
     costMultiplier: 1.11,
@@ -111,7 +105,6 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "polymarket",
     name: "Polymarket",
-    shortName: "Polymarket",
     caption: "Trade outcomes before anyone agrees what happened.",
     baseCost: 14_929_920,
     costMultiplier: 1.1,
@@ -124,7 +117,6 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "chatgpt-3-5",
     name: "ChatGPT-3.5",
-    shortName: "GPT-3.5",
     caption: "Consumer AI at scale, billed one prompt at a time.",
     baseCost: 179_159_040,
     costMultiplier: 1.09,
@@ -137,7 +129,6 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "nvidia",
     name: "Nvidia",
-    shortName: "Nvidia",
     caption: "Sell the picks, shovels, and most of the mountain.",
     baseCost: 2_149_908_480,
     costMultiplier: 1.08,
@@ -150,7 +141,6 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "agi",
     name: "AGI",
-    shortName: "AGI",
     caption: "The final demo that somehow still has a pricing page.",
     baseCost: 25_798_901_760,
     costMultiplier: 1.07,
@@ -166,7 +156,6 @@ const chinaBusinesses: BusinessDefinition[] = [
   {
     id: "pandabuy-agent",
     name: "PandaBuy Agent",
-    shortName: "PandaBuy Agent",
     caption: "Source the haul, manage the warehouse, collect the spread.",
     baseCost: 0.05,
     costMultiplier: 1.01,
@@ -179,7 +168,6 @@ const chinaBusinesses: BusinessDefinition[] = [
   {
     id: "shein-factory",
     name: "Shein Factory",
-    shortName: "Shein Factory",
     caption: "Fast fashion, faster iteration, endless new SKUs.",
     baseCost: 1,
     costMultiplier: 1.03,
@@ -192,7 +180,6 @@ const chinaBusinesses: BusinessDefinition[] = [
   {
     id: "wechat",
     name: "WeChat",
-    shortName: "WeChat",
     caption: "Messages, payments, shops, and daily life in one feed.",
     baseCost: 1_234,
     costMultiplier: 1.05,
@@ -205,7 +192,6 @@ const chinaBusinesses: BusinessDefinition[] = [
   {
     id: "drone-swarm",
     name: "Drone Swarm",
-    shortName: "Drones",
     caption: "Tiny rotors coordinated into a very large invoice.",
     baseCost: 23_000_000,
     costMultiplier: 1.07,
@@ -218,7 +204,6 @@ const chinaBusinesses: BusinessDefinition[] = [
   {
     id: "tiktok-algo",
     name: "TikTok Algo",
-    shortName: "TikTok",
     caption: "Attention routed through an infinitely tuned ranking loop.",
     baseCost: 49_000_000_000,
     costMultiplier: 1.11,
@@ -231,7 +216,6 @@ const chinaBusinesses: BusinessDefinition[] = [
   {
     id: "huawei-phone",
     name: "Huawei Phone",
-    shortName: "Huawei",
     caption: "Premium hardware with a vertically integrated supply chain.",
     baseCost: 77_000_000_000_000,
     costMultiplier: 1.04,
@@ -244,7 +228,6 @@ const chinaBusinesses: BusinessDefinition[] = [
   {
     id: "kimi",
     name: "Kimi",
-    shortName: "Kimi",
     caption: "Long-context answers for every tab you forgot was open.",
     baseCost: 5_000_000_000_000_000,
     costMultiplier: 1.07,
@@ -257,7 +240,6 @@ const chinaBusinesses: BusinessDefinition[] = [
   {
     id: "robot-dog",
     name: "Robot Dog",
-    shortName: "Robot Dog",
     caption: "Quadruped hardware with a surprisingly loyal margin.",
     baseCost: 1_000_000_000_000_000_000,
     costMultiplier: 1.09,
@@ -270,7 +252,6 @@ const chinaBusinesses: BusinessDefinition[] = [
   {
     id: "amd-chip",
     name: "AMD CHIP",
-    shortName: "AMD Chip",
     caption: "Accelerator silicon for anyone chasing the green team.",
     baseCost: 650_000_000_000_000_000_000,
     costMultiplier: 1.12,
@@ -283,7 +264,6 @@ const chinaBusinesses: BusinessDefinition[] = [
   {
     id: "deepseek",
     name: "DeepSeek",
-    shortName: "DeepSeek",
     caption: "Open weights, sharp benchmarks, and cheaper inference.",
     baseCost: 13_000_000_000_000_000_000_000_000,
     costMultiplier: 1.25,
@@ -299,7 +279,6 @@ const europeBusinesses: BusinessDefinition[] = [
   {
     id: "ikea-meatball",
     name: "Ikea Meatball",
-    shortName: "Meatball",
     caption: "Flat-pack dining economics with cafeteria-scale throughput.",
     baseCost: 5,
     costMultiplier: 1.05,
@@ -312,7 +291,6 @@ const europeBusinesses: BusinessDefinition[] = [
   {
     id: "gdpr-compliance",
     name: "GDPR Compliance",
-    shortName: "GDPR",
     caption: "Consent banners, audit trails, and billable paperwork.",
     baseCost: 105,
     costMultiplier: 1.21,
@@ -325,7 +303,6 @@ const europeBusinesses: BusinessDefinition[] = [
   {
     id: "parental-leave",
     name: "Parental Leave",
-    shortName: "Leave",
     caption: "Time off, strong benefits, and productivity that still ships.",
     baseCost: 2_929,
     costMultiplier: 1.07,
@@ -338,7 +315,6 @@ const europeBusinesses: BusinessDefinition[] = [
   {
     id: "lovable-credits",
     name: "Lovable Credits",
-    shortName: "Lovable",
     caption: "Prompt-to-product tokens for the app you built at lunch.",
     baseCost: 42_525,
     costMultiplier: 1.19,
@@ -351,7 +327,6 @@ const europeBusinesses: BusinessDefinition[] = [
   {
     id: "berghain-club",
     name: "Berghain Club",
-    shortName: "Berghain",
     caption: "Scarce entry, loud rooms, and impeccable pricing power.",
     baseCost: 493_025,
     costMultiplier: 1.09,
@@ -364,7 +339,6 @@ const europeBusinesses: BusinessDefinition[] = [
   {
     id: "elevenlabs-dj",
     name: "ElevenLabs DJ",
-    shortName: "11Labs DJ",
     caption: "Synthetic voices over a four-on-the-floor revenue loop.",
     baseCost: 18_753_525,
     costMultiplier: 1.15,
@@ -377,7 +351,6 @@ const europeBusinesses: BusinessDefinition[] = [
   {
     id: "tethered-bottle-cap",
     name: "Tethered Bottle Cap",
-    shortName: "Bottle Cap",
     caption: "A tiny regulation with continent-scale manufacturing impact.",
     baseCost: 393_824_025,
     costMultiplier: 1.13,
@@ -390,7 +363,6 @@ const europeBusinesses: BusinessDefinition[] = [
   {
     id: "public-transport",
     name: "Public Transport",
-    shortName: "Transport",
     caption: "Trains, trams, and monthly passes at civic scale.",
     baseCost: 8_270_304_525,
     costMultiplier: 1.17,
@@ -403,7 +375,6 @@ const europeBusinesses: BusinessDefinition[] = [
   {
     id: "renewable-energy",
     name: "Renewable Energy",
-    shortName: "Renewables",
     caption: "Wind, solar, and grid balancing with subsidized upside.",
     baseCost: 173_676_395_025,
     costMultiplier: 1.11,
@@ -416,7 +387,6 @@ const europeBusinesses: BusinessDefinition[] = [
   {
     id: "cern",
     name: "CERN",
-    shortName: "CERN",
     caption: "Particle physics, big tunnels, and grant-sized revenue.",
     baseCost: 1_000_000_000_000,
     costMultiplier: 1.5,
@@ -431,7 +401,7 @@ const europeBusinesses: BusinessDefinition[] = [
 const formatUpgradeNumber = (value: number) => Number(value.toFixed(8)).toString();
 
 const getTargetName = (businesses: BusinessDefinition[], target: UpgradeTarget) =>
-  target === "all" ? "All businesses" : businesses.find((business) => business.id === target)?.shortName ?? target;
+  target === "all" ? "All businesses" : businesses.find((business) => business.id === target)?.name ?? target;
 
 const getUpgradeDescription = (
   businesses: BusinessDefinition[],
@@ -481,7 +451,7 @@ const createBusinessUnlocks = (businesses: BusinessDefinition[]): UnlockDefiniti
   businesses.flatMap((business) =>
     businessUnlockGoals.map((unlock) => ({
       id: `${business.id}-${unlock.goal}`,
-      name: `${business.shortName}: ${unlock.label}`,
+      name: `${business.name}: ${unlock.label}`,
       goal: unlock.goal,
       target: business.id,
       kind: unlock.kind,
@@ -498,7 +468,7 @@ const createSiliconValleyBusinessUnlocks = (
     if (!rows) {
       return businessUnlockGoals.map((unlock) => ({
         id: `${business.id}-${unlock.goal}`,
-        name: `${business.shortName}: ${unlock.label}`,
+        name: `${business.name}: ${unlock.label}`,
         goal: unlock.goal,
         target: business.id,
         kind: unlock.kind,
@@ -508,7 +478,7 @@ const createSiliconValleyBusinessUnlocks = (
 
     return rows.map(([name, goal, target, kind, multiplier, reward]) => ({
       id: `${business.id}-${goal}-${slugify(name)}`,
-      name: `${business.shortName}: ${name}`,
+      name: `${business.name}: ${name}`,
       goal,
       triggerTarget: target === business.id ? undefined : business.id,
       target,
@@ -536,7 +506,7 @@ const createChinaBusinessUnlocks = (businesses: BusinessDefinition[]): UnlockDef
     if (!rows) {
       return businessUnlockGoals.map((unlock) => ({
         id: `${business.id}-${unlock.goal}`,
-        name: `${business.shortName}: ${unlock.label}`,
+        name: `${business.name}: ${unlock.label}`,
         goal: unlock.goal,
         target: business.id,
         kind: unlock.kind,
@@ -546,7 +516,7 @@ const createChinaBusinessUnlocks = (businesses: BusinessDefinition[]): UnlockDef
 
     return rows.map(([name, goal, kind, multiplier]) => ({
       id: `${business.id}-${goal}-${slugify(name)}`,
-      name: `${business.shortName}: ${name}`,
+      name: `${business.name}: ${name}`,
       goal,
       target: business.id,
       kind,
@@ -574,7 +544,7 @@ const createEuropeBusinessUnlocks = (
     if (!rows) {
       return businessUnlockGoals.map((unlock) => ({
         id: `${business.id}-${unlock.goal}`,
-        name: `${business.shortName}: ${unlock.label}`,
+        name: `${business.name}: ${unlock.label}`,
         goal: unlock.goal,
         target: business.id,
         kind: unlock.kind,
@@ -584,7 +554,7 @@ const createEuropeBusinessUnlocks = (
 
     return rows.map(([name, goal, target, kind, multiplier]) => ({
       id: `${business.id}-${goal}-${slugify(name)}`,
-      name: `${business.shortName}: ${name}`,
+      name: `${business.name}: ${name}`,
       goal,
       triggerTarget: target === business.id ? undefined : business.id,
       target,
@@ -692,7 +662,6 @@ export const achievements: AchievementDefinition[] = [
 const buildWorld = ({
   id,
   name,
-  shortName,
   description,
   currencyName,
   currencySymbol,
@@ -706,7 +675,6 @@ const buildWorld = ({
 }: {
   id: WorldId;
   name: string;
-  shortName: string;
   description: string;
   currencyName: string;
   currencySymbol: string;
@@ -720,7 +688,6 @@ const buildWorld = ({
 }): WorldDefinition => ({
   id,
   name,
-  shortName,
   description,
   currencyName,
   currencySymbol,
@@ -737,7 +704,6 @@ const buildWorld = ({
 export const siliconValleyWorld = buildWorld({
   id: "silicon-valley",
   name: "Silicon Valley",
-  shortName: "GPU",
   description: "The original San Francisco compute market.",
   currencyName: "Dollars",
   currencySymbol: "$",
@@ -753,7 +719,6 @@ export const siliconValleyWorld = buildWorld({
 export const chinaWorld = buildWorld({
   id: "china",
   name: "China",
-  shortName: "China",
   description: "A yuan-denominated market with China-style pacing.",
   currencyName: "Yuan",
   currencySymbol: "¥",
@@ -769,7 +734,6 @@ export const chinaWorld = buildWorld({
 export const europeWorld = buildWorld({
   id: "europe",
   name: "Europe",
-  shortName: "Europe",
   description: "A euro-denominated market with Europe-style pacing.",
   currencyName: "Euros",
   currencySymbol: "€",
