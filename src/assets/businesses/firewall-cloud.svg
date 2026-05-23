@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Firewall Cloud">
-  <g fill="none" stroke="#25211d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8">
-    <path fill="#f1eee5" d="M54 150c-18 0-32-13-32-30s13-30 30-32c9-25 31-41 59-41 29 0 52 18 60 45h7c31 0 56 22 56 50s-23 48-52 48H54z"/>
-    <path fill="#d86bd8" d="M75 111h106v80H75z"/>
-    <path fill="#f4c542" d="M75 111h35v28H75zM146 111h35v28h-35zM110 139h36v28h-36zM75 167h35v24H75zM146 167h35v24h-35z"/>
-    <path d="M75 111h106M75 139h106M75 167h106M110 111v80M146 111v80" stroke="#6b2b71" stroke-width="5"/>
-    <path d="M62 210h132l22 24H40z" fill="#5e6567"/>
-  </g>
-</svg>

@@ -30,6 +30,39 @@ const initialBusinessState = (): BusinessState => ({
 const primaryWorldId = "silicon-valley";
 const legacyPrimaryWorldId = String.fromCharCode(101, 97, 114, 116, 104);
 const legacyMineralBusinessId = ["rare", legacyPrimaryWorldId, "mine"].join("-");
+const legacyBusinessIdMap: Record<string, BusinessId> = {
+  "single-gpu-rig": "bitcoin-miner",
+  "render-rack": "yc",
+  "inference-cluster": "waymo",
+  "training-pod": "stanford-dropout",
+  "colocation-hall": "h100-gpu-cluster",
+  "asic-farm": "cursor-tab",
+  "cloud-region": "polymarket",
+  "hyperscale-campus": "chatgpt-3-5",
+  "ai-supercomputer": "nvidia",
+  "orbital-data-center": "agi",
+  [legacyMineralBusinessId]: "pandabuy-agent",
+  "strategic-mineral-mine": "pandabuy-agent",
+  "e-commerce-marketplace": "shein-factory",
+  "ev-plant": "wechat",
+  "drone-factory": "drone-swarm",
+  "firewall-cloud": "tiktok-algo",
+  "livestream-agency": "huawei-phone",
+  "ai-tutor-app": "kimi",
+  "smartphone-campus": "robot-dog",
+  "semiconductor-foundry": "amd-chip",
+  "high-speed-rail-grid": "deepseek",
+  "dutch-lithography-lab": "ikea-meatball",
+  "alpine-gravity-booth": "gdpr-compliance",
+  "nordic-payroll-clone": "parental-leave",
+  "continental-rail-express": "lovable-credits",
+  "riviera-oxygen-bar": "berghain-club",
+  "north-sea-helium-farm": "elevenlabs-dj",
+  "alpine-cheese-mine": "tethered-bottle-cap",
+  "europa-park-resort": "public-transport",
+  "transylvanian-data-colony": "renewable-energy",
+  "cern-giant-laser": "cern",
+};
 
 const isWorldId = (value: unknown): value is WorldId =>
   typeof value === "string" && value in worlds;
@@ -78,13 +111,15 @@ const hydrateWorldState = (
   const savedBusinesses = { ...saved.businesses };
   const savedManagers = { ...saved.managers };
 
-  if (savedBusinesses[legacyMineralBusinessId] && !savedBusinesses["strategic-mineral-mine"]) {
-    savedBusinesses["strategic-mineral-mine"] = savedBusinesses[legacyMineralBusinessId];
-  }
+  Object.entries(legacyBusinessIdMap).forEach(([legacyId, currentId]) => {
+    if (savedBusinesses[legacyId] && !savedBusinesses[currentId]) {
+      savedBusinesses[currentId] = savedBusinesses[legacyId];
+    }
 
-  if (savedManagers[legacyMineralBusinessId] && !savedManagers["strategic-mineral-mine"]) {
-    savedManagers["strategic-mineral-mine"] = savedManagers[legacyMineralBusinessId];
-  }
+    if (savedManagers[legacyId] && !savedManagers[currentId]) {
+      savedManagers[currentId] = savedManagers[legacyId];
+    }
+  });
 
   const hydrated: WorldState = {
     ...initial,

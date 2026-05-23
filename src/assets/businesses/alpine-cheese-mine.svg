@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Alpine Cheese Mine">
-  <circle cx="48" cy="48" r="43" fill="#ece7d7" stroke="#171717" stroke-width="5"/>
-  <path fill="#777" stroke="#171717" stroke-width="4" d="M20 68 37 32h22l17 36z"/>
-  <path fill="#f0c34f" stroke="#171717" stroke-width="4" d="M31 55h36v18H31z"/>
-  <circle cx="42" cy="63" r="4" fill="#9b6a25"/>
-  <circle cx="58" cy="66" r="3" fill="#9b6a25"/>
-  <path stroke="#171717" stroke-width="4" d="M25 78h46M39 32l-7 36M57 32l7 36"/>
-</svg>

@@ -25,37 +25,8 @@ import {
 import chinaTravelImage from '../china.png'
 import siliconValleyTravelImage from '../san-francisco.png'
 import europeTravelImage from '../europe.png'
-import aiTutorAppImage from './assets/businesses/ai-tutor-app.svg'
-import aiSupercomputerImage from './assets/businesses/ai-supercomputer.svg'
-import alpineCheeseMineImage from './assets/businesses/alpine-cheese-mine.svg'
-import alpineGravityBoothImage from './assets/businesses/alpine-gravity-booth.svg'
-import asicFarmImage from './assets/businesses/asic-farm.svg'
-import cernGiantLaserImage from './assets/businesses/cern-giant-laser.svg'
-import cloudRegionImage from './assets/businesses/cloud-region.svg'
-import colocationHallImage from './assets/businesses/colocation-hall.svg'
-import continentalRailExpressImage from './assets/businesses/continental-rail-express.svg'
-import droneFactoryImage from './assets/businesses/drone-factory.svg'
-import dutchLithographyLabImage from './assets/businesses/dutch-lithography-lab.svg'
-import ecommerceMarketplaceImage from './assets/businesses/e-commerce-marketplace.svg'
-import europaParkResortImage from './assets/businesses/europa-park-resort.svg'
-import evPlantImage from './assets/businesses/ev-plant.svg'
-import firewallCloudImage from './assets/businesses/firewall-cloud.svg'
-import highSpeedRailGridImage from './assets/businesses/high-speed-rail-grid.svg'
-import hyperscaleCampusImage from './assets/businesses/hyperscale-campus.svg'
-import inferenceClusterImage from './assets/businesses/inference-cluster.svg'
-import livestreamAgencyImage from './assets/businesses/livestream-agency.svg'
-import nordicPayrollCloneImage from './assets/businesses/nordic-payroll-clone.svg'
-import northSeaHeliumFarmImage from './assets/businesses/north-sea-helium-farm.svg'
-import orbitalDataCenterImage from './assets/businesses/orbital-data-center.svg'
+import { businessIconImages } from './assets/businessIcons'
 import quickUpgradeImage from './assets/businesses/quick-upgrade.png'
-import strategicMineralMineImage from './assets/businesses/strategic-mineral-mine.svg'
-import renderRackImage from './assets/businesses/render-rack.svg'
-import rivieraOxygenBarImage from './assets/businesses/riviera-oxygen-bar.svg'
-import semiconductorFoundryImage from './assets/businesses/semiconductor-foundry.svg'
-import singleGpuRigImage from './assets/businesses/single-gpu-rig.svg'
-import smartphoneCampusImage from './assets/businesses/smartphone-campus.svg'
-import trainingPodImage from './assets/businesses/training-pod.svg'
-import transylvanianDataColonyImage from './assets/businesses/transylvanian-data-colony.svg'
 import { worldList } from './game/economy'
 import {
   canUnlockWorld,
@@ -93,38 +64,7 @@ import { useGame } from './game/useGame'
 
 type Panel = 'managers' | 'upgrades' | 'angels' | 'unlocks' | 'travel' | 'stats'
 
-const businessImages: Record<string, string> = {
-  'single-gpu-rig': singleGpuRigImage,
-  'render-rack': renderRackImage,
-  'inference-cluster': inferenceClusterImage,
-  'training-pod': trainingPodImage,
-  'colocation-hall': colocationHallImage,
-  'asic-farm': asicFarmImage,
-  'cloud-region': cloudRegionImage,
-  'hyperscale-campus': hyperscaleCampusImage,
-  'ai-supercomputer': aiSupercomputerImage,
-  'orbital-data-center': orbitalDataCenterImage,
-  'strategic-mineral-mine': strategicMineralMineImage,
-  'e-commerce-marketplace': ecommerceMarketplaceImage,
-  'ev-plant': evPlantImage,
-  'drone-factory': droneFactoryImage,
-  'firewall-cloud': firewallCloudImage,
-  'livestream-agency': livestreamAgencyImage,
-  'ai-tutor-app': aiTutorAppImage,
-  'smartphone-campus': smartphoneCampusImage,
-  'semiconductor-foundry': semiconductorFoundryImage,
-  'high-speed-rail-grid': highSpeedRailGridImage,
-  'dutch-lithography-lab': dutchLithographyLabImage,
-  'alpine-gravity-booth': alpineGravityBoothImage,
-  'nordic-payroll-clone': nordicPayrollCloneImage,
-  'continental-rail-express': continentalRailExpressImage,
-  'riviera-oxygen-bar': rivieraOxygenBarImage,
-  'north-sea-helium-farm': northSeaHeliumFarmImage,
-  'alpine-cheese-mine': alpineCheeseMineImage,
-  'europa-park-resort': europaParkResortImage,
-  'transylvanian-data-colony': transylvanianDataColonyImage,
-  'cern-giant-laser': cernGiantLaserImage,
-}
+const businessImages: Record<string, string> = businessIconImages
 
 const getBusinessImage = (business: BusinessDefinition) =>
   businessImages[business.imageId ?? business.id] ?? quickUpgradeImage

@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Transylvanian Data Colony">
-  <circle cx="48" cy="48" r="43" fill="#ece7d7" stroke="#171717" stroke-width="5"/>
-  <path fill="#8958d4" stroke="#171717" stroke-width="4" d="M24 39h48v34H24z"/>
-  <path fill="#4a2f79" stroke="#171717" stroke-width="4" d="M29 39V26l8 8 8-8v13zm22 0V26l8 8 8-8v13z"/>
-  <path fill="#b8f1ec" d="M33 48h8v8h-8zm14 0h8v8h-8zm14 0h8v8h-8z"/>
-  <path stroke="#171717" stroke-width="4" d="M20 78h56"/>
-</svg>
