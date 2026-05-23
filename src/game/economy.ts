@@ -11,8 +11,17 @@ import type {
   WorldUnlockCost,
 } from "./types";
 import { siliconValleyAngelUpgradeRows, siliconValleyCashUpgradeRows } from "./siliconValleyData";
+import {
+  siliconValleyAllBusinessUnlockRows,
+  siliconValleyBusinessUnlockRowsById,
+} from "./siliconValleyUnlockData";
 import { chinaAngelUpgradeRows, chinaCashUpgradeRows } from "./chinaData";
+import { chinaAllBusinessUnlockRows, chinaBusinessUnlockRowsById } from "./chinaUnlockData";
 import { europeAngelUpgradeRows, europeCashUpgradeRows } from "./europeData";
+import {
+  europeAllBusinessUnlockRows,
+  europeBusinessUnlockRowsById,
+} from "./europeUnlockData";
 
 type UpgradeRow = readonly [string, UpgradeTarget, number, UpgradeDefinition["kind"], number];
 
@@ -24,7 +33,7 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "bitcoin-miner",
     name: "Bitcoin Miner",
-    shortName: "Bitcoin",
+    shortName: "Bitcoin Miner",
     caption: "Hash rates, cheap power, and a wallet full of upside.",
     baseCost: 4,
     costMultiplier: 1.07,
@@ -89,7 +98,7 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "cursor-tab",
     name: "Cursor Tab",
-    shortName: "Cursor",
+    shortName: "Cursor Tab",
     caption: "Autocomplete turns keystrokes into revenue.",
     baseCost: 1_244_160,
     costMultiplier: 1.11,
@@ -157,7 +166,7 @@ const chinaBusinesses: BusinessDefinition[] = [
   {
     id: "pandabuy-agent",
     name: "PandaBuy Agent",
-    shortName: "PandaBuy",
+    shortName: "PandaBuy Agent",
     caption: "Source the haul, manage the warehouse, collect the spread.",
     baseCost: 0.05,
     costMultiplier: 1.01,
@@ -170,7 +179,7 @@ const chinaBusinesses: BusinessDefinition[] = [
   {
     id: "shein-factory",
     name: "Shein Factory",
-    shortName: "Shein",
+    shortName: "Shein Factory",
     caption: "Fast fashion, faster iteration, endless new SKUs.",
     baseCost: 1,
     costMultiplier: 1.03,
@@ -480,112 +489,119 @@ const createBusinessUnlocks = (businesses: BusinessDefinition[]): UnlockDefiniti
     })),
   );
 
-const createEuropeStyleBusinessUnlocks = (businesses: BusinessDefinition[]): UnlockDefinition[] => {
-  const byIndex: Array<Array<[string, number, number]>> = [
-    [
-      ["Start A Trend", 10, 3.5],
-      ["One Small Step", 20, 4],
-      ["Low-G Catwalks", 40, 4.5],
-      ["Bounce-Friendly", 80, 5],
-      ["Hipster Approved", 160, 5.5],
-      ["Made For Walking", 320, 6],
-      ["Walking On Sunshine", 640, 6.5],
-      ["Miami Over Market", 1280, 7],
-      ["Shoe-t To Thrill", 2560, 7.5],
-      ["Market Walker", 5120, 999_999_999],
-      ["Fly Me To The Boots", 10000, 3.5],
-    ],
-    Array.from({ length: 27 }, (_, index) => [
-      `Gravity Tier ${index + 1}`,
-      [30, 60, 90, 120, 160, 200, 240, 280, 330, 380, 430, 480, 540, 600, 660, 720, 790, 860, 940, 1020, 1110, 1200, 1400, 1600, 1800, 2000, 2400][index],
-      index === 25 ? 999_999_999 : index < 15 ? 1.5 + index * 0.25 : 5.5 + (index - 15) * 0.25,
-    ]),
-    [
-      ...[10, 20, 40, 60, 80, 100, 120, 240, 480, 600, 1080, 1320, 1800, 2160, 2520, 2880].map(
-        (goal, index) => [`Clone Tier ${index + 1}`, goal, 3] as [string, number, number],
-      ),
-      ["Fresh Shipment of Sam", 360, 3],
-      ["What's Mine Is Mine", 840, 3],
-      ["1 Eighth Mini-Yous", 1560, 3],
-      ["The Clone Skirmishes", 3240, 33],
-      ["Sheep Attack", 3600, 33],
-      ["Don't Step On Mitosis", 4000, 33],
-      ["Repeat Business", 4400, 33],
-      ["Double Your Fun", 4800, 33],
-      ["Mixed Doubles", 5200, 3333],
-      ["Two's Company", 5600, 3333],
-      ["Three's A Crowd", 6000, 3333],
-      ["So Is Four", 6666, 3333],
-    ],
-    [25, 50, 75, 100, 150, 200, 250, 300, 350, 400, 450, 500, 700, 900, 1100, 1300, 1500, 1700, 1900, 2100, 2300, 2500].map(
-      (goal, index) => [`Express Tier ${index + 1}`, goal, index < 4 ? 3 : index < 11 ? 6 : (index - 10) * 12] as [string, number, number],
-    ),
-    [
-      ["Everyone Knows Your Name", 20, 12],
-      ["Always Glad You Came", 50, 12],
-      ["Witty Comebacks", 90, 12],
-      ["Happy Hour", 180, 22],
-      ["Shiny Club Shine", 360, 333],
-      ["Charge By The Breath", 720, 4444],
-      ["Free Nitrogen", 1440, 55555],
-      ["The Bubbly", 2880, 666666],
-      ["No Smoking Please", 5720, 7777777],
-    ],
-    [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000].map(
-      (goal, index) => [`Helium Tier ${index + 1}`, goal, index < 16 ? 7 : 777] as [string, number, number],
-    ),
-    [8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096].map((goal, index) => [
-      `Cheese Tier ${index + 1}`,
-      goal,
-      index < 8 ? 5 : 88_888_888,
-    ]),
-    [80, 160, 240, 320, 480, 640, 800, 960, 1200, 1440, 1680, 1920, 2160, 2300, 2540, 2780, 3000].map(
-      (goal, index) => [`Park Tier ${index + 1}`, goal, index < 9 ? 8 : 888] as [string, number, number],
-    ),
-    [25, 50, 75, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000, 2300, 2600, 2900, 3200, 3500, 3800, 4100].map(
-      (goal, index) => [`Colony Tier ${index + 1}`, goal, index === 26 ? 9_876_543_210 : index >= 24 ? 33 : 3] as [string, number, number],
-    ),
-    [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1111].map((goal, index) => [
-      `Laser Tier ${index + 1}`,
-      goal,
-      75,
-    ]),
-  ];
+const createSiliconValleyBusinessUnlocks = (
+  businesses: BusinessDefinition[],
+): UnlockDefinition[] =>
+  businesses.flatMap<UnlockDefinition>((business) => {
+    const rows = siliconValleyBusinessUnlockRowsById[business.id];
 
-  return businesses.flatMap((business, index) =>
-    byIndex[index].map(([name, goal, multiplier]) => ({
-      id: `${business.id}-${goal}`,
+    if (!rows) {
+      return businessUnlockGoals.map((unlock) => ({
+        id: `${business.id}-${unlock.goal}`,
+        name: `${business.shortName}: ${unlock.label}`,
+        goal: unlock.goal,
+        target: business.id,
+        kind: unlock.kind,
+        multiplier: unlock.multiplier,
+      }));
+    }
+
+    return rows.map(([name, goal, target, kind, multiplier, reward]) => ({
+      id: `${business.id}-${goal}-${slugify(name)}`,
+      name: `${business.shortName}: ${name}`,
+      goal,
+      triggerTarget: target === business.id ? undefined : business.id,
+      target,
+      kind,
+      multiplier,
+      reward,
+    }));
+  });
+
+const siliconValleyAllBusinessUnlocks: UnlockDefinition[] =
+  siliconValleyAllBusinessUnlockRows.map(([name, goal, target, kind, multiplier, reward]) => ({
+    id: `all-${goal}-${slugify(name)}`,
+    name,
+    goal,
+    target,
+    kind,
+    multiplier,
+    reward,
+  }));
+
+const createChinaBusinessUnlocks = (businesses: BusinessDefinition[]): UnlockDefinition[] =>
+  businesses.flatMap<UnlockDefinition>((business) => {
+    const rows = chinaBusinessUnlockRowsById[business.id];
+
+    if (!rows) {
+      return businessUnlockGoals.map((unlock) => ({
+        id: `${business.id}-${unlock.goal}`,
+        name: `${business.shortName}: ${unlock.label}`,
+        goal: unlock.goal,
+        target: business.id,
+        kind: unlock.kind,
+        multiplier: unlock.multiplier,
+      }));
+    }
+
+    return rows.map(([name, goal, kind, multiplier]) => ({
+      id: `${business.id}-${goal}-${slugify(name)}`,
       name: `${business.shortName}: ${name}`,
       goal,
       target: business.id,
-      kind: "profit",
+      kind,
       multiplier,
-    })),
-  );
-};
+    }));
+  });
 
-const europeStyleAllBusinessUnlocks: UnlockDefinition[] = [
-  { id: "all-1", name: "Finally", goal: 1, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-5", name: "Now You're Cooking With N204", goal: 5, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-25", name: "Special Relativity", goal: 25, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-50", name: "Just A Phase", goal: 50, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-75", name: "Dark Side Of The Market", goal: 75, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-100", name: "Miami Over Market", goal: 100, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-150", name: "Luny Luna", goal: 150, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-200", name: "Apollo-getic", goal: 200, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-250", name: "Case Of The Mondays", goal: 250, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-300", name: "The Euro-arch", goal: 300, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-350", name: "Shiny Monocle", goal: 350, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-400", name: "Monotheism", goal: 400, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-450", name: "Gany-mead", goal: 450, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-500", name: "Titan-ic Achievement", goal: 500, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-600", name: "Callisto-riffic", goal: 600, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-700", name: "I/O", goal: 700, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-800", name: "Europa Opa", goal: 800, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-900", name: "Tri-tons Of Fun", goal: 900, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-1000", name: "Charon Is Caring", goal: 1_000, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-1111", name: "Continental Achievement", goal: 1_111, target: "all", kind: "speed", multiplier: 2 },
-];
+const chinaAllBusinessUnlocks: UnlockDefinition[] = chinaAllBusinessUnlockRows.map(
+  ([name, goal, kind, multiplier]) => ({
+    id: `all-${goal}-${slugify(name)}`,
+    name,
+    goal,
+    target: "all",
+    kind,
+    multiplier,
+  }),
+);
+
+const createEuropeBusinessUnlocks = (
+  businesses: BusinessDefinition[],
+): UnlockDefinition[] =>
+  businesses.flatMap<UnlockDefinition>((business) => {
+    const rows = europeBusinessUnlockRowsById[business.id];
+
+    if (!rows) {
+      return businessUnlockGoals.map((unlock) => ({
+        id: `${business.id}-${unlock.goal}`,
+        name: `${business.shortName}: ${unlock.label}`,
+        goal: unlock.goal,
+        target: business.id,
+        kind: unlock.kind,
+        multiplier: unlock.multiplier,
+      }));
+    }
+
+    return rows.map(([name, goal, target, kind, multiplier]) => ({
+      id: `${business.id}-${goal}-${slugify(name)}`,
+      name: `${business.shortName}: ${name}`,
+      goal,
+      triggerTarget: target === business.id ? undefined : business.id,
+      target,
+      kind,
+      multiplier,
+    }));
+  });
+
+const europeAllBusinessUnlocks: UnlockDefinition[] =
+  europeAllBusinessUnlockRows.map(([name, goal, target, kind, multiplier]) => ({
+    id: `all-${goal}-${slugify(name)}`,
+    name,
+    goal,
+    target,
+    kind,
+    multiplier,
+  }));
 
 const businessUnlockGoals = [
   { goal: 25, kind: "speed", multiplier: 2, label: "Thermal Paste Applied" },
@@ -730,6 +746,8 @@ export const siliconValleyWorld = buildWorld({
   businesses: siliconValleyBusinesses,
   cashUpgradeRows: siliconValleyCashUpgradeRows,
   angelUpgradeRows: siliconValleyAngelUpgradeRows,
+  businessUnlocks: createSiliconValleyBusinessUnlocks(siliconValleyBusinesses),
+  allBusinessUnlocks: siliconValleyAllBusinessUnlocks,
 });
 
 export const chinaWorld = buildWorld({
@@ -744,6 +762,8 @@ export const chinaWorld = buildWorld({
   businesses: chinaBusinesses,
   cashUpgradeRows: chinaCashUpgradeRows,
   angelUpgradeRows: chinaAngelUpgradeRows,
+  businessUnlocks: createChinaBusinessUnlocks(chinaBusinesses),
+  allBusinessUnlocks: chinaAllBusinessUnlocks,
 });
 
 export const europeWorld = buildWorld({
@@ -759,8 +779,8 @@ export const europeWorld = buildWorld({
   businesses: europeBusinesses,
   cashUpgradeRows: europeCashUpgradeRows,
   angelUpgradeRows: europeAngelUpgradeRows,
-  businessUnlocks: createEuropeStyleBusinessUnlocks(europeBusinesses),
-  allBusinessUnlocks: europeStyleAllBusinessUnlocks,
+  businessUnlocks: createEuropeBusinessUnlocks(europeBusinesses),
+  allBusinessUnlocks: europeAllBusinessUnlocks,
 });
 
 export const worlds = {

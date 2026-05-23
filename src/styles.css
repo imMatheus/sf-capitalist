@@ -785,11 +785,10 @@ button:disabled {
 .revenue-fill {
   position: absolute;
   top: 3px;
+  right: 3px;
   bottom: 3px;
   left: 3px;
   z-index: 1;
-  max-width: calc(100% - 6px);
-  min-width: 0;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 15px 50%);
   background:
     linear-gradient(
@@ -799,14 +798,13 @@ button:disabled {
       rgba(255, 255, 255, 0.14) 59%
     ),
     linear-gradient(#9dde61, #79bf3c);
-  transition: width 100ms linear;
-}
-
-.revenue-fill.snap {
+  transform: scaleX(0);
+  transform-origin: left center;
   transition: none;
+  will-change: transform;
 }
 
-.revenue-arrow.fast-cycle .revenue-fill {
+.revenue-fill.fast-progress {
   background:
     repeating-linear-gradient(
       120deg,
@@ -820,6 +818,7 @@ button:disabled {
     58px 100%,
     100% 100%;
   transition: none;
+  transform: scaleX(1);
   animation: revenue-stripes 650ms linear infinite;
 }
 
@@ -1308,6 +1307,50 @@ button:disabled {
   text-shadow: 0 1px 0 #fff;
 }
 
+.manager-cash-balance {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: min(620px, 100%);
+  margin: 0 auto 18px;
+  border: 5px solid color-mix(in srgb, var(--modal-accent) 70%, #7c4b20);
+  border-radius: 12px;
+  background: linear-gradient(#fffdf7, #eadbc9);
+  padding: 12px 16px;
+  color: #51483f;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.7),
+    0 4px 0 rgba(0, 0, 0, 0.12);
+  text-shadow: 0 1px 0 #fff;
+}
+
+.manager-cash-balance svg {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(#d8f8b8, #92d653);
+  padding: 6px;
+  color: #2f4c21;
+}
+
+.manager-cash-balance span {
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.manager-cash-balance strong {
+  justify-self: end;
+  overflow: hidden;
+  max-width: 100%;
+  color: #3f3a36;
+  font-size: clamp(24px, 4vw, 34px);
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .modal-section-label {
   margin: 8px 0 12px;
   color: #615c56;
@@ -1419,9 +1462,13 @@ button:disabled {
   padding: 8px 8px 0;
 }
 
+.unlock-detail-shell,
 .unlock-gallery-shell {
   position: relative;
-  padding-bottom: 138px;
+}
+
+.unlock-detail-shell.has-detail {
+  padding-bottom: 150px;
 }
 
 .unlock-card {
@@ -1442,12 +1489,19 @@ button:disabled {
 }
 
 button.unlock-card {
+  appearance: none;
+  width: 100%;
   font: inherit;
 }
 
 .unlock-card.complete {
   border-color: #9ed36d;
   background: #f4fff0;
+}
+
+.unlock-card.active:not(.gallery) {
+  border-color: #8fbd56;
+  transform: translateY(-2px);
 }
 
 .unlock-card.gallery {
@@ -1582,38 +1636,45 @@ button.unlock-card {
 }
 
 .unlock-gallery-detail {
-  position: sticky;
-  bottom: 10px;
-  z-index: 8;
-  display: grid;
-  width: min(820px, calc(100% - 12px));
-  min-height: 126px;
+  position: fixed;
+  right: max(24px, calc((100vw - 920px) / 2 + 38px));
+  bottom: 38px;
+  left: max(24px, calc((100vw - 920px) / 2 + 38px));
+  z-index: 120;
+  display: none;
+  width: auto;
+  min-height: 106px;
   align-content: center;
   justify-items: center;
-  margin: 20px auto 0;
-  transform: translateY(calc(100% + 28px));
+  margin: 0;
   border: 7px solid #ffde79;
   border-radius: 18px;
   background: #fffefa;
   color: #3f3a36;
-  padding: 18px 58px 22px;
-  opacity: 0;
-  pointer-events: none;
+  padding: 16px 58px 18px;
   text-align: center;
   text-shadow: 0 1px 0 #fff;
-  transition:
-    transform 180ms ease,
-    opacity 180ms ease;
   box-shadow:
     inset 0 0 0 4px #fff3bf,
-    0 -28px 48px rgba(0, 0, 0, 0.24),
+    0 12px 28px rgba(0, 0, 0, 0.2),
     0 7px 0 rgba(0, 0, 0, 0.18);
 }
 
 .unlock-gallery-detail.visible {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
+  display: grid;
+  animation: unlock-detail-pop 140ms ease-out;
+}
+
+@keyframes unlock-detail-pop {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .unlock-gallery-detail button {
@@ -2545,7 +2606,10 @@ button.unlock-card {
   }
 
   .unlock-gallery-detail {
-    width: calc(100% - 8px);
+    right: 14px;
+    bottom: 24px;
+    left: 14px;
+    width: auto;
     min-height: 112px;
     padding: 16px 42px 18px;
   }
@@ -2663,16 +2727,27 @@ button.unlock-card {
     font-size: 22px;
   }
 
+  .manager-cash-balance {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 6px 10px;
+    padding: 10px 12px;
+  }
+
+  .manager-cash-balance strong {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    font-size: 24px;
+    text-align: center;
+  }
+
   .unlock-card-grid.gallery {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .unlock-gallery-shell {
-    padding-bottom: 128px;
-  }
-
   .unlock-gallery-detail {
-    bottom: 6px;
+    right: 10px;
+    bottom: 18px;
+    left: 10px;
     border-width: 5px;
     border-radius: 15px;
     padding: 14px 34px 16px;

@@ -247,11 +247,13 @@ const appliesToBusiness = (upgrade: UpgradeDefinition | UnlockDefinition, busine
 
 const getActiveUnlocks = (state: WorldState, world: WorldDefinition) => {
   const activeBusinessUnlocks = world.businessUnlocks.filter((unlock) => {
-    if (unlock.target === "all") {
+    const triggerTarget = unlock.triggerTarget ?? unlock.target;
+
+    if (triggerTarget === "all") {
       return false;
     }
 
-    return state.businesses[unlock.target].owned >= unlock.goal;
+    return state.businesses[triggerTarget].owned >= unlock.goal;
   });
 
   const activeAllUnlocks = world.allBusinessUnlocks.filter((unlock) =>
@@ -343,7 +345,7 @@ export const getNextUnlock = (
   const owned = state.businesses[businessId].owned;
 
   return world.businessUnlocks
-    .filter((unlock) => unlock.target === businessId && unlock.goal > owned)
+    .filter((unlock) => (unlock.triggerTarget ?? unlock.target) === businessId && unlock.goal > owned)
     .sort((a, b) => a.goal - b.goal)[0];
 };
 

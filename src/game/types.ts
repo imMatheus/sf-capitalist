@@ -45,9 +45,11 @@ export interface UnlockDefinition {
   id: string;
   name: string;
   goal: number;
+  triggerTarget?: UpgradeTarget;
   target: UpgradeTarget;
-  kind: Extract<ModifierKind, "profit" | "speed">;
+  kind: Extract<ModifierKind, "profit" | "speed"> | "reward";
   multiplier: number;
+  reward?: string;
 }
 
 export interface AchievementDefinition {

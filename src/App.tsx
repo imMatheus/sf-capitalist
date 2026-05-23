@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import {
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -133,6 +134,7 @@ const panelMeta: Record<
 }
 
 const buyModes: BuyMode[] = [1, 10, 100, 'next', 'max']
+const fastProgressThresholdSeconds = 0.1
 
 const travelImages: Record<WorldId, string> = {
   'silicon-valley': siliconValleyTravelImage,
@@ -248,14 +250,17 @@ const getUnlockCurrent = (
   state: WorldState,
   world: WorldDefinition,
   unlock: UnlockDefinition,
-) =>
-  unlock.target === 'all'
+) => {
+  const triggerTarget = unlock.triggerTarget ?? unlock.target
+
+  return triggerTarget === 'all'
     ? Math.min(
         ...world.businesses.map(
           (business) => state.businesses[business.id].owned,
         ),
       )
-    : state.businesses[unlock.target].owned
+    : state.businesses[triggerTarget].owned
+}
 
 const isUnlockComplete = (
   state: WorldState,
@@ -269,18 +274,34 @@ const getUnlockDetailTitle = (unlock: UnlockDefinition) => {
   return label ?? unlock.name
 }
 
+const getUnlockEffectLabel = (unlock: UnlockDefinition) =>
+  unlock.kind === 'reward'
+    ? (unlock.reward ?? 'Reward')
+    : `${unlock.kind} ${formatMultiplier(unlock.multiplier)}`
+
 const getUnlockDetailText = (
   unlock: UnlockDefinition,
   world: WorldDefinition,
 ) => {
   const targetName = getUnlockTargetName(unlock, world)
+  const triggerTarget = unlock.triggerTarget ?? unlock.target
+  const triggerName =
+    triggerTarget === unlock.target || triggerTarget === 'all'
+      ? targetName
+      : (world.businesses.find((business) => business.id === triggerTarget)
+          ?.shortName ?? targetName)
+
+  if (unlock.kind === 'reward') {
+    return `${unlock.goal} ${triggerName} - ${unlock.reward ?? 'Reward'}!`
+  }
+
   const targetLabel = unlock.target === 'all' ? 'Every Business' : targetName
   const effectLabel =
     unlock.kind === 'speed'
       ? `Speed of ${targetLabel}`
       : `Profit of ${targetLabel}`
 
-  return `${unlock.goal} ${targetName} - ${effectLabel} ${formatMultiplier(unlock.multiplier)}!`
+  return `${unlock.goal} ${triggerName} - ${effectLabel} ${formatMultiplier(unlock.multiplier)}!`
 }
 
 const formatUpgradeBadge = (upgrade: UpgradeDefinition) => {
@@ -783,6 +804,110 @@ const getScaleLabel = (value: number, world: WorldDefinition) => {
 
 const getAmountLabel = (value: number) => formatCompact(value, 3).split(' ')[0]
 
+const getRevenueFillScale = (
+  progress: number,
+  duration: number,
+  elapsedSeconds: number,
+  loops: boolean,
+) => {
+  if (duration <= 0) {
+    return 0
+  }
+
+  const totalProgress = Math.max(0, progress + elapsedSeconds)
+  const visibleProgress = loops
+    ? totalProgress % duration
+    : Math.min(duration, totalProgress)
+
+  return Math.min(1, Math.max(0, visibleProgress / duration))
+}
+
+interface RevenueFillProps {
+  active: boolean
+  automated: boolean
+  duration: number
+  fastCycle: boolean
+  progress: number
+}
+
+const RevenueFill = ({
+  active,
+  automated,
+  duration,
+  fastCycle,
+  progress,
+}: RevenueFillProps) => {
+  const fillRef = useRef<HTMLSpanElement | null>(null)
+  const baselineRef = useRef({
+    duration,
+    progress,
+    updatedAt: 0,
+  })
+  const initialScale =
+    active && fastCycle
+      ? 1
+      : active
+        ? getRevenueFillScale(progress, duration, 0, automated)
+        : 0
+
+  useLayoutEffect(() => {
+    baselineRef.current = {
+      duration,
+      progress,
+      updatedAt: performance.now(),
+    }
+
+    if (fillRef.current) {
+      fillRef.current.style.transform = `scaleX(${initialScale})`
+    }
+  }, [active, automated, duration, fastCycle, initialScale, progress])
+
+  useEffect(() => {
+    const fill = fillRef.current
+
+    if (!fill) {
+      return
+    }
+
+    if (!active) {
+      fill.style.transform = 'scaleX(0)'
+      return
+    }
+
+    if (fastCycle) {
+      fill.style.transform = 'scaleX(1)'
+      return
+    }
+
+    let frameId = 0
+    const draw = (now: number) => {
+      const baseline = baselineRef.current
+      const elapsedSeconds = (now - baseline.updatedAt) / 1_000
+      const scale = getRevenueFillScale(
+        baseline.progress,
+        baseline.duration,
+        elapsedSeconds,
+        automated,
+      )
+
+      fill.style.transform = `scaleX(${scale})`
+      frameId = window.requestAnimationFrame(draw)
+    }
+
+    frameId = window.requestAnimationFrame(draw)
+
+    return () => window.cancelAnimationFrame(frameId)
+  }, [active, automated, duration, fastCycle])
+
+  return (
+    <span
+      className={`revenue-fill ${fastCycle ? 'fast-progress' : ''}`}
+      ref={fillRef}
+      style={{ transform: `scaleX(${initialScale})` }}
+    />
+  )
+}
+
 interface BusinessRowProps {
   business: BusinessDefinition
   buyMode: BuyMode
@@ -811,17 +936,12 @@ const BusinessRow = ({
       : getPurchaseCost(business, businessState.owned, 1)
   const duration = getBusinessDuration(state, world, business)
   const revenue = getBusinessRevenue(state, world, business)
-  const progressPercent = Math.min(
-    100,
-    (businessState.progress / duration) * 100,
-  )
   const automated = state.managers[business.id]
   const showProgress = businessState.running || automated
-  const fastCycle = duration < 0.1 && showProgress
-  const barPercent = fastCycle ? 100 : showProgress ? progressPercent : 0
-  const previousBarPercentRef = useRef(barPercent)
-  const shouldAnimateProgress =
-    showProgress && !fastCycle && barPercent >= previousBarPercentRef.current
+  const fastCycle = duration < fastProgressThresholdSeconds && showProgress
+  const progressSeconds = showProgress
+    ? Math.min(duration, Math.max(0, businessState.progress))
+    : 0
   const canStart =
     businessState.owned > 0 && !businessState.running && !automated
   const timeRemaining =
@@ -830,7 +950,7 @@ const BusinessRow = ({
       : duration
   const nextUnlock = getNextUnlock(state, world, business.id)
   const unlockGoals = world.businessUnlocks
-    .filter((unlock) => unlock.target === business.id)
+    .filter((unlock) => (unlock.triggerTarget ?? unlock.target) === business.id)
     .map((unlock) => unlock.goal)
   const previousUnlockGoal = nextUnlock
     ? Math.max(0, ...unlockGoals.filter((goal) => goal < nextUnlock.goal))
@@ -849,10 +969,6 @@ const BusinessRow = ({
   const revenueLabel = automated
     ? `${formatMoney(getBusinessCashPerSecond(state, world, business), world.currencySymbol)} /sec`
     : `${formatMoney(revenue, world.currencySymbol)} /run`
-
-  useEffect(() => {
-    previousBarPercentRef.current = barPercent
-  }, [barPercent])
 
   if (businessState.owned === 0) {
     const firstPurchaseCost = getPurchaseCost(business, 0, 1)
@@ -937,9 +1053,12 @@ const BusinessRow = ({
           title={canStart ? 'Start production' : business.caption}
           type="button"
         >
-          <span
-            className={`revenue-fill ${shouldAnimateProgress ? '' : 'snap'}`}
-            style={{ width: `${barPercent}%` }}
+          <RevenueFill
+            active={showProgress}
+            automated={automated}
+            duration={duration}
+            fastCycle={fastCycle}
+            progress={progressSeconds}
           />
           <span className="revenue-text">{revenueLabel}</span>
           {canStart ? (
@@ -1009,9 +1128,23 @@ const CurrencyPills = ({
   </div>
 )
 
+const ManagerCashBalance = ({
+  state,
+  world,
+}: {
+  state: WorldState
+  world: WorldDefinition
+}) => (
+  <div className="manager-cash-balance">
+    <BadgeDollarSign aria-hidden="true" />
+    <span>Cash on hand</span>
+    <strong>{formatMoney(state.cash, world.currencySymbol)}</strong>
+  </div>
+)
+
 const ManagersPanel = ({ state, world, onBuy }: ManagersPanelProps) => (
   <div className="space-y-2">
-    <CurrencyPills active="cash" state={state} world={world} />
+    <ManagerCashBalance state={state} world={world} />
     {[...world.businesses]
       .sort(
         (a, b) => Number(state.managers[a.id]) - Number(state.managers[b.id]),
@@ -1309,10 +1442,7 @@ const UnlocksPanel = ({
   world: WorldDefinition
 }) => {
   const [view, setView] = useState<'upcoming' | 'gallery'>('upcoming')
-  const [activeGalleryUnlockId, setActiveGalleryUnlockId] = useState<
-    string | null
-  >(null)
-  const galleryDetailTimerRef = useRef<number | null>(null)
+  const [activeUnlockId, setActiveUnlockId] = useState<string | null>(null)
   const nextBusinessUnlocks = world.businesses
     .map((business) => getNextUnlock(state, world, business.id))
     .filter((unlock): unlock is UnlockDefinition => Boolean(unlock))
@@ -1325,50 +1455,27 @@ const UnlocksPanel = ({
     isUnlockComplete(state, world, unlock),
   ).length
   const visibleUnlocks = view === 'upcoming' ? upcomingUnlocks : galleryUnlocks
-  const activeGalleryUnlock =
+  const activeUnlock =
     view === 'gallery'
-      ? (galleryUnlocks.find((unlock) => unlock.id === activeGalleryUnlockId) ??
-        null)
+      ? (galleryUnlocks.find((unlock) => unlock.id === activeUnlockId) ?? null)
       : null
 
-  const clearGalleryDetailTimer = () => {
-    if (galleryDetailTimerRef.current !== null) {
-      window.clearTimeout(galleryDetailTimerRef.current)
-      galleryDetailTimerRef.current = null
-    }
+  const hideUnlockDetail = () => {
+    setActiveUnlockId(null)
   }
 
-  const hideGalleryDetail = () => {
-    clearGalleryDetailTimer()
-    setActiveGalleryUnlockId(null)
+  const showUnlockDetail = (unlock: UnlockDefinition) => {
+    setActiveUnlockId(unlock.id)
   }
-
-  const showGalleryDetail = (unlock: UnlockDefinition, timed = false) => {
-    clearGalleryDetailTimer()
-    setActiveGalleryUnlockId(unlock.id)
-
-    if (timed) {
-      galleryDetailTimerRef.current = window.setTimeout(() => {
-        setActiveGalleryUnlockId((current) =>
-          current === unlock.id ? null : current,
-        )
-        galleryDetailTimerRef.current = null
-      }, 3_000)
-    }
-  }
-
-  useEffect(
-    () => () => {
-      clearGalleryDetailTimer()
-    },
-    [],
-  )
 
   useEffect(() => {
-    if (view !== 'gallery') {
-      hideGalleryDetail()
-    }
+    hideUnlockDetail()
   }, [view])
+
+  const getUnlockDetailHandlers = (unlock: UnlockDefinition) => ({
+    active: activeUnlockId === unlock.id,
+    onActivate: () => showUnlockDetail(unlock),
+  })
 
   return (
     <div className="unlock-panel">
@@ -1404,57 +1511,31 @@ const UnlocksPanel = ({
           : `Every quota in your ${world.name} empire. Completed levels are checked off.`}
       </p>
 
-      {view === 'gallery' ? (
-        <div className="unlock-gallery-shell">
-          <div className="unlock-card-grid gallery">
-            {galleryUnlocks.map((unlock) => (
+      {visibleUnlocks.length > 0 ? (
+        <div
+          className={`unlock-detail-shell ${view} ${activeUnlock ? 'has-detail' : ''}`}
+        >
+          {view === 'gallery' ? (
+            <UnlockGalleryDetail
+              onClose={hideUnlockDetail}
+              unlock={activeUnlock}
+              world={world}
+            />
+          ) : null}
+          <div className={`unlock-card-grid ${view}`}>
+            {visibleUnlocks.map((unlock) => (
               <UnlockCard
-                active={activeGalleryUnlockId === unlock.id}
+                {...(view === 'gallery'
+                  ? getUnlockDetailHandlers(unlock)
+                  : {})}
                 complete={isUnlockComplete(state, world, unlock)}
                 key={unlock.id}
-                onBlur={() => {
-                  if (galleryDetailTimerRef.current === null) {
-                    setActiveGalleryUnlockId(null)
-                  }
-                }}
-                onFocus={() => {
-                  if (galleryDetailTimerRef.current === null) {
-                    showGalleryDetail(unlock)
-                  }
-                }}
-                onMouseEnter={() => {
-                  if (galleryDetailTimerRef.current === null) {
-                    showGalleryDetail(unlock)
-                  }
-                }}
-                onMouseLeave={() => {
-                  if (galleryDetailTimerRef.current === null) {
-                    setActiveGalleryUnlockId(null)
-                  }
-                }}
-                onTouchActivate={() => showGalleryDetail(unlock, true)}
                 unlock={unlock}
                 world={world}
-                variant="gallery"
+                variant={view}
               />
             ))}
           </div>
-          <UnlockGalleryDetail
-            onClose={hideGalleryDetail}
-            unlock={activeGalleryUnlock}
-            world={world}
-          />
-        </div>
-      ) : visibleUnlocks.length > 0 ? (
-        <div className={`unlock-card-grid ${view}`}>
-          {visibleUnlocks.map((unlock) => (
-            <UnlockCard
-              complete={isUnlockComplete(state, world, unlock)}
-              key={unlock.id}
-              unlock={unlock}
-              world={world}
-            />
-          ))}
         </div>
       ) : (
         <div className="unlock-empty">All unlock quotas cleared.</div>
@@ -1466,22 +1547,14 @@ const UnlocksPanel = ({
 const UnlockCard = ({
   active = false,
   complete,
-  onBlur,
-  onFocus,
-  onMouseEnter,
-  onMouseLeave,
-  onTouchActivate,
+  onActivate,
   unlock,
   world,
   variant = 'upcoming',
 }: {
   active?: boolean
   complete: boolean
-  onBlur?: () => void
-  onFocus?: () => void
-  onMouseEnter?: () => void
-  onMouseLeave?: () => void
-  onTouchActivate?: () => void
+  onActivate?: () => void
   unlock: UnlockDefinition
   world: WorldDefinition
   variant?: 'upcoming' | 'gallery'
@@ -1496,38 +1569,28 @@ const UnlockCard = ({
       <img alt="" draggable={false} src={getUnlockImage(unlock, world)} />
       <strong>{unlock.goal}</strong>
       <span>{getUnlockTargetName(unlock, world)}</span>
-      <small>
-        {unlock.kind} {formatMultiplier(unlock.multiplier)}
-      </small>
+      <small>{getUnlockEffectLabel(unlock)}</small>
     </>
   )
 
-  if (variant === 'gallery') {
+  if (!onActivate) {
     return (
-      <button
-        aria-label={`${unlock.name}: ${getUnlockDetailText(unlock, world)}`}
-        className={className}
-        onBlur={onBlur}
-        onFocus={onFocus}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onPointerDown={(event) => {
-          if (event.pointerType !== 'mouse') {
-            onTouchActivate?.()
-          }
-        }}
-        title={unlock.name}
-        type="button"
-      >
+      <div className={className} title={unlock.name}>
         {content}
-      </button>
+      </div>
     )
   }
 
   return (
-    <div className={className} title={unlock.name}>
+    <button
+      aria-label={`${unlock.name}: ${getUnlockDetailText(unlock, world)}`}
+      className={className}
+      onClick={onActivate}
+      title={unlock.name}
+      type="button"
+    >
       {content}
-    </div>
+    </button>
   )
 }
 
