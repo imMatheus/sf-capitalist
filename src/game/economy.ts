@@ -130,7 +130,7 @@ const siliconValleyBusinesses: BusinessDefinition[] = [
     costMultiplier: 1.09,
     baseRevenue: 89_579_520,
     baseDuration: 1_536,
-    managerCost: 1_000_000_000,
+    managerCost: 555_555_555,
     managerName: "Carrie Capacity",
     accent: "#ffcb8a",
   },

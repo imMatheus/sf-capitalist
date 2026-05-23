@@ -68,6 +68,13 @@ import { useGame } from './game/useGame'
 
 type Panel = 'managers' | 'upgrades' | 'angels' | 'unlocks' | 'travel' | 'stats'
 
+type LevelToast = {
+  key: number
+  title: string
+  detail: string
+  image: string
+}
+
 const businessImages: Record<string, string> = businessIconImages
 
 const getBusinessImage = (business: BusinessDefinition) =>
@@ -304,6 +311,48 @@ const getUnlockDetailText = (
   return `${unlock.goal} ${triggerName} - ${effectLabel} ${formatMultiplier(unlock.multiplier)}!`
 }
 
+const createOwnedStatePreview = (
+  state: WorldState,
+  businessId: BusinessId,
+  owned: number,
+): WorldState => ({
+  ...state,
+  businesses: {
+    ...state.businesses,
+    [businessId]: {
+      ...state.businesses[businessId],
+      owned,
+    },
+  },
+})
+
+const getNewUnlockToast = (
+  beforeState: WorldState,
+  afterState: WorldState,
+  world: WorldDefinition,
+): Omit<LevelToast, 'key'> | null => {
+  const newlyCompleted = [
+    ...world.businessUnlocks,
+    ...world.allBusinessUnlocks,
+  ].filter(
+    (unlock) =>
+      !isUnlockComplete(beforeState, world, unlock) &&
+      isUnlockComplete(afterState, world, unlock),
+  )
+
+  const unlock = newlyCompleted.sort((a, b) => a.goal - b.goal).at(-1)
+
+  if (!unlock) {
+    return null
+  }
+
+  return {
+    title: getUnlockEffectLabel(unlock),
+    detail: getUnlockTargetName(unlock, world),
+    image: getUnlockImage(unlock, world),
+  }
+}
+
 const formatUpgradeBadge = (upgrade: UpgradeDefinition) => {
   if (upgrade.kind === 'angelEffectiveness') {
     return `+${upgrade.multiplier}%`
@@ -350,7 +399,7 @@ const getQuickBuyOption = (
     }))
 
   return (
-    [...managerOptions, ...upgradeOptions].sort((a, b) => b.cost - a.cost)[0] ??
+    [...managerOptions, ...upgradeOptions].sort((a, b) => a.cost - b.cost)[0] ??
     null
   )
 }
@@ -361,6 +410,9 @@ const App = () => {
   const worldState = getActiveWorldState(state)
   const [buyMode, setBuyMode] = useState<BuyMode>(1)
   const [panel, setPanel] = useState<Panel | null>(null)
+  const [levelToast, setLevelToast] = useState<LevelToast | null>(null)
+  const levelToastTimerRef = useRef<number | null>(null)
+  const levelToastKeyRef = useRef(0)
   const claimableAngels = getClaimableAngels(worldState)
   const angelBonusPercent =
     worldState.angels * getAngelEffectiveness(worldState, world) * 100
@@ -380,6 +432,52 @@ const App = () => {
   const cycleBuyMode = () => setBuyMode((current) => getNextBuyMode(current))
   const closePanel = () => setPanel(null)
 
+  const clearLevelToastTimer = () => {
+    if (levelToastTimerRef.current !== null) {
+      window.clearTimeout(levelToastTimerRef.current)
+      levelToastTimerRef.current = null
+    }
+  }
+
+  const showLevelToast = (toast: Omit<LevelToast, 'key'>) => {
+    clearLevelToastTimer()
+    levelToastKeyRef.current += 1
+    setLevelToast({ ...toast, key: levelToastKeyRef.current })
+    levelToastTimerRef.current = window.setTimeout(() => {
+      setLevelToast(null)
+      levelToastTimerRef.current = null
+    }, 2_500)
+  }
+
+  const buyBusinessWithToast = (businessId: BusinessId, mode: BuyMode) => {
+    const business = world.businesses.find((entry) => entry.id === businessId)
+
+    if (!business) {
+      return
+    }
+
+    const currentBusiness = worldState.businesses[businessId]
+    const quantity = getBuyQuantity(worldState, world, business, mode)
+    const cost = getPurchaseCost(business, currentBusiness.owned, quantity)
+
+    if (quantity <= 0 || cost > worldState.cash || !Number.isFinite(cost)) {
+      return
+    }
+
+    const afterState = createOwnedStatePreview(
+      worldState,
+      businessId,
+      currentBusiness.owned + quantity,
+    )
+    const toast = getNewUnlockToast(worldState, afterState, world)
+
+    actions.buyBusiness(businessId, mode)
+
+    if (toast) {
+      showLevelToast(toast)
+    }
+  }
+
   useEffect(() => {
     if (!panel) {
       return
@@ -395,6 +493,13 @@ const App = () => {
 
     return () => window.removeEventListener('keydown', closeOnEscape)
   }, [panel])
+
+  useEffect(
+    () => () => {
+      clearLevelToastTimer()
+    },
+    [],
+  )
 
   return (
     <div className="adcap-screen min-h-screen overflow-x-hidden text-[#241d17]">
@@ -465,7 +570,7 @@ const App = () => {
                 business={business}
                 buyMode={buyMode}
                 key={business.id}
-                onBuy={actions.buyBusiness}
+                onBuy={buyBusinessWithToast}
                 onStart={actions.startBusiness}
                 state={worldState}
                 world={world}
@@ -527,9 +632,22 @@ const App = () => {
           ) : null}
         </PanelModal>
       ) : null}
+      {levelToast ? (
+        <LevelToastView key={levelToast.key} toast={levelToast} />
+      ) : null}
     </div>
   )
 }
+
+const LevelToastView = ({ toast }: { toast: LevelToast }) => (
+  <div className="level-toast" role="status">
+    <img alt="" draggable={false} src={toast.image} />
+    <div>
+      <strong>{toast.title}</strong>
+      <span>{toast.detail}</span>
+    </div>
+  </div>
+)
 
 interface SidebarProps {
   availability: Partial<Record<Panel, boolean>>
@@ -1525,9 +1643,7 @@ const UnlocksPanel = ({
           <div className={`unlock-card-grid ${view}`}>
             {visibleUnlocks.map((unlock) => (
               <UnlockCard
-                {...(view === 'gallery'
-                  ? getUnlockDetailHandlers(unlock)
-                  : {})}
+                {...(view === 'gallery' ? getUnlockDetailHandlers(unlock) : {})}
                 complete={isUnlockComplete(state, world, unlock)}
                 key={unlock.id}
                 unlock={unlock}
