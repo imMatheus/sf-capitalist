@@ -6,12 +6,14 @@ import {
   Globe2,
   LayoutGrid,
   Lock,
+  Menu,
   Play,
   Save,
   Sparkles,
   Trash2,
   Trophy,
   Users,
+  X,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -665,51 +667,145 @@ const Sidebar = ({
   playerPortraitMirrored,
   worldName,
   setPanel,
-}: SidebarProps) => (
-  <aside className="left-menu">
-    <div className="mascot-card" aria-label={`${worldName} player icon`}>
-      <img
-        alt=""
-        className={`mascot-portrait${playerPortraitMirrored ? ' mirrored' : ''}`}
-        draggable={false}
-        src={playerPortrait}
-      />
-      <div className="ribbon">GPU & Stats</div>
-    </div>
+}: SidebarProps) => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-    <nav className="nav-rail" aria-label="Game menu">
-      {panelTabs.slice(1).map((tab) => {
-        const Icon = tab.icon
+  const selectPanel = (nextPanel: Panel) => {
+    setPanel(nextPanel)
+    setMobileMenuOpen(false)
+  }
 
-        return (
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      return
+    }
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileMenuOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', closeOnEscape)
+
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [mobileMenuOpen])
+
+  return (
+    <aside className="left-menu">
+      <div className="mascot-card" aria-label={`${worldName} player icon`}>
+        <img
+          alt=""
+          className={`mascot-portrait${playerPortraitMirrored ? ' mirrored' : ''}`}
+          draggable={false}
+          src={playerPortrait}
+        />
+        <div className="ribbon">GPU & Stats</div>
+      </div>
+
+      <div
+        className="mobile-player-card"
+        aria-label={`${worldName} player icon`}
+      >
+        <img
+          alt=""
+          className={`mobile-player-portrait${playerPortraitMirrored ? ' mirrored' : ''}`}
+          draggable={false}
+          src={playerPortrait}
+        />
+      </div>
+
+      <nav className="nav-rail" aria-label="Game menu">
+        {panelTabs.slice(1).map((tab) => {
+          const Icon = tab.icon
+
+          return (
+            <button
+              className={`paper-tab ${panel === tab.id ? 'active' : ''} ${
+                availability[tab.id] ? 'available' : ''
+              }`}
+              key={tab.id}
+              onClick={() => selectPanel(tab.id)}
+              type="button"
+            >
+              {availability[tab.id] ? (
+                <span className="paper-tab-notification" aria-hidden="true" />
+              ) : null}
+              <Icon className="h-5 w-5" />
+              <span>{tab.label}</span>
+            </button>
+          )
+        })}
+      </nav>
+
+      <button
+        className={`shop-card ${panel === 'stats' ? 'active' : ''}`}
+        onClick={() => selectPanel('stats')}
+        type="button"
+      >
+        <span>Shop</span>
+        <BadgeDollarSign className="h-11 w-11" />
+      </button>
+
+      <div className="mobile-bottom-nav" aria-label="Mobile game menu">
+        <button
+          aria-controls="mobile-panel-menu"
+          aria-expanded={mobileMenuOpen}
+          className="mobile-menu-button"
+          onClick={() => setMobileMenuOpen((current) => !current)}
+          type="button"
+        >
+          <Menu className="h-9 w-9" strokeWidth={4} />
+          <span>Menu</span>
+        </button>
+      </div>
+
+      {mobileMenuOpen ? (
+        <div className="mobile-menu-backdrop" role="presentation">
           <button
-            className={`paper-tab ${panel === tab.id ? 'active' : ''} ${
-              availability[tab.id] ? 'available' : ''
-            }`}
-            key={tab.id}
-            onClick={() => setPanel(tab.id)}
+            aria-label="Close mobile menu"
+            className="mobile-menu-dismiss"
+            onClick={() => setMobileMenuOpen(false)}
             type="button"
+          />
+          <nav
+            aria-label="Mobile pages"
+            className="mobile-menu-sheet"
+            id="mobile-panel-menu"
           >
-            {availability[tab.id] ? (
-              <span className="paper-tab-notification" aria-hidden="true" />
-            ) : null}
-            <Icon className="h-5 w-5" />
-            <span>{tab.label}</span>
-          </button>
-        )
-      })}
-    </nav>
+            {panelTabs.map((tab) => {
+              const Icon = tab.icon
 
-    <button
-      className={`shop-card ${panel === 'stats' ? 'active' : ''}`}
-      onClick={() => setPanel('stats')}
-      type="button"
-    >
-      <span>Shop</span>
-      <BadgeDollarSign className="h-11 w-11" />
-    </button>
-  </aside>
-)
+              return (
+                <button
+                  className={`mobile-menu-item ${panel === tab.id ? 'active' : ''}`}
+                  key={tab.id}
+                  onClick={() => selectPanel(tab.id)}
+                  type="button"
+                >
+                  <span
+                    className={`mobile-menu-status ${availability[tab.id] ? 'available' : ''}`}
+                    aria-hidden="true"
+                  />
+                  <Icon className="h-6 w-6" />
+                  <span>{tab.label}</span>
+                </button>
+              )
+            })}
+            <button
+              aria-label="Close mobile menu"
+              className="mobile-menu-close"
+              onClick={() => setMobileMenuOpen(false)}
+              type="button"
+            >
+              <X className="h-11 w-11" strokeWidth={4} />
+            </button>
+          </nav>
+        </div>
+      ) : null}
+    </aside>
+  )
+}
 
 interface PanelModalProps {
   panel: Panel
@@ -827,6 +923,10 @@ const QuickBuyAction = ({
     onBuyUpgrade(option.id)
   }
   const title = `Buy ${option.name}: ${option.description} (${formatMoney(option.cost, world.currencySymbol)})`
+  const caption =
+    option.kind === 'upgrade' && option.badge.toLowerCase().startsWith('x')
+      ? `Profit ${option.badge}`
+      : option.badge
 
   return (
     <div className={`quick-buy-action ${option.kind}`} title={title}>
@@ -847,6 +947,7 @@ const QuickBuyAction = ({
         />
         <strong>{option.badge}</strong>
       </button>
+      <span className="quick-buy-caption">{caption}</span>
     </div>
   )
 }
