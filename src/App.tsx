@@ -23,7 +23,7 @@ import {
   type ReactNode,
 } from 'react'
 import chinaTravelImage from '../china.png'
-import earthTravelImage from '../san-francisco.png'
+import siliconValleyTravelImage from '../san-francisco.png'
 import europeTravelImage from '../europe.png'
 import aiTutorAppImage from './assets/businesses/ai-tutor-app.svg'
 import aiSupercomputerImage from './assets/businesses/ai-supercomputer.svg'
@@ -48,7 +48,7 @@ import nordicPayrollCloneImage from './assets/businesses/nordic-payroll-clone.sv
 import northSeaHeliumFarmImage from './assets/businesses/north-sea-helium-farm.svg'
 import orbitalDataCenterImage from './assets/businesses/orbital-data-center.svg'
 import quickUpgradeImage from './assets/businesses/quick-upgrade.png'
-import rareEarthMineImage from './assets/businesses/rare-earth-mine.svg'
+import strategicMineralMineImage from './assets/businesses/strategic-mineral-mine.svg'
 import renderRackImage from './assets/businesses/render-rack.svg'
 import rivieraOxygenBarImage from './assets/businesses/riviera-oxygen-bar.svg'
 import semiconductorFoundryImage from './assets/businesses/semiconductor-foundry.svg'
@@ -104,7 +104,7 @@ const businessImages: Record<string, string> = {
   'hyperscale-campus': hyperscaleCampusImage,
   'ai-supercomputer': aiSupercomputerImage,
   'orbital-data-center': orbitalDataCenterImage,
-  'rare-earth-mine': rareEarthMineImage,
+  'strategic-mineral-mine': strategicMineralMineImage,
   'e-commerce-marketplace': ecommerceMarketplaceImage,
   'ev-plant': evPlantImage,
   'drone-factory': droneFactoryImage,
@@ -192,7 +192,7 @@ const panelMeta: Record<
 const buyModes: BuyMode[] = [1, 10, 100, 'next', 'max']
 
 const travelImages: Record<WorldId, string> = {
-  earth: earthTravelImage,
+  'silicon-valley': siliconValleyTravelImage,
   china: chinaTravelImage,
   europe: europeTravelImage,
 }
@@ -1145,7 +1145,7 @@ const TravelPanel = ({
       <div className="mega-bucks-balance">
         <Globe2 className="h-5 w-5" />
         <span>{formatCompact(gameState.megaBucks, 0)} Mega Bucks</span>
-        <span>{formatMoney(gameState.worlds.earth.cash, '$')} Earth cash</span>
+        <span>{formatMoney(gameState.worlds['silicon-valley'].cash, '$')} Silicon Valley cash</span>
       </div>
 
       <div className="travel-destinations">

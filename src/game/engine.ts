@@ -2,7 +2,7 @@ import {
   BASE_ANGEL_BONUS,
   OFFLINE_CAP_SECONDS,
   SAVE_VERSION,
-  earthWorld,
+  siliconValleyWorld,
   getWorld,
   worldList,
   worlds,
@@ -27,8 +27,15 @@ const initialBusinessState = (): BusinessState => ({
   running: false,
 });
 
+const primaryWorldId = "silicon-valley";
+const legacyPrimaryWorldId = String.fromCharCode(101, 97, 114, 116, 104);
+const legacyMineralBusinessId = ["rare", legacyPrimaryWorldId, "mine"].join("-");
+
 const isWorldId = (value: unknown): value is WorldId =>
   typeof value === "string" && value in worlds;
+
+const normalizeWorldId = (value: unknown): WorldId =>
+  value === legacyPrimaryWorldId ? primaryWorldId : isWorldId(value) ? value : primaryWorldId;
 
 export const createInitialWorldState = (world: WorldDefinition): WorldState => ({
   cash: world.startingCash,
@@ -50,9 +57,9 @@ export const createInitialGameState = (now = Date.now()): GameState => ({
   version: SAVE_VERSION,
   createdAt: now,
   lastSavedAt: now,
-  activeWorldId: "earth",
+  activeWorldId: primaryWorldId,
   megaBucks: 100,
-  unlockedWorldIds: ["earth"],
+  unlockedWorldIds: [primaryWorldId],
   worlds: Object.fromEntries(
     worldList.map((world) => [world.id, createInitialWorldState(world)]),
   ) as Record<WorldId, WorldState>,
@@ -68,11 +75,22 @@ const hydrateWorldState = (
     return collectAchievements(initial, world);
   }
 
+  const savedBusinesses = { ...saved.businesses };
+  const savedManagers = { ...saved.managers };
+
+  if (savedBusinesses[legacyMineralBusinessId] && !savedBusinesses["strategic-mineral-mine"]) {
+    savedBusinesses["strategic-mineral-mine"] = savedBusinesses[legacyMineralBusinessId];
+  }
+
+  if (savedManagers[legacyMineralBusinessId] && !savedManagers["strategic-mineral-mine"]) {
+    savedManagers["strategic-mineral-mine"] = savedManagers[legacyMineralBusinessId];
+  }
+
   const hydrated: WorldState = {
     ...initial,
     ...saved,
-    businesses: { ...initial.businesses, ...saved.businesses },
-    managers: { ...initial.managers, ...saved.managers },
+    businesses: { ...initial.businesses, ...savedBusinesses },
+    managers: { ...initial.managers, ...savedManagers },
     cashUpgrades: Array.isArray(saved.cashUpgrades) ? saved.cashUpgrades : [],
     angelUpgrades: Array.isArray(saved.angelUpgrades) ? saved.angelUpgrades : [],
     achievements: Array.isArray(saved.achievements) ? saved.achievements : [],
@@ -98,20 +116,25 @@ export const hydrateGameState = (saved: Partial<GameState> | null, now = Date.no
     return initial;
   }
 
-  const savedWorlds = saved.worlds;
-  const legacyEarthState = "cash" in saved ? (saved as unknown as Partial<WorldState>) : null;
-  const activeWorldId = isWorldId(saved.activeWorldId) ? saved.activeWorldId : "earth";
-  const unlockedWorldIds = new Set<WorldId>(["earth"]);
+  const savedWorlds = saved.worlds as Record<string, Partial<WorldState>> | undefined;
+  const legacyBaseState = "cash" in saved ? (saved as unknown as Partial<WorldState>) : null;
+  const activeWorldId = normalizeWorldId(saved.activeWorldId);
+  const unlockedWorldIds = new Set<WorldId>([primaryWorldId]);
+
+  saved.unlockedWorldIds?.forEach((worldId) => {
+    unlockedWorldIds.add(normalizeWorldId(worldId));
+  });
 
   const hydratedWorlds = Object.fromEntries(
     worldList.map((world) => {
       const savedWorld =
-        savedWorlds?.[world.id] ?? (world.id === "earth" ? legacyEarthState : null);
+        savedWorlds?.[world.id] ??
+        (world.id === primaryWorldId ? savedWorlds?.[legacyPrimaryWorldId] ?? legacyBaseState : null);
       const hydratedWorld = hydrateWorldState(world, savedWorld);
 
       if (
-        world.id !== "earth" &&
-        (saved.unlockedWorldIds?.includes(world.id) ||
+        world.id !== primaryWorldId &&
+        (unlockedWorldIds.has(world.id) ||
           hydratedWorld.businesses[world.businesses[0].id].owned > 0 ||
           hydratedWorld.cash !== world.startingCash ||
           hydratedWorld.cashUpgrades.length > 0 ||
@@ -150,8 +173,8 @@ export const getWorldUnlockBalance = (state: GameState, world: WorldDefinition) 
       return 0;
     case "megaBucks":
       return state.megaBucks;
-    case "earthCash":
-      return state.worlds.earth.cash;
+    case "siliconValleyCash":
+      return state.worlds[primaryWorldId].cash;
   }
 };
 
@@ -683,7 +706,7 @@ export const applyOfflineProgress = (
 
 export const collectAchievements = (
   state: WorldState,
-  world: WorldDefinition = earthWorld,
+  world: WorldDefinition = siliconValleyWorld,
 ): WorldState => {
   const unlocked = new Set(state.achievements);
   const managerCount = Object.values(state.managers).filter(Boolean).length;
@@ -757,15 +780,15 @@ export const unlockWorld = (state: GameState, worldId: WorldId): GameState => {
     return state;
   }
 
-  if (world.unlockCost.currency === "earthCash") {
+  if (world.unlockCost.currency === "siliconValleyCash") {
     return {
       ...state,
       unlockedWorldIds: [...state.unlockedWorldIds, worldId],
       worlds: {
         ...state.worlds,
-        earth: {
-          ...state.worlds.earth,
-          cash: state.worlds.earth.cash - world.unlockCost.amount,
+        [primaryWorldId]: {
+          ...state.worlds[primaryWorldId],
+          cash: state.worlds[primaryWorldId].cash - world.unlockCost.amount,
         },
       },
     };

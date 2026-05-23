@@ -10,9 +10,9 @@ import type {
   WorldId,
   WorldUnlockCost,
 } from "./types";
-import { earthAngelUpgradeRows, earthCashUpgradeRows } from "./adventureCapitalistEarthData";
-import { chinaAngelUpgradeRows, chinaCashUpgradeRows } from "./adventureCapitalistMarsData";
-import { europeAngelUpgradeRows, europeCashUpgradeRows } from "./adventureCapitalistMoonData";
+import { siliconValleyAngelUpgradeRows, siliconValleyCashUpgradeRows } from "./siliconValleyData";
+import { chinaAngelUpgradeRows, chinaCashUpgradeRows } from "./chinaData";
+import { europeAngelUpgradeRows, europeCashUpgradeRows } from "./europeData";
 
 type UpgradeRow = readonly [string, UpgradeTarget, number, UpgradeDefinition["kind"], number];
 
@@ -20,7 +20,7 @@ export const SAVE_VERSION = 4;
 export const BASE_ANGEL_BONUS = 0.02;
 export const OFFLINE_CAP_SECONDS = 60 * 60 * 24 * 7;
 
-const earthBusinesses: BusinessDefinition[] = [
+const siliconValleyBusinesses: BusinessDefinition[] = [
   {
     id: "single-gpu-rig",
     name: "Single GPU Rig",
@@ -155,9 +155,9 @@ const earthBusinesses: BusinessDefinition[] = [
 
 const chinaBusinesses: BusinessDefinition[] = [
   {
-    id: "rare-earth-mine",
-    name: "Rare Earth Mine",
-    shortName: "Rare Earth",
+    id: "strategic-mineral-mine",
+    name: "Strategic Mineral Mine",
+    shortName: "Minerals",
     caption: "Extract strategic minerals for the next hardware cycle.",
     baseCost: 0.05,
     costMultiplier: 1.01,
@@ -480,7 +480,7 @@ const createBusinessUnlocks = (businesses: BusinessDefinition[]): UnlockDefiniti
     })),
   );
 
-const createMoonStyleBusinessUnlocks = (businesses: BusinessDefinition[]): UnlockDefinition[] => {
+const createEuropeStyleBusinessUnlocks = (businesses: BusinessDefinition[]): UnlockDefinition[] => {
   const byIndex: Array<Array<[string, number, number]>> = [
     [
       ["Start A Trend", 10, 3.5],
@@ -489,10 +489,10 @@ const createMoonStyleBusinessUnlocks = (businesses: BusinessDefinition[]): Unloc
       ["Bounce-Friendly", 80, 5],
       ["Hipster Approved", 160, 5.5],
       ["Made For Walking", 320, 6],
-      ["Walking On Moonshine", 640, 6.5],
-      ["Moon Over My-ami", 1280, 7],
+      ["Walking On Sunshine", 640, 6.5],
+      ["Miami Over Market", 1280, 7],
       ["Shoe-t To Thrill", 2560, 7.5],
-      ["Moon Walker", 5120, 999_999_999],
+      ["Market Walker", 5120, 999_999_999],
       ["Fly Me To The Boots", 10000, 3.5],
     ],
     Array.from({ length: 27 }, (_, index) => [
@@ -525,7 +525,7 @@ const createMoonStyleBusinessUnlocks = (businesses: BusinessDefinition[]): Unloc
       ["Always Glad You Came", 50, 12],
       ["Witty Comebacks", 90, 12],
       ["Happy Hour", 180, 22],
-      ["Shiny Moon Shine", 360, 333],
+      ["Shiny Club Shine", 360, 333],
       ["Charge By The Breath", 720, 4444],
       ["Free Nitrogen", 1440, 55555],
       ["The Bubbly", 2880, 666666],
@@ -564,19 +564,19 @@ const createMoonStyleBusinessUnlocks = (businesses: BusinessDefinition[]): Unloc
   );
 };
 
-const moonStyleAllBusinessUnlocks: UnlockDefinition[] = [
+const europeStyleAllBusinessUnlocks: UnlockDefinition[] = [
   { id: "all-1", name: "Finally", goal: 1, target: "all", kind: "speed", multiplier: 2 },
   { id: "all-5", name: "Now You're Cooking With N204", goal: 5, target: "all", kind: "speed", multiplier: 2 },
   { id: "all-25", name: "Special Relativity", goal: 25, target: "all", kind: "speed", multiplier: 2 },
   { id: "all-50", name: "Just A Phase", goal: 50, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-75", name: "Dark Side Of The Moon", goal: 75, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-100", name: "Miami Over Moon", goal: 100, target: "all", kind: "speed", multiplier: 2 },
+  { id: "all-75", name: "Dark Side Of The Market", goal: 75, target: "all", kind: "speed", multiplier: 2 },
+  { id: "all-100", name: "Miami Over Market", goal: 100, target: "all", kind: "speed", multiplier: 2 },
   { id: "all-150", name: "Luny Luna", goal: 150, target: "all", kind: "speed", multiplier: 2 },
   { id: "all-200", name: "Apollo-getic", goal: 200, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-250", name: "Case Of The Moondays", goal: 250, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-300", name: "The Moon-arch", goal: 300, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-350", name: "Shiny Moonocle", goal: 350, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-400", name: "Moonotheism", goal: 400, target: "all", kind: "speed", multiplier: 2 },
+  { id: "all-250", name: "Case Of The Mondays", goal: 250, target: "all", kind: "speed", multiplier: 2 },
+  { id: "all-300", name: "The Euro-arch", goal: 300, target: "all", kind: "speed", multiplier: 2 },
+  { id: "all-350", name: "Shiny Monocle", goal: 350, target: "all", kind: "speed", multiplier: 2 },
+  { id: "all-400", name: "Monotheism", goal: 400, target: "all", kind: "speed", multiplier: 2 },
   { id: "all-450", name: "Gany-mead", goal: 450, target: "all", kind: "speed", multiplier: 2 },
   { id: "all-500", name: "Titan-ic Achievement", goal: 500, target: "all", kind: "speed", multiplier: 2 },
   { id: "all-600", name: "Callisto-riffic", goal: 600, target: "all", kind: "speed", multiplier: 2 },
@@ -584,7 +584,7 @@ const moonStyleAllBusinessUnlocks: UnlockDefinition[] = [
   { id: "all-800", name: "Europa Opa", goal: 800, target: "all", kind: "speed", multiplier: 2 },
   { id: "all-900", name: "Tri-tons Of Fun", goal: 900, target: "all", kind: "speed", multiplier: 2 },
   { id: "all-1000", name: "Charon Is Caring", goal: 1_000, target: "all", kind: "speed", multiplier: 2 },
-  { id: "all-1111", name: "Moonumental Achievement", goal: 1_111, target: "all", kind: "speed", multiplier: 2 },
+  { id: "all-1111", name: "Continental Achievement", goal: 1_111, target: "all", kind: "speed", multiplier: 2 },
 ];
 
 const businessUnlockGoals = [
@@ -718,25 +718,25 @@ const buildWorld = ({
   achievements,
 });
 
-export const earthWorld = buildWorld({
-  id: "earth",
-  name: "Earth",
+export const siliconValleyWorld = buildWorld({
+  id: "silicon-valley",
+  name: "Silicon Valley",
   shortName: "GPU",
   description: "The original San Francisco compute market.",
   currencyName: "Dollars",
   currencySymbol: "$",
   unlockCost: { currency: "free", amount: 0 },
   startingCash: 4,
-  businesses: earthBusinesses,
-  cashUpgradeRows: earthCashUpgradeRows,
-  angelUpgradeRows: earthAngelUpgradeRows,
+  businesses: siliconValleyBusinesses,
+  cashUpgradeRows: siliconValleyCashUpgradeRows,
+  angelUpgradeRows: siliconValleyAngelUpgradeRows,
 });
 
 export const chinaWorld = buildWorld({
   id: "china",
   name: "China",
   shortName: "China",
-  description: "A yuan-denominated market with Mars-style pacing.",
+  description: "A yuan-denominated market with China-style pacing.",
   currencyName: "Yuan",
   currencySymbol: "¥",
   unlockCost: { currency: "megaBucks", amount: 100 },
@@ -750,36 +750,36 @@ export const europeWorld = buildWorld({
   id: "europe",
   name: "Europe",
   shortName: "Europe",
-  description: "A euro-denominated market with Moon-style pacing.",
+  description: "A euro-denominated market with Europe-style pacing.",
   currencyName: "Euros",
   currencySymbol: "€",
-  unlockCost: { currency: "earthCash", amount: 10 }, // MATHEUS
-  // unlockCost: { currency: "earthCash", amount: 100_000_000_000_000 },
+  unlockCost: { currency: "siliconValleyCash", amount: 10 }, // MATHEUS
+  // unlockCost: { currency: "siliconValleyCash", amount: 100_000_000_000_000 },
   startingCash: 5,
   businesses: europeBusinesses,
   cashUpgradeRows: europeCashUpgradeRows,
   angelUpgradeRows: europeAngelUpgradeRows,
-  businessUnlocks: createMoonStyleBusinessUnlocks(europeBusinesses),
-  allBusinessUnlocks: moonStyleAllBusinessUnlocks,
+  businessUnlocks: createEuropeStyleBusinessUnlocks(europeBusinesses),
+  allBusinessUnlocks: europeStyleAllBusinessUnlocks,
 });
 
 export const worlds = {
-  earth: earthWorld,
+  "silicon-valley": siliconValleyWorld,
   china: chinaWorld,
   europe: europeWorld,
 } satisfies Record<WorldId, WorldDefinition>;
 
 export const worldList = Object.values(worlds);
 
-export const businesses = earthWorld.businesses;
-export const cashUpgrades = earthWorld.cashUpgrades;
-export const angelUpgrades = earthWorld.angelUpgrades;
-export const businessUnlocks = earthWorld.businessUnlocks;
-export const allBusinessUnlocks = earthWorld.allBusinessUnlocks;
+export const businesses = siliconValleyWorld.businesses;
+export const cashUpgrades = siliconValleyWorld.cashUpgrades;
+export const angelUpgrades = siliconValleyWorld.angelUpgrades;
+export const businessUnlocks = siliconValleyWorld.businessUnlocks;
+export const allBusinessUnlocks = siliconValleyWorld.allBusinessUnlocks;
 
-export const getWorld = (id: WorldId) => worlds[id] ?? earthWorld;
+export const getWorld = (id: WorldId) => worlds[id] ?? siliconValleyWorld;
 
-export const getBusiness = (id: BusinessId, world: WorldDefinition = earthWorld) => {
+export const getBusiness = (id: BusinessId, world: WorldDefinition = siliconValleyWorld) => {
   const business = world.businesses.find((entry) => entry.id === id);
 
   if (!business) {

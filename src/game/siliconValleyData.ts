@@ -1,8 +1,8 @@
 import type { ModifierKind, UpgradeTarget } from "./types";
 
-// Parsed from the current AdVenture Capitalist Wiki Earth cash and angel upgrade tables.
+// Parsed from the current AdVenture Capitalist Wiki Silicon Valley cash and angel upgrade tables.
 // Targets are mapped onto this game's GPU-themed business order.
-type EarthUpgradeRow = readonly [
+type SiliconValleyUpgradeRow = readonly [
   name: string,
   target: UpgradeTarget,
   cost: number,
@@ -10,7 +10,7 @@ type EarthUpgradeRow = readonly [
   value: number,
 ];
 
-export const earthCashUpgradeRows = [
+export const siliconValleyCashUpgradeRows = [
   ["Little Umbrellas","single-gpu-rig",250000,"profit",3],
   ["Funny Pages","render-rack",500000,"profit",3],
   ["Drive Through Wash","inference-cluster",1000000,"profit",3],
@@ -367,7 +367,7 @@ export const earthCashUpgradeRows = [
   ["Colorful Glasses","single-gpu-rig",3e+231,"profit",3],
   ["Cholesterol Free Paper","render-rack",8e+231,"profit",3],
   ["Meteor Proofing","inference-cluster",6.9e+232,"profit",3],
-  ["Earth","all",1e+233,"profit",2],
+  ["Silicon Valley","all",1e+233,"profit",2],
   ["Ghost-repellant","training-pod",1.8800000000000002e+233,"profit",3],
   ["Diplomatic Immunity","colocation-hall",2.39e+233,"profit",3],
   ["Flood Insurance","asic-farm",4.1100000000000004e+233,"profit",3],
@@ -401,7 +401,7 @@ export const earthCashUpgradeRows = [
   ["Of The System","all",1e+244,"profit",6],
   ["Slam Poems","render-rack",2.2000000000000003e+244,"profit",2],
   ["Petting Zoos","inference-cluster",4.4000000000000006e+244,"profit",2],
-  ["Exotic Moon Ingredients","training-pod",6.600000000000001e+244,"profit",2],
+  ["Exotic Space Ingredients","training-pod",6.600000000000001e+244,"profit",2],
   ["Smaller Portions","colocation-hall",8.800000000000001e+244,"profit",2],
   ["Adorable Steam Whistles","asic-farm",1.11e+245,"profit",2],
   ["Butt Guards","cloud-region",2.22e+245,"profit",2],
@@ -483,9 +483,9 @@ export const earthCashUpgradeRows = [
   ["Drill Oil Personally","orbital-data-center",1e+285,"profit",13],
   ["Live Rich","all",1e+286,"profit",7.77],
   ["And Profit!","all",1e+288,"profit",77.77],
-] as const satisfies readonly EarthUpgradeRow[];
+] as const satisfies readonly SiliconValleyUpgradeRow[];
 
-export const earthAngelUpgradeRows = [
+export const siliconValleyAngelUpgradeRows = [
   ["Angel Sacrifice","all",10000,"profit",3],
   ["Angelic Mutiny","all",100000,"angelEffectiveness",2],
   ["Angelic Rebellion","all",100000000,"angelEffectiveness",2],
@@ -514,7 +514,7 @@ export const earthAngelUpgradeRows = [
   ["Fundorium Sanctum","ai-supercomputer",200000000000000000,"profit",3],
   ["Oil Vincit Omnia","orbital-data-center",400000000000000000,"profit",3],
   ["Lemonus Supremus","single-gpu-rig",1000000000000000000,"profit",3],
-  ["Buy Earth","all",1e+21,"profit",15],
+  ["Buy Silicon Valley","all",1e+21,"profit",15],
   ["Newspaper Takeover","render-rack",1e+22,"owned",75],
   ["Car Wash Takeover","inference-cluster",1e+22,"owned",75],
   ["Pizza Takeover","training-pod",1e+22,"owned",75],
@@ -680,4 +680,4 @@ export const earthAngelUpgradeRows = [
   ["Let There Be Pastries","colocation-hall",3e+138,"owned",25],
   ["Let There Be Classics","hyperscale-campus",3e+138,"owned",25],
   ["Let There Be Blood","orbital-data-center",4e+138,"owned",25],
-] as const satisfies readonly EarthUpgradeRow[];
+] as const satisfies readonly SiliconValleyUpgradeRow[];
