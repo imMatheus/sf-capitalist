@@ -312,6 +312,7 @@ export const startBusiness = (state: GameState, businessId: BusinessId): GameSta
       ...state.businesses,
       [businessId]: {
         ...current,
+        progress: 0,
         running: true,
       },
     },

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Single GPU Rig">
+  <g fill="none" stroke="#25211d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8">
+    <path fill="#33383d" d="M45 90h146c15 0 27 12 27 27v54c0 15-12 27-27 27H45z"/>
+    <path fill="#4b535a" d="M63 111h106c10 0 18 8 18 18v30c0 10-8 18-18 18H63z" stroke-width="5"/>
+    <path fill="#f28c3c" d="M31 112h20v68H31z"/>
+    <path fill="#f28c3c" d="M205 112h20v68h-20z"/>
+    <circle cx="121" cy="144" r="38" fill="#65c8c8"/>
+    <circle cx="121" cy="144" r="14" fill="#287a80" stroke-width="5"/>
+    <path d="M121 109v28M154 144h-27M121 179v-28M88 144h27" stroke="#e9fbf8" stroke-width="7"/>
+    <path d="M70 90V56h42v34M154 90V56h42v34"/>
+    <path d="M67 198h122l22 24H45z" fill="#596169"/>
+  </g>
+</svg>

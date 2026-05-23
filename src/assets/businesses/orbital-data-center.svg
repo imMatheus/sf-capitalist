@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Orbital Data Center">
+  <g fill="none" stroke="#25211d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8">
+    <ellipse cx="128" cy="128" rx="90" ry="70" fill="#647984"/>
+    <ellipse cx="128" cy="128" rx="58" ry="44" fill="#3f464c" stroke-width="6"/>
+    <rect x="94" y="94" width="68" height="68" rx="14" fill="#59646b" stroke-width="5"/>
+    <rect x="106" y="108" width="16" height="41" rx="4" fill="#30353a" stroke-width="3"/>
+    <rect x="134" y="108" width="16" height="41" rx="4" fill="#30353a" stroke-width="3"/>
+    <path d="M112 121h5M140 121h5M112 136h5M140 136h5" stroke="#f5d14d" stroke-width="3"/>
+    <path d="M38 121l52-19 10 34-52 21z" fill="#f5d14d"/>
+    <path d="M218 121l-52-19-10 34 52 21z" fill="#f5d14d"/>
+    <path d="M84 141l-39 31M172 141l39 31" stroke="#6bb5de" stroke-width="7"/>
+    <circle cx="128" cy="50" r="12" fill="#f1eee5" stroke-width="5"/>
+    <path d="M128 62v28"/>
+  </g>
+</svg>

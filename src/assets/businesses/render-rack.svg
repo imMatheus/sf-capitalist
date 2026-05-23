@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Render Rack">
+  <g fill="none" stroke="#25211d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8">
+    <path fill="#394047" d="M71 38h114c13 0 24 11 24 24v145H47V62c0-13 11-24 24-24z"/>
+    <path fill="#555f66" d="M69 63h118v30H69z" stroke-width="5"/>
+    <path fill="#555f66" d="M69 105h118v30H69z" stroke-width="5"/>
+    <path fill="#555f66" d="M69 147h118v30H69z" stroke-width="5"/>
+    <path fill="#555f66" d="M69 189h118v30H69z" stroke-width="5"/>
+    <circle cx="91" cy="78" r="6" fill="#65c8c8" stroke-width="3"/>
+    <circle cx="91" cy="120" r="6" fill="#65c8c8" stroke-width="3"/>
+    <circle cx="91" cy="162" r="6" fill="#65c8c8" stroke-width="3"/>
+    <circle cx="91" cy="204" r="6" fill="#65c8c8" stroke-width="3"/>
+    <path d="M116 78h42M116 120h42M116 162h42M116 204h42" stroke="#f5d14d" stroke-width="5"/>
+    <path fill="#596169" d="M62 219h132l22 23H40z"/>
+  </g>
+</svg>

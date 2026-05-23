@@ -153,6 +153,24 @@ const getTotalCashPerSecond = (state: GameState) =>
     return total + getBusinessCashPerSecond(state, business)
   }, 0)
 
+const getSidebarAvailability = (
+  state: GameState,
+  claimableAngels: number,
+): Partial<Record<Panel, boolean>> => ({
+  upgrades:
+    cashUpgrades.some(
+      (upgrade) => !state.cashUpgrades.includes(upgrade.id) && state.cash >= upgrade.cost,
+    ) ||
+    angelUpgrades.some(
+      (upgrade) =>
+        !state.angelUpgrades.includes(upgrade.id) && state.angels >= upgrade.cost,
+    ),
+  managers: businesses.some(
+    (business) => !state.managers[business.id] && state.cash >= business.managerCost,
+  ),
+  angels: state.angels === 0 && claimableAngels > 0,
+})
+
 type QuickBuyOption =
   | {
       kind: 'manager'
@@ -282,6 +300,10 @@ const App = () => {
   )
   const nextAllUnlock = getNextAllUnlock(state)
   const quickBuyOption = useMemo(() => getQuickBuyOption(state), [state])
+  const sidebarAvailability = useMemo(
+    () => getSidebarAvailability(state, claimableAngels),
+    [state, claimableAngels],
+  )
   const cycleBuyMode = () => setBuyMode((current) => getNextBuyMode(current))
   const closePanel = () => setPanel(null)
 
@@ -304,7 +326,11 @@ const App = () => {
   return (
     <div className="adcap-screen min-h-screen overflow-x-hidden text-[#241d17]">
       <div className="adcap-stage">
-        <Sidebar panel={panel} setPanel={setPanel} />
+        <Sidebar
+          availability={sidebarAvailability}
+          panel={panel}
+          setPanel={setPanel}
+        />
 
         <main className="capital-floor">
           <header className="cash-ribbon">
@@ -403,11 +429,12 @@ const App = () => {
 }
 
 interface SidebarProps {
+  availability: Partial<Record<Panel, boolean>>
   panel: Panel | null
   setPanel: (panel: Panel) => void
 }
 
-const Sidebar = ({ panel, setPanel }: SidebarProps) => (
+const Sidebar = ({ availability, panel, setPanel }: SidebarProps) => (
   <aside className="left-menu">
     <div className="mascot-card" aria-label="GPU Capitalist mascot">
       <div className="top-hat" />
@@ -423,11 +450,16 @@ const Sidebar = ({ panel, setPanel }: SidebarProps) => (
 
         return (
           <button
-            className={`paper-tab ${panel === tab.id ? 'active' : ''}`}
+            className={`paper-tab ${panel === tab.id ? 'active' : ''} ${
+              availability[tab.id] ? 'available' : ''
+            }`}
             key={tab.id}
             onClick={() => setPanel(tab.id)}
             type="button"
           >
+            {availability[tab.id] ? (
+              <span className="paper-tab-notification" aria-hidden="true" />
+            ) : null}
             <Icon className="h-5 w-5" />
             <span>{tab.label}</span>
           </button>
@@ -686,9 +718,7 @@ const BusinessRow = ({
     ? 100
     : showProgress
       ? progressPercent
-      : businessState.owned > 0
-        ? 100
-        : 0
+      : 0
   const canStart =
     businessState.owned > 0 && !businessState.running && !automated
   const timeRemaining =

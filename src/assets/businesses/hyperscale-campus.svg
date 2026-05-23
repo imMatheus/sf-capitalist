@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Hyperscale Campus">
+  <g fill="none" stroke="#25211d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8">
+    <rect x="29" y="115" width="74" height="88" rx="10" fill="#596169"/>
+    <rect x="93" y="82" width="98" height="121" rx="10" fill="#454b50"/>
+    <rect x="169" y="122" width="58" height="81" rx="10" fill="#6a7073"/>
+    <path d="M45 134h10M68 134h10M45 156h10M68 156h10M45 178h10M68 178h10" stroke="#65c8c8" stroke-width="4"/>
+    <path d="M112 105h12M140 105h12M168 105h12M112 130h12M140 130h12M168 130h12M112 155h12M140 155h12M168 155h12" stroke="#65c8c8" stroke-width="4"/>
+    <path d="M185 142h10M207 142h10M185 166h10M207 166h10" stroke="#65c8c8" stroke-width="4"/>
+    <path fill="#b8c0bf" d="M47 74c22 0 22 37 0 37s-22-37 0-37z"/>
+    <path fill="#b8c0bf" d="M81 64c22 0 22 47 0 47s-22-47 0-47z"/>
+    <path d="M47 74V48M81 64V37"/>
+    <path d="M31 215l60-20 52 22 76-23" stroke="#f28c3c"/>
+  </g>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cloud Region">
+  <g fill="none" stroke="#25211d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8">
+    <path fill="#f1eee5" d="M56 151c-20 0-36-15-36-34 0-18 14-32 32-34 8-24 30-40 57-40 27 0 51 18 58 44 3-.1 5-.1 8-.1 31 0 56 22 56 50 0 27-22 49-51 49H56z"/>
+    <rect x="62" y="126" width="36" height="62" rx="8" fill="#4e5559" stroke-width="5"/>
+    <rect x="110" y="126" width="36" height="62" rx="8" fill="#4e5559" stroke-width="5"/>
+    <rect x="158" y="126" width="36" height="62" rx="8" fill="#4e5559" stroke-width="5"/>
+    <path d="M72 143h16M72 160h16M120 143h16M120 160h16M168 143h16M168 160h16" stroke="#65c8c8" stroke-width="4"/>
+    <path d="M97 189l31 25 31-25" stroke="#f5d14d"/>
+  </g>
+</svg>
