@@ -9,9 +9,11 @@ import {
   resetForAngels,
   resetSave,
   startBusiness,
+  switchWorld,
+  unlockWorld,
 } from "./engine";
 import { localStorageGameStorage } from "./storage";
-import type { BusinessId, BuyMode, GameState, OfflineReport } from "./types";
+import type { BusinessId, BuyMode, GameState, OfflineReport, WorldId } from "./types";
 
 const TICK_RATE_MS = 100;
 const SAVE_RATE_MS = 1_500;
@@ -89,6 +91,12 @@ export const useGame = () => {
         localStorageGameStorage.clear();
         setOfflineReport(null);
         setState(resetSave());
+      },
+      switchWorld: (worldId: WorldId) => {
+        setState((current) => switchWorld(current, worldId));
+      },
+      unlockWorld: (worldId: WorldId) => {
+        setState((current) => unlockWorld(current, worldId));
       },
     }),
     [],

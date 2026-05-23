@@ -3,6 +3,7 @@ import {
   CheckCircle2,
   Cpu,
   Gauge,
+  Globe2,
   LayoutGrid,
   Lock,
   Play,
@@ -21,26 +22,33 @@ import {
   type CSSProperties,
   type ReactNode,
 } from 'react'
+import chinaTravelImage from '../china.png'
+import earthTravelImage from '../san-francisco.png'
+import aiTutorAppImage from './assets/businesses/ai-tutor-app.svg'
 import aiSupercomputerImage from './assets/businesses/ai-supercomputer.svg'
 import asicFarmImage from './assets/businesses/asic-farm.svg'
 import cloudRegionImage from './assets/businesses/cloud-region.svg'
 import colocationHallImage from './assets/businesses/colocation-hall.svg'
+import droneFactoryImage from './assets/businesses/drone-factory.svg'
+import ecommerceMarketplaceImage from './assets/businesses/e-commerce-marketplace.svg'
+import evPlantImage from './assets/businesses/ev-plant.svg'
+import firewallCloudImage from './assets/businesses/firewall-cloud.svg'
+import highSpeedRailGridImage from './assets/businesses/high-speed-rail-grid.svg'
 import hyperscaleCampusImage from './assets/businesses/hyperscale-campus.svg'
 import inferenceClusterImage from './assets/businesses/inference-cluster.svg'
+import livestreamAgencyImage from './assets/businesses/livestream-agency.svg'
 import orbitalDataCenterImage from './assets/businesses/orbital-data-center.svg'
 import quickUpgradeImage from './assets/businesses/quick-upgrade.png'
+import rareEarthMineImage from './assets/businesses/rare-earth-mine.svg'
 import renderRackImage from './assets/businesses/render-rack.svg'
+import semiconductorFoundryImage from './assets/businesses/semiconductor-foundry.svg'
 import singleGpuRigImage from './assets/businesses/single-gpu-rig.svg'
+import smartphoneCampusImage from './assets/businesses/smartphone-campus.svg'
 import trainingPodImage from './assets/businesses/training-pod.svg'
+import { worldList } from './game/economy'
 import {
-  achievements,
-  allBusinessUnlocks,
-  angelUpgrades,
-  businesses,
-  businessUnlocks,
-  cashUpgrades,
-} from './game/economy'
-import {
+  getActiveWorld,
+  getActiveWorldState,
   getAngelEffectiveness,
   getBusinessCashPerSecond,
   getBusinessDuration,
@@ -65,12 +73,15 @@ import type {
   GameState,
   UnlockDefinition,
   UpgradeDefinition,
+  WorldDefinition,
+  WorldId,
+  WorldState,
 } from './game/types'
 import { useGame } from './game/useGame'
 
-type Panel = 'managers' | 'upgrades' | 'angels' | 'unlocks' | 'stats'
+type Panel = 'managers' | 'upgrades' | 'angels' | 'unlocks' | 'travel' | 'stats'
 
-const businessImages: Record<BusinessId, string> = {
+const businessImages: Record<string, string> = {
   'single-gpu-rig': singleGpuRigImage,
   'render-rack': renderRackImage,
   'inference-cluster': inferenceClusterImage,
@@ -81,11 +92,34 @@ const businessImages: Record<BusinessId, string> = {
   'hyperscale-campus': hyperscaleCampusImage,
   'ai-supercomputer': aiSupercomputerImage,
   'orbital-data-center': orbitalDataCenterImage,
+  'rare-earth-mine': rareEarthMineImage,
+  'e-commerce-marketplace': ecommerceMarketplaceImage,
+  'ev-plant': evPlantImage,
+  'drone-factory': droneFactoryImage,
+  'firewall-cloud': firewallCloudImage,
+  'livestream-agency': livestreamAgencyImage,
+  'ai-tutor-app': aiTutorAppImage,
+  'smartphone-campus': smartphoneCampusImage,
+  'semiconductor-foundry': semiconductorFoundryImage,
+  'high-speed-rail-grid': highSpeedRailGridImage,
+}
+
+const getBusinessImage = (business: BusinessDefinition) =>
+  businessImages[business.imageId ?? business.id] ?? quickUpgradeImage
+
+const getBusinessImageById = (
+  world: WorldDefinition,
+  businessId: BusinessId,
+) => {
+  const business = world.businesses.find((entry) => entry.id === businessId)
+
+  return business ? getBusinessImage(business) : quickUpgradeImage
 }
 
 const panelTabs: Array<{ id: Panel; label: string; icon: LucideIcon }> = [
   { id: 'stats', label: 'Swag & Stats', icon: Gauge },
   { id: 'unlocks', label: 'Unlocks', icon: Trophy },
+  { id: 'travel', label: 'Travel', icon: Globe2 },
   { id: 'upgrades', label: 'Upgrades', icon: BadgeDollarSign },
   { id: 'managers', label: 'Managers', icon: Users },
   { id: 'angels', label: 'Investors', icon: Sparkles },
@@ -106,6 +140,12 @@ const panelMeta: Record<
     tone: 'yellow',
     kicker: 'Hit ownership quotas to unlock sweet profit bonuses.',
     help: 'Buy more of each business to reach quotas. Completed quotas boost profit or speed for this run.',
+  },
+  travel: {
+    title: 'Adventures',
+    tone: 'travel',
+    kicker: 'Choose which market you want to run.',
+    help: 'Each destination keeps separate money, angels, managers, upgrades, unlocks, and business progress.',
   },
   upgrades: {
     title: 'Upgrades',
@@ -129,6 +169,18 @@ const panelMeta: Record<
 
 const buyModes: BuyMode[] = [1, 10, 100, 'next', 'max']
 
+const travelImages: Record<WorldId, string> = {
+  earth: earthTravelImage,
+  china: chinaTravelImage,
+}
+
+const travelModes: Array<{ label: string; icon: LucideIcon }> = [
+  { label: 'Markets', icon: Globe2 },
+  { label: 'Exchange', icon: BadgeDollarSign },
+  { label: 'Events', icon: Trophy },
+  { label: 'Minigames', icon: Sparkles },
+]
+
 const getNextBuyMode = (current: BuyMode): BuyMode => {
   switch (current) {
     case 1:
@@ -144,29 +196,33 @@ const getNextBuyMode = (current: BuyMode): BuyMode => {
   }
 }
 
-const getTotalCashPerSecond = (state: GameState) =>
-  businesses.reduce((total, business) => {
+const getTotalCashPerSecond = (state: WorldState, world: WorldDefinition) =>
+  world.businesses.reduce((total, business) => {
     if (!state.managers[business.id]) {
       return total
     }
 
-    return total + getBusinessCashPerSecond(state, business)
+    return total + getBusinessCashPerSecond(state, world, business)
   }, 0)
 
 const getSidebarAvailability = (
-  state: GameState,
+  state: WorldState,
+  world: WorldDefinition,
   claimableAngels: number,
 ): Partial<Record<Panel, boolean>> => ({
   upgrades:
-    cashUpgrades.some(
-      (upgrade) => !state.cashUpgrades.includes(upgrade.id) && state.cash >= upgrade.cost,
-    ) ||
-    angelUpgrades.some(
+    world.cashUpgrades.some(
       (upgrade) =>
-        !state.angelUpgrades.includes(upgrade.id) && state.angels >= upgrade.cost,
+        !state.cashUpgrades.includes(upgrade.id) && state.cash >= upgrade.cost,
+    ) ||
+    world.angelUpgrades.some(
+      (upgrade) =>
+        !state.angelUpgrades.includes(upgrade.id) &&
+        state.angels >= upgrade.cost,
     ),
-  managers: businesses.some(
-    (business) => !state.managers[business.id] && state.cash >= business.managerCost,
+  managers: world.businesses.some(
+    (business) =>
+      !state.managers[business.id] && state.cash >= business.managerCost,
   ),
   angels: state.angels === 0 && claimableAngels > 0,
 })
@@ -191,37 +247,54 @@ type QuickBuyOption =
       badge: string
     }
 
-const getUpgradeImage = (upgrade: UpgradeDefinition) => {
+const getUpgradeImage = (
+  upgrade: UpgradeDefinition,
+  world: WorldDefinition,
+) => {
   if (upgrade.target === 'all') {
     return quickUpgradeImage
   }
 
-  return businessImages[upgrade.target]
+  return getBusinessImageById(world, upgrade.target)
 }
 
-const getUnlockImage = (unlock: UnlockDefinition) =>
-  unlock.target === 'all' ? quickUpgradeImage : businessImages[unlock.target]
+const getUnlockImage = (unlock: UnlockDefinition, world: WorldDefinition) =>
+  unlock.target === 'all'
+    ? quickUpgradeImage
+    : getBusinessImageById(world, unlock.target)
 
-const getUnlockTargetName = (unlock: UnlockDefinition) => {
+const getUnlockTargetName = (
+  unlock: UnlockDefinition,
+  world: WorldDefinition,
+) => {
   if (unlock.target === 'all') {
     return 'Everything'
   }
 
   return (
-    businesses.find((business) => business.id === unlock.target)?.shortName ??
-    unlock.name
+    world.businesses.find((business) => business.id === unlock.target)
+      ?.shortName ?? unlock.name
   )
 }
 
-const getUnlockCurrent = (state: GameState, unlock: UnlockDefinition) =>
+const getUnlockCurrent = (
+  state: WorldState,
+  world: WorldDefinition,
+  unlock: UnlockDefinition,
+) =>
   unlock.target === 'all'
     ? Math.min(
-        ...businesses.map((business) => state.businesses[business.id].owned),
+        ...world.businesses.map(
+          (business) => state.businesses[business.id].owned,
+        ),
       )
     : state.businesses[unlock.target].owned
 
-const isUnlockComplete = (state: GameState, unlock: UnlockDefinition) =>
-  getUnlockCurrent(state, unlock) >= unlock.goal
+const isUnlockComplete = (
+  state: WorldState,
+  world: WorldDefinition,
+  unlock: UnlockDefinition,
+) => getUnlockCurrent(state, world, unlock) >= unlock.goal
 
 const getUnlockDetailTitle = (unlock: UnlockDefinition) => {
   const [, label] = unlock.name.split(': ')
@@ -229,8 +302,11 @@ const getUnlockDetailTitle = (unlock: UnlockDefinition) => {
   return label ?? unlock.name
 }
 
-const getUnlockDetailText = (unlock: UnlockDefinition) => {
-  const targetName = getUnlockTargetName(unlock)
+const getUnlockDetailText = (
+  unlock: UnlockDefinition,
+  world: WorldDefinition,
+) => {
+  const targetName = getUnlockTargetName(unlock, world)
   const targetLabel = unlock.target === 'all' ? 'Every Business' : targetName
   const effectLabel =
     unlock.kind === 'speed'
@@ -252,8 +328,11 @@ const formatUpgradeBadge = (upgrade: UpgradeDefinition) => {
   return formatMultiplier(upgrade.multiplier)
 }
 
-const getQuickBuyOption = (state: GameState): QuickBuyOption | null => {
-  const managerOptions: QuickBuyOption[] = businesses
+const getQuickBuyOption = (
+  state: WorldState,
+  world: WorldDefinition,
+): QuickBuyOption | null => {
+  const managerOptions: QuickBuyOption[] = world.businesses
     .filter(
       (business) =>
         !state.managers[business.id] && state.cash >= business.managerCost,
@@ -264,10 +343,10 @@ const getQuickBuyOption = (state: GameState): QuickBuyOption | null => {
       name: business.managerName,
       description: `Automates ${business.shortName}`,
       cost: business.managerCost,
-      image: businessImages[business.id],
+      image: getBusinessImage(business),
       badge: 'Mgr',
     }))
-  const upgradeOptions: QuickBuyOption[] = cashUpgrades
+  const upgradeOptions: QuickBuyOption[] = world.cashUpgrades
     .filter(
       (upgrade) =>
         !state.cashUpgrades.includes(upgrade.id) && state.cash >= upgrade.cost,
@@ -278,7 +357,7 @@ const getQuickBuyOption = (state: GameState): QuickBuyOption | null => {
       name: upgrade.name,
       description: upgrade.description,
       cost: upgrade.cost,
-      image: getUpgradeImage(upgrade),
+      image: getUpgradeImage(upgrade, world),
       badge: formatUpgradeBadge(upgrade),
     }))
 
@@ -290,19 +369,25 @@ const getQuickBuyOption = (state: GameState): QuickBuyOption | null => {
 
 const App = () => {
   const { state, actions, offlineReport, saveNow } = useGame()
+  const world = getActiveWorld(state)
+  const worldState = getActiveWorldState(state)
   const [buyMode, setBuyMode] = useState<BuyMode>(1)
   const [panel, setPanel] = useState<Panel | null>(null)
-  const claimableAngels = getClaimableAngels(state)
-  const angelBonusPercent = state.angels * getAngelEffectiveness(state) * 100
+  const claimableAngels = getClaimableAngels(worldState)
+  const angelBonusPercent =
+    worldState.angels * getAngelEffectiveness(worldState, world) * 100
   const totalCashPerSecond = useMemo(
-    () => getTotalCashPerSecond(state),
-    [state],
+    () => getTotalCashPerSecond(worldState, world),
+    [worldState, world],
   )
-  const nextAllUnlock = getNextAllUnlock(state)
-  const quickBuyOption = useMemo(() => getQuickBuyOption(state), [state])
+  const nextAllUnlock = getNextAllUnlock(worldState, world)
+  const quickBuyOption = useMemo(
+    () => getQuickBuyOption(worldState, world),
+    [worldState, world],
+  )
   const sidebarAvailability = useMemo(
-    () => getSidebarAvailability(state, claimableAngels),
-    [state, claimableAngels],
+    () => getSidebarAvailability(worldState, world, claimableAngels),
+    [worldState, world, claimableAngels],
   )
   const cycleBuyMode = () => setBuyMode((current) => getNextBuyMode(current))
   const closePanel = () => setPanel(null)
@@ -338,16 +423,19 @@ const App = () => {
               <Cpu className="h-7 w-7" strokeWidth={3} />
               <span>GPU Capitalist</span>
             </div>
-            <CashHeadline value={state.cash} />
+            <CashHeadline value={worldState.cash} world={world} />
             <div className="cash-subline">
-              <span>{formatMoney(totalCashPerSecond)} /sec</span>
-              <span>{formatCompact(state.angels, 1)} angels</span>
+              <span>
+                {formatMoney(totalCashPerSecond, world.currencySymbol)} /sec
+              </span>
+              <span>{formatCompact(worldState.angels, 1)} angels</span>
             </div>
             <div className="top-controls">
               <QuickBuyAction
                 onBuyManager={actions.buyManager}
                 onBuyUpgrade={actions.buyUpgrade}
                 option={quickBuyOption}
+                world={world}
               />
               <BuyModeTag buyMode={buyMode} onCycle={cycleBuyMode} />
             </div>
@@ -359,7 +447,7 @@ const App = () => {
                 <div className="text-lg font-black">Welcome back, boss.</div>
                 <div className="text-sm font-bold">
                   {formatDuration(offlineReport.elapsedSeconds)} away earned{' '}
-                  {formatMoney(offlineReport.earnings)}.
+                  {formatMoney(offlineReport.earnings, world.currencySymbol)}.
                 </div>
               </div>
               <button
@@ -381,14 +469,15 @@ const App = () => {
           </div>
 
           <section className="investment-grid">
-            {businesses.map((business) => (
+            {world.businesses.map((business) => (
               <BusinessRow
                 business={business}
                 buyMode={buyMode}
                 key={business.id}
                 onBuy={actions.buyBusiness}
                 onStart={actions.startBusiness}
-                state={state}
+                state={worldState}
+                world={world}
               />
             ))}
           </section>
@@ -398,28 +487,51 @@ const App = () => {
       {panel ? (
         <PanelModal onClose={closePanel} panel={panel}>
           {panel === 'managers' ? (
-            <ManagersPanel onBuy={actions.buyManager} state={state} />
+            <ManagersPanel
+              onBuy={actions.buyManager}
+              state={worldState}
+              world={world}
+            />
           ) : null}
           {panel === 'upgrades' ? (
-            <UpgradesPanel onBuy={actions.buyUpgrade} state={state} />
+            <UpgradesPanel
+              onBuy={actions.buyUpgrade}
+              state={worldState}
+              world={world}
+            />
+          ) : null}
+          {panel === 'travel' ? (
+            <TravelPanel
+              activeWorldId={state.activeWorldId}
+              gameState={state}
+              onUnlock={actions.unlockWorld}
+              onSelect={(worldId) => {
+                actions.switchWorld(worldId)
+                closePanel()
+              }}
+            />
           ) : null}
           {panel === 'angels' ? (
             <AngelsPanel
               angelBonusPercent={angelBonusPercent}
               claimableAngels={claimableAngels}
               onReset={actions.resetForAngels}
-              state={state}
+              state={worldState}
+              world={world}
             />
           ) : null}
-          {panel === 'unlocks' ? <UnlocksPanel state={state} /> : null}
+          {panel === 'unlocks' ? (
+            <UnlocksPanel state={worldState} world={world} />
+          ) : null}
           {panel === 'stats' ? (
             <StatsPanel
               angelBonusPercent={angelBonusPercent}
               claimableAngels={claimableAngels}
               onHardReset={actions.hardReset}
               onSave={saveNow}
-              state={state}
+              state={worldState}
               totalCashPerSecond={totalCashPerSecond}
+              world={world}
             />
           ) : null}
         </PanelModal>
@@ -541,18 +653,24 @@ const PanelModal = ({ panel, children, onClose }: PanelModalProps) => {
   )
 }
 
-const splitMoney = (value: number) => {
-  const formatted = formatMoney(value)
+const splitMoney = (value: number, world: WorldDefinition) => {
+  const formatted = formatMoney(value, world.currencySymbol)
   const [amount, ...scale] = formatted.split(' ')
 
   return {
     amount,
-    scale: scale.join(' ').toUpperCase() || 'CASH',
+    scale: scale.join(' ').toUpperCase() || world.currencyName.toUpperCase(),
   }
 }
 
-const CashHeadline = ({ value }: { value: number }) => {
-  const money = splitMoney(value)
+const CashHeadline = ({
+  value,
+  world,
+}: {
+  value: number
+  world: WorldDefinition
+}) => {
+  const money = splitMoney(value, world)
 
   return (
     <div className="cash-headline">
@@ -566,12 +684,14 @@ interface QuickBuyActionProps {
   option: QuickBuyOption | null
   onBuyManager: (businessId: BusinessId) => void
   onBuyUpgrade: (upgradeId: string) => void
+  world: WorldDefinition
 }
 
 const QuickBuyAction = ({
   option,
   onBuyManager,
   onBuyUpgrade,
+  world,
 }: QuickBuyActionProps) => {
   if (!option) {
     return null
@@ -585,7 +705,7 @@ const QuickBuyAction = ({
 
     onBuyUpgrade(option.id)
   }
-  const title = `Buy ${option.name}: ${option.description} (${formatMoney(option.cost)})`
+  const title = `Buy ${option.name}: ${option.description} (${formatMoney(option.cost, world.currencySymbol)})`
 
   return (
     <div className={`quick-buy-action ${option.kind}`} title={title}>
@@ -673,10 +793,10 @@ const formatCountdown = (seconds: number): string => {
   return `${totalSeconds}s`
 }
 
-const getScaleLabel = (value: number) => {
+const getScaleLabel = (value: number, world: WorldDefinition) => {
   const [, ...scale] = formatCompact(value, 3).split(' ')
 
-  return scale.join(' ').toUpperCase() || 'CASH'
+  return scale.join(' ').toUpperCase() || world.currencyName.toUpperCase()
 }
 
 const getAmountLabel = (value: number) => formatCompact(value, 3).split(' ')[0]
@@ -684,7 +804,8 @@ const getAmountLabel = (value: number) => formatCompact(value, 3).split(' ')[0]
 interface BusinessRowProps {
   business: BusinessDefinition
   buyMode: BuyMode
-  state: GameState
+  state: WorldState
+  world: WorldDefinition
   onBuy: (businessId: BusinessId, mode: BuyMode) => void
   onStart: (businessId: BusinessId) => void
 }
@@ -693,11 +814,12 @@ const BusinessRow = ({
   business,
   buyMode,
   state,
+  world,
   onBuy,
   onStart,
 }: BusinessRowProps) => {
   const businessState = state.businesses[business.id]
-  const quantity = getBuyQuantity(state, business, buyMode)
+  const quantity = getBuyQuantity(state, world, business, buyMode)
   const purchaseCost = getPurchaseCost(business, businessState.owned, quantity)
   const canBuy = quantity > 0 && state.cash >= purchaseCost
   const buyLabel = `Buy ${quantity}`
@@ -705,28 +827,24 @@ const BusinessRow = ({
     quantity > 0
       ? purchaseCost
       : getPurchaseCost(business, businessState.owned, 1)
-  const duration = getBusinessDuration(state, business)
-  const revenue = getBusinessRevenue(state, business)
+  const duration = getBusinessDuration(state, world, business)
+  const revenue = getBusinessRevenue(state, world, business)
   const progressPercent = Math.min(
     100,
     (businessState.progress / duration) * 100,
   )
   const automated = state.managers[business.id]
   const showProgress = businessState.running || automated
-  const fastCycle = duration < 0.5 && showProgress
-  const barPercent = fastCycle
-    ? 100
-    : showProgress
-      ? progressPercent
-      : 0
+  const fastCycle = duration < 0.1 && showProgress
+  const barPercent = fastCycle ? 100 : showProgress ? progressPercent : 0
   const canStart =
     businessState.owned > 0 && !businessState.running && !automated
   const timeRemaining =
     businessState.running || automated
       ? duration - businessState.progress
       : duration
-  const nextUnlock = getNextUnlock(state, business.id)
-  const unlockGoals = businessUnlocks
+  const nextUnlock = getNextUnlock(state, world, business.id)
+  const unlockGoals = world.businessUnlocks
     .filter((unlock) => unlock.target === business.id)
     .map((unlock) => unlock.goal)
   const previousUnlockGoal = nextUnlock
@@ -744,8 +862,8 @@ const BusinessRow = ({
       )
     : 100
   const revenueLabel = automated
-    ? `${formatMoney(getBusinessCashPerSecond(state, business))} /sec`
-    : `${formatMoney(revenue)} /run`
+    ? `${formatMoney(getBusinessCashPerSecond(state, world, business), world.currencySymbol)} /sec`
+    : `${formatMoney(revenue, world.currencySymbol)} /run`
 
   if (businessState.owned === 0) {
     const firstPurchaseCost = getPurchaseCost(business, 0, 1)
@@ -757,7 +875,7 @@ const BusinessRow = ({
         style={{ '--business-accent': business.accent } as CSSProperties}
       >
         <button
-          aria-label={`Buy ${business.name} for ${formatMoney(firstPurchaseCost)}`}
+          aria-label={`Buy ${business.name} for ${formatMoney(firstPurchaseCost, world.currencySymbol)}`}
           className="business-unlock-button"
           disabled={!canUnlock}
           onClick={() => onBuy(business.id, 1)}
@@ -769,12 +887,12 @@ const BusinessRow = ({
               alt=""
               className="business-image"
               draggable={false}
-              src={businessImages[business.id]}
+              src={getBusinessImage(business)}
             />
           </span>
           <span className="business-unlock-copy">
             <strong>{business.name}</strong>
-            <span>{formatMoney(firstPurchaseCost)}</span>
+            <span>{formatMoney(firstPurchaseCost, world.currencySymbol)}</span>
           </span>
         </button>
       </article>
@@ -803,7 +921,7 @@ const BusinessRow = ({
             alt=""
             className="business-image"
             draggable={false}
-            src={businessImages[business.id]}
+            src={getBusinessImage(business)}
           />
         </button>
         <div
@@ -846,7 +964,7 @@ const BusinessRow = ({
           >
             <span>{buyLabel}</span>
             <strong>{getAmountLabel(displayCost)}</strong>
-            <em>{getScaleLabel(displayCost)}</em>
+            <em>{getScaleLabel(displayCost, world)}</em>
           </button>
           <div className="time-block">{formatCountdown(timeRemaining)}</div>
         </div>
@@ -856,7 +974,8 @@ const BusinessRow = ({
 }
 
 interface ManagersPanelProps {
-  state: GameState
+  state: WorldState
+  world: WorldDefinition
   onBuy: (businessId: BusinessId) => void
 }
 
@@ -864,10 +983,12 @@ const CurrencyPills = ({
   active,
   onSelect,
   state,
+  world,
 }: {
   active: 'cash' | 'angels'
   onSelect?: (currency: 'cash' | 'angels') => void
-  state: GameState
+  state: WorldState
+  world: WorldDefinition
 }) => (
   <div className="modal-pills">
     <button
@@ -890,16 +1011,16 @@ const CurrencyPills = ({
     </button>
     <strong>
       {active === 'cash'
-        ? formatMoney(state.cash)
+        ? formatMoney(state.cash, world.currencySymbol)
         : `${formatCompact(state.angels, 1)} angels`}
     </strong>
   </div>
 )
 
-const ManagersPanel = ({ state, onBuy }: ManagersPanelProps) => (
+const ManagersPanel = ({ state, world, onBuy }: ManagersPanelProps) => (
   <div className="space-y-2">
-    <CurrencyPills active="cash" state={state} />
-    {[...businesses]
+    <CurrencyPills active="cash" state={state} world={world} />
+    {[...world.businesses]
       .sort(
         (a, b) => Number(state.managers[a.id]) - Number(state.managers[b.id]),
       )
@@ -916,7 +1037,7 @@ const ManagersPanel = ({ state, onBuy }: ManagersPanelProps) => (
               alt=""
               className="modal-row-icon"
               draggable={false}
-              src={businessImages[business.id]}
+              src={getBusinessImage(business)}
             />
             <div className="min-w-0">
               <div className="font-black uppercase text-[#3a2208]">
@@ -932,7 +1053,9 @@ const ManagersPanel = ({ state, onBuy }: ManagersPanelProps) => (
               onClick={() => onBuy(business.id)}
               type="button"
             >
-              {hired ? 'Hired' : formatMoney(business.managerCost)}
+              {hired
+                ? 'Hired'
+                : formatMoney(business.managerCost, world.currencySymbol)}
             </button>
           </div>
         )
@@ -940,14 +1063,96 @@ const ManagersPanel = ({ state, onBuy }: ManagersPanelProps) => (
   </div>
 )
 
+interface TravelPanelProps {
+  activeWorldId: WorldId
+  gameState: GameState
+  onUnlock: (worldId: WorldId) => void
+  onSelect: (worldId: WorldId) => void
+}
+
+const TravelPanel = ({
+  activeWorldId,
+  gameState,
+  onUnlock,
+  onSelect,
+}: TravelPanelProps) => (
+  <div className="travel-panel">
+    <div className="travel-mode-row" aria-label="Adventure categories">
+      {travelModes.map((mode) => {
+        const Icon = mode.icon
+
+        return (
+          <span className="travel-mode" key={mode.label}>
+            <span className="travel-mode-icon">
+              <Icon className="h-8 w-8" />
+            </span>
+            <strong>{mode.label}</strong>
+          </span>
+        )
+      })}
+    </div>
+
+    <div className="mega-bucks-balance">
+      <Globe2 className="h-5 w-5" />
+      <span>{formatCompact(gameState.megaBucks, 0)} Mega Bucks</span>
+    </div>
+
+    <div className="travel-destinations">
+      {worldList.map((world) => {
+        const active = activeWorldId === world.id
+        const unlocked = gameState.unlockedWorldIds.includes(world.id)
+        const canUnlock = gameState.megaBucks >= world.unlockCostMegaBucks
+        const statusLabel = active
+          ? 'Current'
+          : unlocked
+            ? 'Launch!'
+            : canUnlock
+              ? `Unlock ${formatCompact(world.unlockCostMegaBucks, 0)} MB`
+              : `${formatCompact(world.unlockCostMegaBucks, 0)} MB`
+
+        return (
+          <button
+            aria-label={`${world.name}: ${statusLabel}`}
+            className={`travel-choice ${world.id} ${active ? 'active' : ''} ${
+              unlocked ? '' : 'locked'
+            }`}
+            disabled={active || (!unlocked && !canUnlock)}
+            key={world.id}
+            onClick={() => {
+              if (unlocked) {
+                onSelect(world.id)
+                return
+              }
+
+              onUnlock(world.id)
+            }}
+            type="button"
+          >
+            <span className="travel-choice-ribbon">{world.name}</span>
+            <img
+              alt=""
+              className="travel-choice-image"
+              draggable={false}
+              src={travelImages[world.id]}
+            />
+            <span className="travel-choice-status">{statusLabel}</span>
+          </button>
+        )
+      })}
+    </div>
+  </div>
+)
+
 interface UpgradesPanelProps {
-  state: GameState
+  state: WorldState
+  world: WorldDefinition
   onBuy: (upgradeId: string) => void
 }
 
-const UpgradesPanel = ({ state, onBuy }: UpgradesPanelProps) => {
+const UpgradesPanel = ({ state, world, onBuy }: UpgradesPanelProps) => {
   const [currency, setCurrency] = useState<'cash' | 'angels'>('cash')
-  const upgrades = currency === 'cash' ? cashUpgrades : angelUpgrades
+  const upgrades =
+    currency === 'cash' ? world.cashUpgrades : world.angelUpgrades
   const sorted = [...upgrades].sort((a, b) => {
     const aOwned =
       a.currency === 'cash'
@@ -967,7 +1172,12 @@ const UpgradesPanel = ({ state, onBuy }: UpgradesPanelProps) => {
 
   return (
     <div className="space-y-2">
-      <CurrencyPills active={currency} onSelect={setCurrency} state={state} />
+      <CurrencyPills
+        active={currency}
+        onSelect={setCurrency}
+        state={state}
+        world={world}
+      />
       {sorted.map((upgrade) => {
         const owned =
           upgrade.currency === 'cash'
@@ -985,7 +1195,7 @@ const UpgradesPanel = ({ state, onBuy }: UpgradesPanelProps) => {
               alt=""
               className="modal-row-icon"
               draggable={false}
-              src={getUpgradeImage(upgrade)}
+              src={getUpgradeImage(upgrade, world)}
             />
             <div className="min-w-0">
               <div className="font-black uppercase text-[#3a2208]">
@@ -1004,7 +1214,7 @@ const UpgradesPanel = ({ state, onBuy }: UpgradesPanelProps) => {
               {owned
                 ? 'Owned'
                 : upgrade.currency === 'cash'
-                  ? formatMoney(upgrade.cost)
+                  ? formatMoney(upgrade.cost, world.currencySymbol)
                   : `${formatCompact(upgrade.cost, 0)} angels`}
             </button>
           </div>
@@ -1015,7 +1225,8 @@ const UpgradesPanel = ({ state, onBuy }: UpgradesPanelProps) => {
 }
 
 interface AngelsPanelProps {
-  state: GameState
+  state: WorldState
+  world: WorldDefinition
   claimableAngels: number
   angelBonusPercent: number
   onReset: () => void
@@ -1023,6 +1234,7 @@ interface AngelsPanelProps {
 
 const AngelsPanel = ({
   state,
+  world,
   claimableAngels,
   angelBonusPercent,
   onReset,
@@ -1035,7 +1247,9 @@ const AngelsPanel = ({
 
     <div className="investor-cards">
       <div className="investor-card">
-        <strong>{formatCompact(getAngelEffectiveness(state) * 100, 2)}%</strong>
+        <strong>
+          {formatCompact(getAngelEffectiveness(state, world) * 100, 2)}%
+        </strong>
         <span>Profit Bonus Per Angel</span>
         <em>{formatCompact(angelBonusPercent, 2)}% total bonus</em>
       </div>
@@ -1056,22 +1270,28 @@ const AngelsPanel = ({
   </div>
 )
 
-const UnlocksPanel = ({ state }: { state: GameState }) => {
+const UnlocksPanel = ({
+  state,
+  world,
+}: {
+  state: WorldState
+  world: WorldDefinition
+}) => {
   const [view, setView] = useState<'upcoming' | 'gallery'>('upcoming')
   const [activeGalleryUnlockId, setActiveGalleryUnlockId] = useState<
     string | null
   >(null)
   const galleryDetailTimerRef = useRef<number | null>(null)
-  const nextBusinessUnlocks = businesses
-    .map((business) => getNextUnlock(state, business.id))
+  const nextBusinessUnlocks = world.businesses
+    .map((business) => getNextUnlock(state, world, business.id))
     .filter((unlock): unlock is UnlockDefinition => Boolean(unlock))
-  const nextAllUnlock = getNextAllUnlock(state)
+  const nextAllUnlock = getNextAllUnlock(state, world)
   const upcomingUnlocks = nextAllUnlock
     ? [...nextBusinessUnlocks, nextAllUnlock]
     : nextBusinessUnlocks
-  const galleryUnlocks = [...businessUnlocks, ...allBusinessUnlocks]
+  const galleryUnlocks = [...world.businessUnlocks, ...world.allBusinessUnlocks]
   const completedUnlocks = galleryUnlocks.filter((unlock) =>
-    isUnlockComplete(state, unlock),
+    isUnlockComplete(state, world, unlock),
   ).length
   const visibleUnlocks = view === 'upcoming' ? upcomingUnlocks : galleryUnlocks
   const activeGalleryUnlock =
@@ -1150,7 +1370,7 @@ const UnlocksPanel = ({ state }: { state: GameState }) => {
       <p className="unlock-panel-copy">
         {view === 'upcoming'
           ? 'Get your investments to these quotas to unlock sweet profit bonuses.'
-          : 'Every quota in your data center empire. Completed levels are checked off.'}
+          : `Every quota in your ${world.name} empire. Completed levels are checked off.`}
       </p>
 
       {view === 'gallery' ? (
@@ -1159,7 +1379,7 @@ const UnlocksPanel = ({ state }: { state: GameState }) => {
             {galleryUnlocks.map((unlock) => (
               <UnlockCard
                 active={activeGalleryUnlockId === unlock.id}
-                complete={isUnlockComplete(state, unlock)}
+                complete={isUnlockComplete(state, world, unlock)}
                 key={unlock.id}
                 onBlur={() => {
                   if (galleryDetailTimerRef.current === null) {
@@ -1183,6 +1403,7 @@ const UnlocksPanel = ({ state }: { state: GameState }) => {
                 }}
                 onTouchActivate={() => showGalleryDetail(unlock, true)}
                 unlock={unlock}
+                world={world}
                 variant="gallery"
               />
             ))}
@@ -1190,15 +1411,17 @@ const UnlocksPanel = ({ state }: { state: GameState }) => {
           <UnlockGalleryDetail
             onClose={hideGalleryDetail}
             unlock={activeGalleryUnlock}
+            world={world}
           />
         </div>
       ) : visibleUnlocks.length > 0 ? (
         <div className={`unlock-card-grid ${view}`}>
           {visibleUnlocks.map((unlock) => (
             <UnlockCard
-              complete={isUnlockComplete(state, unlock)}
+              complete={isUnlockComplete(state, world, unlock)}
               key={unlock.id}
               unlock={unlock}
+              world={world}
             />
           ))}
         </div>
@@ -1218,6 +1441,7 @@ const UnlockCard = ({
   onMouseLeave,
   onTouchActivate,
   unlock,
+  world,
   variant = 'upcoming',
 }: {
   active?: boolean
@@ -1228,6 +1452,7 @@ const UnlockCard = ({
   onMouseLeave?: () => void
   onTouchActivate?: () => void
   unlock: UnlockDefinition
+  world: WorldDefinition
   variant?: 'upcoming' | 'gallery'
 }) => {
   const className = `unlock-card ${variant} ${complete ? 'complete' : 'locked'} ${active ? 'active' : ''}`
@@ -1237,9 +1462,9 @@ const UnlockCard = ({
       {!complete && variant === 'gallery' ? (
         <Lock className="unlock-lock h-8 w-8" />
       ) : null}
-      <img alt="" draggable={false} src={getUnlockImage(unlock)} />
+      <img alt="" draggable={false} src={getUnlockImage(unlock, world)} />
       <strong>{unlock.goal}</strong>
-      <span>{getUnlockTargetName(unlock)}</span>
+      <span>{getUnlockTargetName(unlock, world)}</span>
       <small>
         {unlock.kind} {formatMultiplier(unlock.multiplier)}
       </small>
@@ -1249,7 +1474,7 @@ const UnlockCard = ({
   if (variant === 'gallery') {
     return (
       <button
-        aria-label={`${unlock.name}: ${getUnlockDetailText(unlock)}`}
+        aria-label={`${unlock.name}: ${getUnlockDetailText(unlock, world)}`}
         className={className}
         onBlur={onBlur}
         onFocus={onFocus}
@@ -1278,9 +1503,11 @@ const UnlockCard = ({
 const UnlockGalleryDetail = ({
   unlock,
   onClose,
+  world,
 }: {
   unlock: UnlockDefinition | null
   onClose: () => void
+  world: WorldDefinition
 }) => (
   <div
     className={`unlock-gallery-detail ${unlock ? 'visible' : ''}`}
@@ -1296,14 +1523,15 @@ const UnlockGalleryDetail = ({
           X
         </button>
         <strong>{getUnlockDetailTitle(unlock)}</strong>
-        <p>{getUnlockDetailText(unlock)}</p>
+        <p>{getUnlockDetailText(unlock, world)}</p>
       </>
     ) : null}
   </div>
 )
 
 interface StatsPanelProps {
-  state: GameState
+  state: WorldState
+  world: WorldDefinition
   totalCashPerSecond: number
   claimableAngels: number
   angelBonusPercent: number
@@ -1313,6 +1541,7 @@ interface StatsPanelProps {
 
 const StatsPanel = ({
   state,
+  world,
   totalCashPerSecond,
   claimableAngels,
   angelBonusPercent,
@@ -1324,12 +1553,18 @@ const StatsPanel = ({
   return (
     <div className="space-y-3">
       <div className="stats-grid">
-        <StatTile label="Session" value={formatMoney(state.sessionEarnings)} />
+        <StatTile
+          label="Session"
+          value={formatMoney(state.sessionEarnings, world.currencySymbol)}
+        />
         <StatTile
           label="Lifetime"
-          value={formatMoney(state.lifetimeEarnings)}
+          value={formatMoney(state.lifetimeEarnings, world.currencySymbol)}
         />
-        <StatTile label="Cash/sec" value={formatMoney(totalCashPerSecond)} />
+        <StatTile
+          label="Cash/sec"
+          value={formatMoney(totalCashPerSecond, world.currencySymbol)}
+        />
         <StatTile
           label="Prestiges"
           value={formatCompact(state.prestigeCount, 0)}
@@ -1364,7 +1599,7 @@ const StatsPanel = ({
           Achievements
         </div>
         <div className="space-y-2">
-          {achievements.map((achievement) => {
+          {world.achievements.map((achievement) => {
             const unlocked = unlockedAchievements.has(achievement.id)
 
             return (

@@ -1,14 +1,6 @@
-export type BusinessId =
-  | "single-gpu-rig"
-  | "render-rack"
-  | "inference-cluster"
-  | "training-pod"
-  | "colocation-hall"
-  | "asic-farm"
-  | "cloud-region"
-  | "hyperscale-campus"
-  | "ai-supercomputer"
-  | "orbital-data-center";
+export type WorldId = "earth" | "china";
+
+export type BusinessId = string;
 
 export type BuyMode = 1 | 10 | 100 | "next" | "max";
 
@@ -20,6 +12,7 @@ export type UpgradeTarget = BusinessId | "all";
 
 export interface BusinessDefinition {
   id: BusinessId;
+  imageId?: BusinessId;
   name: string;
   shortName: string;
   caption: string;
@@ -58,16 +51,30 @@ export interface AchievementDefinition {
   description: string;
 }
 
+export interface WorldDefinition {
+  id: WorldId;
+  name: string;
+  shortName: string;
+  description: string;
+  currencyName: string;
+  currencySymbol: string;
+  unlockCostMegaBucks: number;
+  startingCash: number;
+  businesses: BusinessDefinition[];
+  cashUpgrades: UpgradeDefinition[];
+  angelUpgrades: UpgradeDefinition[];
+  businessUnlocks: UnlockDefinition[];
+  allBusinessUnlocks: UnlockDefinition[];
+  achievements: AchievementDefinition[];
+}
+
 export interface BusinessState {
   owned: number;
   progress: number;
   running: boolean;
 }
 
-export interface GameState {
-  version: number;
-  createdAt: number;
-  lastSavedAt: number;
+export interface WorldState {
   cash: number;
   lifetimeEarnings: number;
   sessionEarnings: number;
@@ -79,6 +86,16 @@ export interface GameState {
   cashUpgrades: string[];
   angelUpgrades: string[];
   achievements: string[];
+}
+
+export interface GameState {
+  version: number;
+  createdAt: number;
+  lastSavedAt: number;
+  activeWorldId: WorldId;
+  megaBucks: number;
+  unlockedWorldIds: WorldId[];
+  worlds: Record<WorldId, WorldState>;
 }
 
 export interface OfflineReport {

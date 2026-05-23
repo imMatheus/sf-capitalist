@@ -1040,6 +1040,11 @@ button:disabled {
   --modal-accent-dark: #b69c3c;
 }
 
+.adcap-modal.travel {
+  --modal-accent: #8fb653;
+  --modal-accent-dark: #617f38;
+}
+
 .modal-side-tab {
   position: absolute;
   top: -48px;
@@ -1842,6 +1847,193 @@ button.unlock-card {
   text-transform: none;
 }
 
+.travel-panel {
+  display: grid;
+  gap: 22px;
+  padding: 4px 6px 42px;
+}
+
+.travel-mode-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+.mega-bucks-balance {
+  display: inline-flex;
+  justify-self: end;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  border: 3px solid #52613a;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(#fcffe9, #b9d573);
+  color: #405127;
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.travel-mode {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  color: #fff;
+  text-align: center;
+}
+
+.travel-mode-icon {
+  display: grid;
+  place-items: center;
+  width: 86px;
+  height: 86px;
+  border: 10px solid #91b453;
+  border-radius: 50%;
+  background: #d7f39a;
+  color: #4f6a2d;
+  box-shadow:
+    inset 0 0 0 4px rgba(255, 255, 255, 0.48),
+    0 4px 0 rgba(42, 67, 30, 0.2);
+}
+
+.travel-mode strong {
+  min-width: 112px;
+  border-radius: 8px;
+  background: #90b452;
+  padding: 8px 10px;
+  color: #fffdf4;
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 2px 0 rgba(43, 68, 28, 0.34);
+}
+
+.travel-destinations {
+  display: grid;
+  gap: 66px;
+  padding-top: 16px;
+}
+
+.travel-choice {
+  --travel-accent: #7b4d97;
+  --travel-ribbon: #7b4d97;
+  --travel-button: #91b452;
+  position: relative;
+  display: block;
+  width: 100%;
+  border: 8px solid var(--travel-accent);
+  border-radius: 20px;
+  background: #26283a;
+  padding: 0;
+  color: #fffdf5;
+  cursor: pointer;
+  text-align: center;
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 255, 255, 0.16),
+    0 7px 0 rgba(53, 41, 65, 0.3);
+}
+
+.travel-choice.earth {
+  --travel-accent: #7c4d9a;
+  --travel-ribbon: #7a4d99;
+}
+
+.travel-choice.china {
+  --travel-accent: #b64a43;
+  --travel-ribbon: #b64a43;
+}
+
+.travel-choice:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 255, 255, 0.2),
+    0 10px 0 rgba(53, 41, 65, 0.24);
+}
+
+.travel-choice.active {
+  --travel-accent: #6f9942;
+  --travel-ribbon: #6f9942;
+  cursor: default;
+}
+
+.travel-choice.active:disabled {
+  filter: none;
+  opacity: 1;
+}
+
+.travel-choice.locked {
+  --travel-accent: #8e867b;
+  --travel-ribbon: #8e867b;
+}
+
+.travel-choice.locked:disabled {
+  cursor: not-allowed;
+}
+
+.travel-choice-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 11px;
+  object-fit: cover;
+  user-select: none;
+}
+
+.travel-choice.locked .travel-choice-image {
+  filter: grayscale(0.18) saturate(0.72);
+  opacity: 0.72;
+}
+
+.travel-choice-ribbon {
+  position: absolute;
+  z-index: 2;
+  top: -28px;
+  left: 28px;
+  min-width: 238px;
+  transform: rotate(-1.4deg);
+  border-radius: 6px 6px 3px 3px;
+  background: var(--travel-ribbon);
+  padding: 10px 28px 12px;
+  color: #fffdf5;
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1;
+  text-align: left;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 6px 0 rgba(42, 32, 51, 0.28),
+    -52px 10px 0 -6px color-mix(in srgb, var(--travel-ribbon) 78%, #1f1d24);
+}
+
+.travel-choice-status {
+  position: absolute;
+  z-index: 3;
+  right: max(22%, 92px);
+  bottom: -40px;
+  left: max(22%, 92px);
+  border: 5px solid #6e8d3d;
+  border-radius: 8px;
+  background: var(--travel-button);
+  padding: 11px 18px 13px;
+  color: #fffdf5;
+  font-size: 36px;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 3px 0 rgba(44, 69, 28, 0.34);
+  box-shadow: 0 6px 0 rgba(56, 72, 31, 0.45);
+  white-space: nowrap;
+}
+
+.travel-choice.locked .travel-choice-status {
+  border-color: #766e64;
+  background: #a59b8d;
+  color: #fff4da;
+  text-shadow: none;
+  box-shadow: 0 6px 0 rgba(73, 66, 59, 0.35);
+}
+
 .modal-row-icon {
   width: 86px;
   height: 86px;
@@ -2140,6 +2332,73 @@ button.unlock-card {
     padding: 76px 14px 22px;
   }
 
+  .travel-panel {
+    gap: 18px;
+    padding: 0 0 40px;
+  }
+
+  .travel-mode-row {
+    gap: 8px;
+  }
+
+  .travel-mode {
+    gap: 4px;
+  }
+
+  .travel-mode-icon {
+    width: 64px;
+    height: 64px;
+    border-width: 7px;
+  }
+
+  .travel-mode-icon svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .travel-mode strong {
+    width: 100%;
+    min-width: 0;
+    border-radius: 7px;
+    padding: 7px 4px;
+    font-size: 14px;
+  }
+
+  .mega-bucks-balance {
+    justify-self: center;
+  }
+
+  .travel-destinations {
+    gap: 56px;
+    padding-top: 10px;
+  }
+
+  .travel-choice {
+    border-width: 6px;
+    border-radius: 16px;
+  }
+
+  .travel-choice-image {
+    border-radius: 9px;
+  }
+
+  .travel-choice-ribbon {
+    top: -22px;
+    left: 14px;
+    min-width: 156px;
+    padding: 8px 20px 10px;
+    font-size: 28px;
+  }
+
+  .travel-choice-status {
+    right: max(16%, 60px);
+    bottom: -33px;
+    left: max(16%, 60px);
+    border-width: 4px;
+    padding: 10px 12px 11px;
+    font-size: 28px;
+  }
+
   .modal-pills {
     grid-template-columns: repeat(2, minmax(110px, 1fr));
     gap: 12px;
@@ -2271,6 +2530,60 @@ button.unlock-card {
 
   .investment-icon-wrap {
     display: none;
+  }
+
+  .travel-mode-row {
+    gap: 6px;
+  }
+
+  .travel-mode-icon {
+    width: 52px;
+    height: 52px;
+    border-width: 6px;
+  }
+
+  .travel-mode-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .travel-mode strong {
+    border-radius: 6px;
+    padding: 6px 2px;
+    font-size: 11px;
+  }
+
+  .mega-bucks-balance {
+    padding: 6px 9px;
+    font-size: 12px;
+  }
+
+  .travel-destinations {
+    gap: 44px;
+  }
+
+  .travel-choice {
+    border-width: 5px;
+    border-radius: 13px;
+  }
+
+  .travel-choice-ribbon {
+    top: -18px;
+    left: 8px;
+    min-width: 104px;
+    padding: 7px 14px 8px;
+    font-size: 22px;
+    box-shadow:
+      0 4px 0 rgba(42, 32, 51, 0.28),
+      -28px 8px 0 -6px color-mix(in srgb, var(--travel-ribbon) 78%, #1f1d24);
+  }
+
+  .travel-choice-status {
+    right: 38px;
+    bottom: -28px;
+    left: 38px;
+    padding: 8px 8px 9px;
+    font-size: 22px;
   }
 
   .unlock-card-grid.gallery {

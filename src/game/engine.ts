@@ -2,12 +2,10 @@ import {
   BASE_ANGEL_BONUS,
   OFFLINE_CAP_SECONDS,
   SAVE_VERSION,
-  achievements,
-  allBusinessUnlocks,
-  angelUpgrades,
-  businesses,
-  businessUnlocks,
-  cashUpgrades,
+  earthWorld,
+  getWorld,
+  worldList,
+  worlds,
 } from "./economy";
 import type {
   BusinessDefinition,
@@ -18,6 +16,9 @@ import type {
   OfflineReport,
   UnlockDefinition,
   UpgradeDefinition,
+  WorldDefinition,
+  WorldId,
+  WorldState,
 } from "./types";
 
 const initialBusinessState = (): BusinessState => ({
@@ -26,27 +27,69 @@ const initialBusinessState = (): BusinessState => ({
   running: false,
 });
 
-export const createInitialGameState = (now = Date.now()): GameState => ({
-  version: SAVE_VERSION,
-  createdAt: now,
-  lastSavedAt: now,
-  cash: 4,
+const isWorldId = (value: unknown): value is WorldId =>
+  typeof value === "string" && value in worlds;
+
+export const createInitialWorldState = (world: WorldDefinition): WorldState => ({
+  cash: world.startingCash,
   lifetimeEarnings: 0,
   sessionEarnings: 0,
   angels: 0,
   lifetimeAngels: 0,
   prestigeCount: 0,
   businesses: Object.fromEntries(
-    businesses.map((business) => [business.id, initialBusinessState()]),
-  ) as Record<BusinessId, BusinessState>,
-  managers: Object.fromEntries(businesses.map((business) => [business.id, false])) as Record<
-    BusinessId,
-    boolean
-  >,
+    world.businesses.map((business) => [business.id, initialBusinessState()]),
+  ),
+  managers: Object.fromEntries(world.businesses.map((business) => [business.id, false])),
   cashUpgrades: [],
   angelUpgrades: [],
   achievements: [],
 });
+
+export const createInitialGameState = (now = Date.now()): GameState => ({
+  version: SAVE_VERSION,
+  createdAt: now,
+  lastSavedAt: now,
+  activeWorldId: "earth",
+  megaBucks: 100,
+  unlockedWorldIds: ["earth"],
+  worlds: Object.fromEntries(
+    worldList.map((world) => [world.id, createInitialWorldState(world)]),
+  ) as Record<WorldId, WorldState>,
+});
+
+const hydrateWorldState = (
+  world: WorldDefinition,
+  saved: Partial<WorldState> | null | undefined,
+): WorldState => {
+  const initial = createInitialWorldState(world);
+
+  if (!saved) {
+    return collectAchievements(initial, world);
+  }
+
+  const hydrated: WorldState = {
+    ...initial,
+    ...saved,
+    businesses: { ...initial.businesses, ...saved.businesses },
+    managers: { ...initial.managers, ...saved.managers },
+    cashUpgrades: Array.isArray(saved.cashUpgrades) ? saved.cashUpgrades : [],
+    angelUpgrades: Array.isArray(saved.angelUpgrades) ? saved.angelUpgrades : [],
+    achievements: Array.isArray(saved.achievements) ? saved.achievements : [],
+  };
+
+  for (const business of world.businesses) {
+    const current = hydrated.businesses[business.id] ?? initialBusinessState();
+    hydrated.businesses[business.id] = {
+      owned: Math.max(0, Math.floor(Number(current.owned) || 0)),
+      progress: Math.max(0, Number(current.progress) || 0),
+      running: Boolean(current.running),
+    };
+    hydrated.managers[business.id] = Boolean(hydrated.managers[business.id]);
+  }
+
+  return collectAchievements(hydrated, world);
+};
 
 export const hydrateGameState = (saved: Partial<GameState> | null, now = Date.now()): GameState => {
   const initial = createInitialGameState(now);
@@ -55,44 +98,83 @@ export const hydrateGameState = (saved: Partial<GameState> | null, now = Date.no
     return initial;
   }
 
-  const hydrated: GameState = {
+  const savedWorlds = saved.worlds;
+  const legacyEarthState = "cash" in saved ? (saved as unknown as Partial<WorldState>) : null;
+  const activeWorldId = isWorldId(saved.activeWorldId) ? saved.activeWorldId : "earth";
+  const unlockedWorldIds = new Set<WorldId>(["earth"]);
+
+  const hydratedWorlds = Object.fromEntries(
+    worldList.map((world) => {
+      const savedWorld =
+        savedWorlds?.[world.id] ?? (world.id === "earth" ? legacyEarthState : null);
+      const hydratedWorld = hydrateWorldState(world, savedWorld);
+
+      if (
+        world.id !== "earth" &&
+        (saved.unlockedWorldIds?.includes(world.id) ||
+          hydratedWorld.businesses[world.businesses[0].id].owned > 0 ||
+          hydratedWorld.cash !== world.startingCash ||
+          hydratedWorld.cashUpgrades.length > 0 ||
+          hydratedWorld.angelUpgrades.length > 0 ||
+          hydratedWorld.lifetimeEarnings > 0)
+      ) {
+        unlockedWorldIds.add(world.id);
+      }
+
+      return [world.id, hydratedWorld];
+    }),
+  ) as Record<WorldId, WorldState>;
+
+  if (!unlockedWorldIds.has(activeWorldId)) {
+    unlockedWorldIds.add(activeWorldId);
+  }
+
+  return {
     ...initial,
     ...saved,
     version: SAVE_VERSION,
-    businesses: { ...initial.businesses, ...saved.businesses },
-    managers: { ...initial.managers, ...saved.managers },
-    cashUpgrades: Array.isArray(saved.cashUpgrades) ? saved.cashUpgrades : [],
-    angelUpgrades: Array.isArray(saved.angelUpgrades) ? saved.angelUpgrades : [],
-    achievements: Array.isArray(saved.achievements) ? saved.achievements : [],
+    activeWorldId,
+    megaBucks: Math.max(0, Number(saved.megaBucks ?? initial.megaBucks) || 0),
+    unlockedWorldIds: [...unlockedWorldIds],
+    worlds: hydratedWorlds,
   };
-
-  for (const business of businesses) {
-    const current = hydrated.businesses[business.id] ?? initialBusinessState();
-    hydrated.businesses[business.id] = {
-      owned: Math.max(0, Math.floor(Number(current.owned) || 0)),
-      progress: Math.max(0, Number(current.progress) || 0),
-      running: Boolean(current.running),
-    };
-  }
-
-  return collectAchievements(hydrated);
 };
 
-const upgradeIsOwned = (state: GameState, upgrade: UpgradeDefinition) =>
+export const getActiveWorld = (state: GameState) => getWorld(state.activeWorldId);
+
+export const getActiveWorldState = (state: GameState) => state.worlds[state.activeWorldId];
+
+const updateWorldState = (
+  state: GameState,
+  worldId: WorldId,
+  updater: (worldState: WorldState, world: WorldDefinition) => WorldState,
+): GameState => {
+  const world = getWorld(worldId);
+
+  return {
+    ...state,
+    worlds: {
+      ...state.worlds,
+      [worldId]: updater(state.worlds[worldId], world),
+    },
+  };
+};
+
+const upgradeIsOwned = (state: WorldState, upgrade: UpgradeDefinition) =>
   upgrade.currency === "cash"
     ? state.cashUpgrades.includes(upgrade.id)
     : state.angelUpgrades.includes(upgrade.id);
 
-const getOwnedUpgrades = (state: GameState) => [
-  ...cashUpgrades.filter((upgrade) => state.cashUpgrades.includes(upgrade.id)),
-  ...angelUpgrades.filter((upgrade) => state.angelUpgrades.includes(upgrade.id)),
+const getOwnedUpgrades = (state: WorldState, world: WorldDefinition) => [
+  ...world.cashUpgrades.filter((upgrade) => state.cashUpgrades.includes(upgrade.id)),
+  ...world.angelUpgrades.filter((upgrade) => state.angelUpgrades.includes(upgrade.id)),
 ];
 
 const appliesToBusiness = (upgrade: UpgradeDefinition | UnlockDefinition, businessId: BusinessId) =>
   upgrade.target === "all" || upgrade.target === businessId;
 
-const getActiveUnlocks = (state: GameState) => {
-  const activeBusinessUnlocks = businessUnlocks.filter((unlock) => {
+const getActiveUnlocks = (state: WorldState, world: WorldDefinition) => {
+  const activeBusinessUnlocks = world.businessUnlocks.filter((unlock) => {
     if (unlock.target === "all") {
       return false;
     }
@@ -100,20 +182,20 @@ const getActiveUnlocks = (state: GameState) => {
     return state.businesses[unlock.target].owned >= unlock.goal;
   });
 
-  const activeAllUnlocks = allBusinessUnlocks.filter((unlock) =>
-    businesses.every((business) => state.businesses[business.id].owned >= unlock.goal),
+  const activeAllUnlocks = world.allBusinessUnlocks.filter((unlock) =>
+    world.businesses.every((business) => state.businesses[business.id].owned >= unlock.goal),
   );
 
   return [...activeBusinessUnlocks, ...activeAllUnlocks];
 };
 
-export const getAngelEffectiveness = (state: GameState) =>
+export const getAngelEffectiveness = (state: WorldState, world: WorldDefinition) =>
   BASE_ANGEL_BONUS +
-  getOwnedUpgrades(state)
+  getOwnedUpgrades(state, world)
     .filter((upgrade) => upgrade.kind === "angelEffectiveness")
     .reduce((total, upgrade) => total + upgrade.multiplier / 100, 0);
 
-export const getClaimableAngels = (state: GameState) => {
+export const getClaimableAngels = (state: WorldState) => {
   const potentialLifetimeAngels = Math.floor(
     150 * Math.sqrt(Math.max(0, state.lifetimeEarnings) / 1_000_000_000_000_000),
   );
@@ -121,59 +203,82 @@ export const getClaimableAngels = (state: GameState) => {
   return Math.max(0, potentialLifetimeAngels - state.lifetimeAngels);
 };
 
-export const getProfitMultiplier = (state: GameState, businessId: BusinessId) => {
-  const angelMultiplier = 1 + state.angels * getAngelEffectiveness(state);
-  const upgradeMultiplier = getOwnedUpgrades(state)
+export const getProfitMultiplier = (
+  state: WorldState,
+  world: WorldDefinition,
+  businessId: BusinessId,
+) => {
+  const angelMultiplier = 1 + state.angels * getAngelEffectiveness(state, world);
+  const upgradeMultiplier = getOwnedUpgrades(state, world)
     .filter((upgrade) => upgrade.kind === "profit" && appliesToBusiness(upgrade, businessId))
     .reduce((total, upgrade) => total * upgrade.multiplier, 1);
-  const unlockMultiplier = getActiveUnlocks(state)
+  const unlockMultiplier = getActiveUnlocks(state, world)
     .filter((unlock) => unlock.kind === "profit" && appliesToBusiness(unlock, businessId))
     .reduce((total, unlock) => total * unlock.multiplier, 1);
 
   return angelMultiplier * upgradeMultiplier * unlockMultiplier;
 };
 
-export const getSpeedMultiplier = (state: GameState, businessId: BusinessId) => {
-  const upgradeMultiplier = getOwnedUpgrades(state)
+export const getSpeedMultiplier = (
+  state: WorldState,
+  world: WorldDefinition,
+  businessId: BusinessId,
+) => {
+  const upgradeMultiplier = getOwnedUpgrades(state, world)
     .filter((upgrade) => upgrade.kind === "speed" && appliesToBusiness(upgrade, businessId))
     .reduce((total, upgrade) => total * upgrade.multiplier, 1);
-  const unlockMultiplier = getActiveUnlocks(state)
+  const unlockMultiplier = getActiveUnlocks(state, world)
     .filter((unlock) => unlock.kind === "speed" && appliesToBusiness(unlock, businessId))
     .reduce((total, unlock) => total * unlock.multiplier, 1);
 
   return upgradeMultiplier * unlockMultiplier;
 };
 
-export const getBusinessDuration = (state: GameState, business: BusinessDefinition) =>
-  Math.max(0.05, business.baseDuration / getSpeedMultiplier(state, business.id));
+export const getBusinessDuration = (
+  state: WorldState,
+  world: WorldDefinition,
+  business: BusinessDefinition,
+) => Math.max(0.05, business.baseDuration / getSpeedMultiplier(state, world, business.id));
 
-export const getBusinessRevenue = (state: GameState, business: BusinessDefinition) =>
+export const getBusinessRevenue = (
+  state: WorldState,
+  world: WorldDefinition,
+  business: BusinessDefinition,
+) =>
   business.baseRevenue *
   state.businesses[business.id].owned *
-  getProfitMultiplier(state, business.id);
+  getProfitMultiplier(state, world, business.id);
 
-export const getBusinessCashPerSecond = (state: GameState, business: BusinessDefinition) => {
+export const getBusinessCashPerSecond = (
+  state: WorldState,
+  world: WorldDefinition,
+  business: BusinessDefinition,
+) => {
   const owned = state.businesses[business.id].owned;
 
   if (owned <= 0) {
     return 0;
   }
 
-  return getBusinessRevenue(state, business) / getBusinessDuration(state, business);
+  return getBusinessRevenue(state, world, business) / getBusinessDuration(state, world, business);
 };
 
-export const getNextUnlock = (state: GameState, businessId: BusinessId) => {
+export const getNextUnlock = (
+  state: WorldState,
+  world: WorldDefinition,
+  businessId: BusinessId,
+) => {
   const owned = state.businesses[businessId].owned;
 
-  return businessUnlocks
+  return world.businessUnlocks
     .filter((unlock) => unlock.target === businessId && unlock.goal > owned)
     .sort((a, b) => a.goal - b.goal)[0];
 };
 
-export const getNextAllUnlock = (state: GameState) => {
-  const minimumOwned = Math.min(...businesses.map((business) => state.businesses[business.id].owned));
+export const getNextAllUnlock = (state: WorldState, world: WorldDefinition) => {
+  const minimumOwned = Math.min(...world.businesses.map((business) => state.businesses[business.id].owned));
 
-  return allBusinessUnlocks
+  return world.allBusinessUnlocks
     .filter((unlock) => unlock.goal > minimumOwned)
     .sort((a, b) => a.goal - b.goal)[0];
 };
@@ -193,10 +298,7 @@ export const getPurchaseCost = (
     return firstCost;
   }
 
-  return (
-    firstCost *
-    ((business.costMultiplier ** quantity - 1) / (business.costMultiplier - 1))
-  );
+  return firstCost * ((business.costMultiplier ** quantity - 1) / (business.costMultiplier - 1));
 };
 
 export const getMaxAffordableQuantity = (
@@ -233,7 +335,12 @@ export const getMaxAffordableQuantity = (
   return low;
 };
 
-export const getBuyQuantity = (state: GameState, business: BusinessDefinition, mode: BuyMode) => {
+export const getBuyQuantity = (
+  state: WorldState,
+  world: WorldDefinition,
+  business: BusinessDefinition,
+  mode: BuyMode,
+) => {
   const owned = state.businesses[business.id].owned;
 
   if (mode === "max") {
@@ -241,7 +348,7 @@ export const getBuyQuantity = (state: GameState, business: BusinessDefinition, m
   }
 
   if (mode === "next") {
-    const nextUnlock = getNextUnlock(state, business.id);
+    const nextUnlock = getNextUnlock(state, world, business.id);
 
     if (!nextUnlock) {
       return 0;
@@ -253,7 +360,7 @@ export const getBuyQuantity = (state: GameState, business: BusinessDefinition, m
   return mode;
 };
 
-const earnCash = (state: GameState, amount: number): GameState => {
+const earnCash = (state: WorldState, amount: number): WorldState => {
   if (amount <= 0 || !Number.isFinite(amount)) {
     return state;
   }
@@ -270,46 +377,52 @@ export const buyBusiness = (
   state: GameState,
   businessId: BusinessId,
   mode: BuyMode,
-): GameState => {
-  const business = businesses.find((entry) => entry.id === businessId);
+): GameState =>
+  updateWorldState(state, state.activeWorldId, (worldState, world) => {
+    const business = world.businesses.find((entry) => entry.id === businessId);
 
-  if (!business) {
-    return state;
-  }
+    if (!business) {
+      return worldState;
+    }
 
-  const quantity = getBuyQuantity(state, business, mode);
-  const cost = getPurchaseCost(business, state.businesses[businessId].owned, quantity);
+    const quantity = getBuyQuantity(worldState, world, business, mode);
+    const cost = getPurchaseCost(business, worldState.businesses[businessId].owned, quantity);
 
-  if (quantity <= 0 || cost > state.cash || !Number.isFinite(cost)) {
-    return state;
-  }
+    if (quantity <= 0 || cost > worldState.cash || !Number.isFinite(cost)) {
+      return worldState;
+    }
 
-  const nextState: GameState = {
-    ...state,
-    cash: state.cash - cost,
-    businesses: {
-      ...state.businesses,
-      [businessId]: {
-        ...state.businesses[businessId],
-        owned: state.businesses[businessId].owned + quantity,
+    const nextState: WorldState = {
+      ...worldState,
+      cash: worldState.cash - cost,
+      businesses: {
+        ...worldState.businesses,
+        [businessId]: {
+          ...worldState.businesses[businessId],
+          owned: worldState.businesses[businessId].owned + quantity,
+        },
       },
-    },
-  };
+    };
 
-  return collectAchievements(nextState);
-};
+    return collectAchievements(nextState, world);
+  });
 
-export const startBusiness = (state: GameState, businessId: BusinessId): GameState => {
-  const current = state.businesses[businessId];
+const startBusinessInWorld = (
+  worldState: WorldState,
+  world: WorldDefinition,
+  businessId: BusinessId,
+): WorldState => {
+  const business = world.businesses.find((entry) => entry.id === businessId);
+  const current = worldState.businesses[businessId];
 
-  if (!current || current.owned <= 0 || current.running) {
-    return state;
+  if (!business || !current || current.owned <= 0 || current.running) {
+    return worldState;
   }
 
   return {
-    ...state,
+    ...worldState,
     businesses: {
-      ...state.businesses,
+      ...worldState.businesses,
       [businessId]: {
         ...current,
         progress: 0,
@@ -319,112 +432,121 @@ export const startBusiness = (state: GameState, businessId: BusinessId): GameSta
   };
 };
 
-export const buyManager = (state: GameState, businessId: BusinessId): GameState => {
-  const business = businesses.find((entry) => entry.id === businessId);
+export const startBusiness = (state: GameState, businessId: BusinessId): GameState =>
+  updateWorldState(state, state.activeWorldId, (worldState, world) =>
+    startBusinessInWorld(worldState, world, businessId),
+  );
 
-  if (!business || state.managers[businessId] || state.cash < business.managerCost) {
-    return state;
-  }
+export const buyManager = (state: GameState, businessId: BusinessId): GameState =>
+  updateWorldState(state, state.activeWorldId, (worldState, world) => {
+    const business = world.businesses.find((entry) => entry.id === businessId);
 
-  const nextState: GameState = {
-    ...state,
-    cash: state.cash - business.managerCost,
-    managers: {
-      ...state.managers,
-      [businessId]: true,
-    },
-  };
-
-  return collectAchievements(startBusiness(nextState, businessId));
-};
-
-export const buyUpgrade = (state: GameState, upgradeId: string): GameState => {
-  const upgrade = [...cashUpgrades, ...angelUpgrades].find((entry) => entry.id === upgradeId);
-
-  if (!upgrade || upgradeIsOwned(state, upgrade)) {
-    return state;
-  }
-
-  const applyUpgradeEffect = (nextState: GameState): GameState => {
-    if (upgrade.kind !== "owned" || upgrade.target === "all") {
-      return nextState;
+    if (!business || worldState.managers[businessId] || worldState.cash < business.managerCost) {
+      return worldState;
     }
 
-    return {
-      ...nextState,
-      businesses: {
-        ...nextState.businesses,
-        [upgrade.target]: {
-          ...nextState.businesses[upgrade.target],
-          owned: nextState.businesses[upgrade.target].owned + upgrade.multiplier,
-        },
+    const nextState: WorldState = {
+      ...worldState,
+      cash: worldState.cash - business.managerCost,
+      managers: {
+        ...worldState.managers,
+        [businessId]: true,
       },
     };
-  };
 
-  if (upgrade.currency === "cash") {
-    if (state.cash < upgrade.cost) {
-      return state;
+    return collectAchievements(startBusinessInWorld(nextState, world, businessId), world);
+  });
+
+export const buyUpgrade = (state: GameState, upgradeId: string): GameState =>
+  updateWorldState(state, state.activeWorldId, (worldState, world) => {
+    const upgrade = [...world.cashUpgrades, ...world.angelUpgrades].find((entry) => entry.id === upgradeId);
+
+    if (!upgrade || upgradeIsOwned(worldState, upgrade)) {
+      return worldState;
+    }
+
+    const applyUpgradeEffect = (nextState: WorldState): WorldState => {
+      if (upgrade.kind !== "owned" || upgrade.target === "all") {
+        return nextState;
+      }
+
+      return {
+        ...nextState,
+        businesses: {
+          ...nextState.businesses,
+          [upgrade.target]: {
+            ...nextState.businesses[upgrade.target],
+            owned: nextState.businesses[upgrade.target].owned + upgrade.multiplier,
+          },
+        },
+      };
+    };
+
+    if (upgrade.currency === "cash") {
+      if (worldState.cash < upgrade.cost) {
+        return worldState;
+      }
+
+      return collectAchievements(
+        applyUpgradeEffect({
+          ...worldState,
+          cash: worldState.cash - upgrade.cost,
+          cashUpgrades: [...worldState.cashUpgrades, upgrade.id],
+        }),
+        world,
+      );
+    }
+
+    if (worldState.angels < upgrade.cost) {
+      return worldState;
     }
 
     return collectAchievements(
       applyUpgradeEffect({
-        ...state,
-        cash: state.cash - upgrade.cost,
-        cashUpgrades: [...state.cashUpgrades, upgrade.id],
+        ...worldState,
+        angels: worldState.angels - upgrade.cost,
+        angelUpgrades: [...worldState.angelUpgrades, upgrade.id],
       }),
+      world,
     );
-  }
+  });
 
-  if (state.angels < upgrade.cost) {
-    return state;
-  }
+export const resetForAngels = (state: GameState): GameState =>
+  updateWorldState(state, state.activeWorldId, (worldState, world) => {
+    const claimableAngels = getClaimableAngels(worldState);
 
-  return collectAchievements(
-    applyUpgradeEffect({
-      ...state,
-      angels: state.angels - upgrade.cost,
-      angelUpgrades: [...state.angelUpgrades, upgrade.id],
-    }),
-  );
-};
+    if (claimableAngels <= 0) {
+      return worldState;
+    }
 
-export const resetForAngels = (state: GameState): GameState => {
-  const claimableAngels = getClaimableAngels(state);
+    const nextState: WorldState = {
+      ...createInitialWorldState(world),
+      lifetimeEarnings: worldState.lifetimeEarnings,
+      angels: worldState.angels + claimableAngels,
+      lifetimeAngels: worldState.lifetimeAngels + claimableAngels,
+      prestigeCount: worldState.prestigeCount + 1,
+      achievements: worldState.achievements,
+    };
 
-  if (claimableAngels <= 0) {
-    return state;
-  }
+    return collectAchievements(nextState, world);
+  });
 
-  const now = Date.now();
-  const nextState: GameState = {
-    ...createInitialGameState(now),
-    createdAt: state.createdAt,
-    lifetimeEarnings: state.lifetimeEarnings,
-    angels: state.angels + claimableAngels,
-    lifetimeAngels: state.lifetimeAngels + claimableAngels,
-    prestigeCount: state.prestigeCount + 1,
-    achievements: state.achievements,
-  };
-
-  return collectAchievements(nextState);
-};
-
-export const advanceTime = (
-  state: GameState,
+const advanceWorldTime = (
+  worldState: WorldState,
+  world: WorldDefinition,
   elapsedSeconds: number,
-): { state: GameState; earnings: number } => {
+): { state: WorldState; earnings: number } => {
   const safeElapsed = Math.max(0, elapsedSeconds);
 
   if (safeElapsed <= 0) {
-    return { state, earnings: 0 };
+    return { state: worldState, earnings: 0 };
   }
 
-  let nextState = state;
+  let nextState = worldState;
   let totalEarnings = 0;
   const nextBusinesses = { ...nextState.businesses };
 
-  for (const business of businesses) {
+  for (const business of world.businesses) {
     const current = nextBusinesses[business.id];
 
     if (current.owned <= 0) {
@@ -438,8 +560,8 @@ export const advanceTime = (
       continue;
     }
 
-    const duration = getBusinessDuration(nextState, business);
-    const revenue = getBusinessRevenue(nextState, business);
+    const duration = getBusinessDuration(nextState, world, business);
+    const revenue = getBusinessRevenue(nextState, world, business);
 
     if (automated) {
       const totalProgress = current.progress + safeElapsed;
@@ -481,8 +603,34 @@ export const advanceTime = (
   nextState = earnCash(nextState, totalEarnings);
 
   return {
-    state: collectAchievements(nextState),
+    state: collectAchievements(nextState, world),
     earnings: totalEarnings,
+  };
+};
+
+export const advanceTime = (
+  state: GameState,
+  elapsedSeconds: number,
+): { state: GameState; earnings: number } => {
+  let activeWorldEarnings = 0;
+  const nextWorlds = Object.fromEntries(
+    worldList.map((world) => {
+      const advanced = advanceWorldTime(state.worlds[world.id], world, elapsedSeconds);
+
+      if (world.id === state.activeWorldId) {
+        activeWorldEarnings = advanced.earnings;
+      }
+
+      return [world.id, advanced.state];
+    }),
+  ) as Record<WorldId, WorldState>;
+
+  return {
+    state: {
+      ...state,
+      worlds: nextWorlds,
+    },
+    earnings: activeWorldEarnings,
   };
 };
 
@@ -519,15 +667,20 @@ export const applyOfflineProgress = (
   };
 };
 
-export const collectAchievements = (state: GameState): GameState => {
+export const collectAchievements = (
+  state: WorldState,
+  world: WorldDefinition = earthWorld,
+): WorldState => {
   const unlocked = new Set(state.achievements);
   const managerCount = Object.values(state.managers).filter(Boolean).length;
   const cashUpgradeCount = state.cashUpgrades.length;
   const claimableAngels = getClaimableAngels(state);
-  const allBusinessesOwned = businesses.every((business) => state.businesses[business.id].owned >= 1);
-  const allBusinessHundred = businesses.every((business) => state.businesses[business.id].owned >= 100);
+  const allBusinessesOwned = world.businesses.every((business) => state.businesses[business.id].owned >= 1);
+  const allBusinessHundred = world.businesses.every((business) => state.businesses[business.id].owned >= 100);
+  const firstBusiness = world.businesses[0];
+  const finalBusiness = world.businesses[world.businesses.length - 1];
 
-  if (state.businesses["single-gpu-rig"].owned >= 1) {
+  if (firstBusiness && state.businesses[firstBusiness.id].owned >= 1) {
     unlocked.add("first-rig");
   }
 
@@ -551,7 +704,7 @@ export const collectAchievements = (state: GameState): GameState => {
     unlocked.add("first-prestige");
   }
 
-  if (managerCount === businesses.length) {
+  if (managerCount === world.businesses.length) {
     unlocked.add("all-automated");
   }
 
@@ -563,7 +716,7 @@ export const collectAchievements = (state: GameState): GameState => {
     unlocked.add("ten-businesses");
   }
 
-  if (state.businesses["orbital-data-center"].owned >= 1) {
+  if (finalBusiness && state.businesses[finalBusiness.id].owned >= 1) {
     unlocked.add("orbital-operator");
   }
 
@@ -571,11 +724,40 @@ export const collectAchievements = (state: GameState): GameState => {
     unlocked.add("trillionaire");
   }
 
-  const knownIds = new Set(achievements.map((achievement) => achievement.id));
+  const knownIds = new Set(world.achievements.map((achievement) => achievement.id));
 
   return {
     ...state,
     achievements: [...unlocked].filter((id) => knownIds.has(id)),
+  };
+};
+
+export const unlockWorld = (state: GameState, worldId: WorldId): GameState => {
+  if (state.unlockedWorldIds.includes(worldId)) {
+    return state;
+  }
+
+  const world = getWorld(worldId);
+
+  if (state.megaBucks < world.unlockCostMegaBucks) {
+    return state;
+  }
+
+  return {
+    ...state,
+    megaBucks: state.megaBucks - world.unlockCostMegaBucks,
+    unlockedWorldIds: [...state.unlockedWorldIds, worldId],
+  };
+};
+
+export const switchWorld = (state: GameState, worldId: WorldId): GameState => {
+  if (!state.unlockedWorldIds.includes(worldId)) {
+    return state;
+  }
+
+  return {
+    ...state,
+    activeWorldId: worldId,
   };
 };
 

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="High-Speed Rail Grid">
+  <g fill="none" stroke="#25211d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8">
+    <path fill="#6878ff" d="M34 118c14-40 53-62 103-62h42c22 0 40 18 40 40v54c0 25-20 45-45 45H50c-17 0-29-16-23-32z"/>
+    <path fill="#f1eee5" d="M62 112c15-22 42-34 78-34h32c11 0 20 9 20 20v20z"/>
+    <path fill="#ffbf3f" d="M48 144h148v24H41z"/>
+    <circle cx="77" cy="195" r="18" fill="#3f464c"/>
+    <circle cx="171" cy="195" r="18" fill="#3f464c"/>
+    <path d="M63 224h126M40 236h168" stroke="#5e6567"/>
+    <path d="M88 96h30M134 96h30M82 144h34M132 144h34" stroke="#25211d" stroke-width="5"/>
+    <path d="M204 88l20-14M208 116h28M204 144l20 14" stroke="#d94235"/>
+  </g>
+</svg>

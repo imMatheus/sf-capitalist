@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="EV Plant">
+  <g fill="none" stroke="#25211d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8">
+    <path fill="#4fbf73" d="M40 110h98l38 36h30c14 0 26 12 26 26v24H24v-54c0-18 8-32 16-32z"/>
+    <path fill="#f1eee5" d="M70 124h52l28 26H62z"/>
+    <circle cx="77" cy="196" r="22" fill="#3f464c"/>
+    <circle cx="183" cy="196" r="22" fill="#3f464c"/>
+    <circle cx="77" cy="196" r="8" fill="#f1eee5" stroke-width="4"/>
+    <circle cx="183" cy="196" r="8" fill="#f1eee5" stroke-width="4"/>
+    <path fill="#ffbf3f" d="M104 40h44l-22 38h28l-58 70 18-50H86z"/>
+    <path d="M38 222h172" stroke="#5e6567"/>
+  </g>
+</svg>

@@ -141,7 +141,7 @@ export const formatCompact = (value: number, fractionDigits = 2): string => {
   })} ${suffix}`.trim();
 };
 
-export const formatMoney = (value: number) => `$${formatCompact(value)}`;
+export const formatMoney = (value: number, symbol = "$") => `${symbol}${formatCompact(value)}`;
 
 export const formatLevel = (value: number) => String(Math.trunc(value));
 
