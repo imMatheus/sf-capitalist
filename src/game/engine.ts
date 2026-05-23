@@ -107,7 +107,11 @@ const getActiveUnlocks = (state: GameState) => {
   return [...activeBusinessUnlocks, ...activeAllUnlocks];
 };
 
-export const getAngelEffectiveness = (_state: GameState) => BASE_ANGEL_BONUS;
+export const getAngelEffectiveness = (state: GameState) =>
+  BASE_ANGEL_BONUS +
+  getOwnedUpgrades(state)
+    .filter((upgrade) => upgrade.kind === "angelEffectiveness")
+    .reduce((total, upgrade) => total + upgrade.multiplier / 100, 0);
 
 export const getClaimableAngels = (state: GameState) => {
   const potentialLifetimeAngels = Math.floor(
@@ -340,27 +344,48 @@ export const buyUpgrade = (state: GameState, upgradeId: string): GameState => {
     return state;
   }
 
+  const applyUpgradeEffect = (nextState: GameState): GameState => {
+    if (upgrade.kind !== "owned" || upgrade.target === "all") {
+      return nextState;
+    }
+
+    return {
+      ...nextState,
+      businesses: {
+        ...nextState.businesses,
+        [upgrade.target]: {
+          ...nextState.businesses[upgrade.target],
+          owned: nextState.businesses[upgrade.target].owned + upgrade.multiplier,
+        },
+      },
+    };
+  };
+
   if (upgrade.currency === "cash") {
     if (state.cash < upgrade.cost) {
       return state;
     }
 
-    return collectAchievements({
-      ...state,
-      cash: state.cash - upgrade.cost,
-      cashUpgrades: [...state.cashUpgrades, upgrade.id],
-    });
+    return collectAchievements(
+      applyUpgradeEffect({
+        ...state,
+        cash: state.cash - upgrade.cost,
+        cashUpgrades: [...state.cashUpgrades, upgrade.id],
+      }),
+    );
   }
 
   if (state.angels < upgrade.cost) {
     return state;
   }
 
-  return collectAchievements({
-    ...state,
-    angels: state.angels - upgrade.cost,
-    angelUpgrades: [...state.angelUpgrades, upgrade.id],
-  });
+  return collectAchievements(
+    applyUpgradeEffect({
+      ...state,
+      angels: state.angels - upgrade.cost,
+      angelUpgrades: [...state.angelUpgrades, upgrade.id],
+    }),
+  );
 };
 
 export const resetForAngels = (state: GameState): GameState => {

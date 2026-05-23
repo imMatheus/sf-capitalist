@@ -12,19 +12,26 @@ import {
   Trophy,
   Users,
   type LucideIcon,
-} from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import aiSupercomputerImage from "./assets/businesses/ai-supercomputer.png";
-import asicFarmImage from "./assets/businesses/asic-farm.png";
-import cloudRegionImage from "./assets/businesses/cloud-region.png";
-import colocationHallImage from "./assets/businesses/colocation-hall.png";
-import hyperscaleCampusImage from "./assets/businesses/hyperscale-campus.png";
-import inferenceClusterImage from "./assets/businesses/inference-cluster.png";
-import orbitalDataCenterImage from "./assets/businesses/orbital-data-center.png";
-import quickUpgradeImage from "./assets/businesses/quick-upgrade.png";
-import renderRackImage from "./assets/businesses/render-rack.png";
-import singleGpuRigImage from "./assets/businesses/single-gpu-rig.png";
-import trainingPodImage from "./assets/businesses/training-pod.png";
+} from 'lucide-react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from 'react'
+import aiSupercomputerImage from './assets/businesses/ai-supercomputer.svg'
+import asicFarmImage from './assets/businesses/asic-farm.svg'
+import cloudRegionImage from './assets/businesses/cloud-region.svg'
+import colocationHallImage from './assets/businesses/colocation-hall.svg'
+import hyperscaleCampusImage from './assets/businesses/hyperscale-campus.svg'
+import inferenceClusterImage from './assets/businesses/inference-cluster.svg'
+import orbitalDataCenterImage from './assets/businesses/orbital-data-center.svg'
+import quickUpgradeImage from './assets/businesses/quick-upgrade.png'
+import renderRackImage from './assets/businesses/render-rack.svg'
+import singleGpuRigImage from './assets/businesses/single-gpu-rig.svg'
+import trainingPodImage from './assets/businesses/training-pod.svg'
 import {
   achievements,
   allBusinessUnlocks,
@@ -32,7 +39,7 @@ import {
   businesses,
   businessUnlocks,
   cashUpgrades,
-} from "./game/economy";
+} from './game/economy'
 import {
   getAngelEffectiveness,
   getBusinessCashPerSecond,
@@ -43,208 +50,256 @@ import {
   getNextAllUnlock,
   getNextUnlock,
   getPurchaseCost,
-} from "./game/engine";
-import { formatCompact, formatDuration, formatLevel, formatMoney, formatMultiplier } from "./game/format";
-import type { BusinessDefinition, BusinessId, BuyMode, GameState, UnlockDefinition, UpgradeDefinition } from "./game/types";
-import { useGame } from "./game/useGame";
+} from './game/engine'
+import {
+  formatCompact,
+  formatDuration,
+  formatLevel,
+  formatMoney,
+  formatMultiplier,
+} from './game/format'
+import type {
+  BusinessDefinition,
+  BusinessId,
+  BuyMode,
+  GameState,
+  UnlockDefinition,
+  UpgradeDefinition,
+} from './game/types'
+import { useGame } from './game/useGame'
 
-type Panel = "managers" | "upgrades" | "angels" | "unlocks" | "stats";
+type Panel = 'managers' | 'upgrades' | 'angels' | 'unlocks' | 'stats'
 
 const businessImages: Record<BusinessId, string> = {
-  "single-gpu-rig": singleGpuRigImage,
-  "render-rack": renderRackImage,
-  "inference-cluster": inferenceClusterImage,
-  "training-pod": trainingPodImage,
-  "colocation-hall": colocationHallImage,
-  "asic-farm": asicFarmImage,
-  "cloud-region": cloudRegionImage,
-  "hyperscale-campus": hyperscaleCampusImage,
-  "ai-supercomputer": aiSupercomputerImage,
-  "orbital-data-center": orbitalDataCenterImage,
-};
+  'single-gpu-rig': singleGpuRigImage,
+  'render-rack': renderRackImage,
+  'inference-cluster': inferenceClusterImage,
+  'training-pod': trainingPodImage,
+  'colocation-hall': colocationHallImage,
+  'asic-farm': asicFarmImage,
+  'cloud-region': cloudRegionImage,
+  'hyperscale-campus': hyperscaleCampusImage,
+  'ai-supercomputer': aiSupercomputerImage,
+  'orbital-data-center': orbitalDataCenterImage,
+}
 
 const panelTabs: Array<{ id: Panel; label: string; icon: LucideIcon }> = [
-  { id: "stats", label: "Swag & Stats", icon: Gauge },
-  { id: "unlocks", label: "Unlocks", icon: Trophy },
-  { id: "upgrades", label: "Upgrades", icon: BadgeDollarSign },
-  { id: "managers", label: "Managers", icon: Users },
-  { id: "angels", label: "Investors", icon: Sparkles },
-];
+  { id: 'stats', label: 'Swag & Stats', icon: Gauge },
+  { id: 'unlocks', label: 'Unlocks', icon: Trophy },
+  { id: 'upgrades', label: 'Upgrades', icon: BadgeDollarSign },
+  { id: 'managers', label: 'Managers', icon: Users },
+  { id: 'angels', label: 'Investors', icon: Sparkles },
+]
 
-const panelMeta: Record<Panel, { title: string; tone: string; kicker: string; help: string }> = {
+const panelMeta: Record<
+  Panel,
+  { title: string; tone: string; kicker: string; help: string }
+> = {
   stats: {
-    title: "Swag & Stats",
-    tone: "gold",
-    kicker: "The numbers behind your compute empire.",
-    help: "Stats track your current run, lifetime earnings, automation rate, prestige count, achievements, and save controls.",
+    title: 'Swag & Stats',
+    tone: 'gold',
+    kicker: 'The numbers behind your compute empire.',
+    help: 'Stats track your current run, lifetime earnings, automation rate, prestige count, achievements, and save controls.',
   },
   unlocks: {
-    title: "Unlocks",
-    tone: "yellow",
-    kicker: "Hit ownership quotas to unlock sweet profit bonuses.",
-    help: "Buy more of each business to reach quotas. Completed quotas boost profit or speed for this run.",
+    title: 'Unlocks',
+    tone: 'yellow',
+    kicker: 'Hit ownership quotas to unlock sweet profit bonuses.',
+    help: 'Buy more of each business to reach quotas. Completed quotas boost profit or speed for this run.',
   },
   upgrades: {
-    title: "Upgrades",
-    tone: "orange",
-    kicker: "Spend money to make money.",
-    help: "Cash upgrades spend current money. Angel upgrades spend angel investors. Both multiply profits or speed.",
+    title: 'Upgrades',
+    tone: 'orange',
+    kicker: 'Spend money to make money.',
+    help: 'Cash upgrades spend current money. Angel upgrades spend angel investors. Both multiply profits or speed.',
   },
   managers: {
-    title: "Managers",
-    tone: "blue",
-    kicker: "Hire one to run your businesses for you.",
-    help: "Managers automate a business so it restarts as soon as its timer completes.",
+    title: 'Managers',
+    tone: 'blue',
+    kicker: 'Hire one to run your businesses for you.',
+    help: 'Managers automate a business so it restarts as soon as its timer completes.',
   },
   angels: {
-    title: "Investors",
-    tone: "purple",
-    kicker: "Reset for angel investors and bigger profit bonuses.",
-    help: "Angel investors increase profits. Claiming them restarts your businesses, cash, managers, and cash upgrades.",
+    title: 'Investors',
+    tone: 'purple',
+    kicker: 'Reset for angel investors and bigger profit bonuses.',
+    help: 'Angel investors increase profits. Claiming them restarts your businesses, cash, managers, and cash upgrades.',
   },
-};
+}
 
-const buyModes: BuyMode[] = [1, 10, 100, "next", "max"];
+const buyModes: BuyMode[] = [1, 10, 100, 'next', 'max']
 
 const getNextBuyMode = (current: BuyMode): BuyMode => {
   switch (current) {
     case 1:
-      return 10;
+      return 10
     case 10:
-      return 100;
+      return 100
     case 100:
-      return "next";
-    case "next":
-      return "max";
-    case "max":
-      return 1;
+      return 'next'
+    case 'next':
+      return 'max'
+    case 'max':
+      return 1
   }
-};
+}
 
 const getTotalCashPerSecond = (state: GameState) =>
   businesses.reduce((total, business) => {
     if (!state.managers[business.id]) {
-      return total;
+      return total
     }
 
-    return total + getBusinessCashPerSecond(state, business);
-  }, 0);
+    return total + getBusinessCashPerSecond(state, business)
+  }, 0)
 
 type QuickBuyOption =
   | {
-      kind: "manager";
-      id: BusinessId;
-      name: string;
-      description: string;
-      cost: number;
-      image: string;
-      badge: string;
+      kind: 'manager'
+      id: BusinessId
+      name: string
+      description: string
+      cost: number
+      image: string
+      badge: string
     }
   | {
-      kind: "upgrade";
-      id: string;
-      name: string;
-      description: string;
-      cost: number;
-      image: string;
-      badge: string;
-    };
+      kind: 'upgrade'
+      id: string
+      name: string
+      description: string
+      cost: number
+      image: string
+      badge: string
+    }
 
 const getUpgradeImage = (upgrade: UpgradeDefinition) => {
-  if (upgrade.target === "all") {
-    return quickUpgradeImage;
+  if (upgrade.target === 'all') {
+    return quickUpgradeImage
   }
 
-  return businessImages[upgrade.target];
-};
+  return businessImages[upgrade.target]
+}
 
 const getUnlockImage = (unlock: UnlockDefinition) =>
-  unlock.target === "all" ? quickUpgradeImage : businessImages[unlock.target];
+  unlock.target === 'all' ? quickUpgradeImage : businessImages[unlock.target]
 
 const getUnlockTargetName = (unlock: UnlockDefinition) => {
-  if (unlock.target === "all") {
-    return "Everything";
+  if (unlock.target === 'all') {
+    return 'Everything'
   }
 
-  return businesses.find((business) => business.id === unlock.target)?.shortName ?? unlock.name;
-};
+  return (
+    businesses.find((business) => business.id === unlock.target)?.shortName ??
+    unlock.name
+  )
+}
 
 const getUnlockCurrent = (state: GameState, unlock: UnlockDefinition) =>
-  unlock.target === "all"
-    ? Math.min(...businesses.map((business) => state.businesses[business.id].owned))
-    : state.businesses[unlock.target].owned;
+  unlock.target === 'all'
+    ? Math.min(
+        ...businesses.map((business) => state.businesses[business.id].owned),
+      )
+    : state.businesses[unlock.target].owned
 
 const isUnlockComplete = (state: GameState, unlock: UnlockDefinition) =>
-  getUnlockCurrent(state, unlock) >= unlock.goal;
+  getUnlockCurrent(state, unlock) >= unlock.goal
 
 const getUnlockDetailTitle = (unlock: UnlockDefinition) => {
-  const [, label] = unlock.name.split(": ");
+  const [, label] = unlock.name.split(': ')
 
-  return label ?? unlock.name;
-};
+  return label ?? unlock.name
+}
 
 const getUnlockDetailText = (unlock: UnlockDefinition) => {
-  const targetName = getUnlockTargetName(unlock);
-  const targetLabel = unlock.target === "all" ? "Every Business" : targetName;
-  const effectLabel = unlock.kind === "speed" ? `Speed of ${targetLabel}` : `Profit of ${targetLabel}`;
+  const targetName = getUnlockTargetName(unlock)
+  const targetLabel = unlock.target === 'all' ? 'Every Business' : targetName
+  const effectLabel =
+    unlock.kind === 'speed'
+      ? `Speed of ${targetLabel}`
+      : `Profit of ${targetLabel}`
 
-  return `${unlock.goal} ${targetName} - ${effectLabel} ${formatMultiplier(unlock.multiplier)}!`;
-};
+  return `${unlock.goal} ${targetName} - ${effectLabel} ${formatMultiplier(unlock.multiplier)}!`
+}
+
+const formatUpgradeBadge = (upgrade: UpgradeDefinition) => {
+  if (upgrade.kind === 'angelEffectiveness') {
+    return `+${upgrade.multiplier}%`
+  }
+
+  if (upgrade.kind === 'owned') {
+    return `+${upgrade.multiplier}`
+  }
+
+  return formatMultiplier(upgrade.multiplier)
+}
 
 const getQuickBuyOption = (state: GameState): QuickBuyOption | null => {
   const managerOptions: QuickBuyOption[] = businesses
-    .filter((business) => !state.managers[business.id] && state.cash >= business.managerCost)
+    .filter(
+      (business) =>
+        !state.managers[business.id] && state.cash >= business.managerCost,
+    )
     .map((business) => ({
-      kind: "manager",
+      kind: 'manager',
       id: business.id,
       name: business.managerName,
       description: `Automates ${business.shortName}`,
       cost: business.managerCost,
       image: businessImages[business.id],
-      badge: "Mgr",
-    }));
+      badge: 'Mgr',
+    }))
   const upgradeOptions: QuickBuyOption[] = cashUpgrades
-    .filter((upgrade) => !state.cashUpgrades.includes(upgrade.id) && state.cash >= upgrade.cost)
+    .filter(
+      (upgrade) =>
+        !state.cashUpgrades.includes(upgrade.id) && state.cash >= upgrade.cost,
+    )
     .map((upgrade) => ({
-      kind: "upgrade",
+      kind: 'upgrade',
       id: upgrade.id,
       name: upgrade.name,
       description: upgrade.description,
       cost: upgrade.cost,
       image: getUpgradeImage(upgrade),
-      badge: formatMultiplier(upgrade.multiplier),
-    }));
+      badge: formatUpgradeBadge(upgrade),
+    }))
 
-  return [...managerOptions, ...upgradeOptions].sort((a, b) => b.cost - a.cost)[0] ?? null;
-};
+  return (
+    [...managerOptions, ...upgradeOptions].sort((a, b) => b.cost - a.cost)[0] ??
+    null
+  )
+}
 
 const App = () => {
-  const { state, actions, offlineReport, saveNow } = useGame();
-  const [buyMode, setBuyMode] = useState<BuyMode>(1);
-  const [panel, setPanel] = useState<Panel | null>(null);
-  const claimableAngels = getClaimableAngels(state);
-  const angelBonusPercent = state.angels * getAngelEffectiveness(state) * 100;
-  const totalCashPerSecond = useMemo(() => getTotalCashPerSecond(state), [state]);
-  const nextAllUnlock = getNextAllUnlock(state);
-  const quickBuyOption = useMemo(() => getQuickBuyOption(state), [state]);
-  const cycleBuyMode = () => setBuyMode((current) => getNextBuyMode(current));
-  const closePanel = () => setPanel(null);
+  const { state, actions, offlineReport, saveNow } = useGame()
+  const [buyMode, setBuyMode] = useState<BuyMode>(1)
+  const [panel, setPanel] = useState<Panel | null>(null)
+  const claimableAngels = getClaimableAngels(state)
+  const angelBonusPercent = state.angels * getAngelEffectiveness(state) * 100
+  const totalCashPerSecond = useMemo(
+    () => getTotalCashPerSecond(state),
+    [state],
+  )
+  const nextAllUnlock = getNextAllUnlock(state)
+  const quickBuyOption = useMemo(() => getQuickBuyOption(state), [state])
+  const cycleBuyMode = () => setBuyMode((current) => getNextBuyMode(current))
+  const closePanel = () => setPanel(null)
 
   useEffect(() => {
     if (!panel) {
-      return;
+      return
     }
 
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closePanel();
+      if (event.key === 'Escape') {
+        closePanel()
       }
-    };
+    }
 
-    window.addEventListener("keydown", closeOnEscape);
+    window.addEventListener('keydown', closeOnEscape)
 
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [panel]);
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [panel])
 
   return (
     <div className="adcap-screen min-h-screen overflow-x-hidden text-[#241d17]">
@@ -277,10 +332,14 @@ const App = () => {
               <div>
                 <div className="text-lg font-black">Welcome back, boss.</div>
                 <div className="text-sm font-bold">
-                  {formatDuration(offlineReport.elapsedSeconds)} away earned {formatMoney(offlineReport.earnings)}.
+                  {formatDuration(offlineReport.elapsedSeconds)} away earned{' '}
+                  {formatMoney(offlineReport.earnings)}.
                 </div>
               </div>
-              <button className="paper-button orange px-5 py-3" onClick={actions.dismissOfflineReport}>
+              <button
+                className="paper-button orange px-5 py-3"
+                onClick={actions.dismissOfflineReport}
+              >
                 Collect
               </button>
             </div>
@@ -291,7 +350,7 @@ const App = () => {
             <strong>
               {nextAllUnlock
                 ? `${nextAllUnlock.goal} of everything: ${nextAllUnlock.name}`
-                : "All empire unlocks cleared"}
+                : 'All empire unlocks cleared'}
             </strong>
           </div>
 
@@ -312,13 +371,13 @@ const App = () => {
 
       {panel ? (
         <PanelModal onClose={closePanel} panel={panel}>
-          {panel === "managers" ? (
+          {panel === 'managers' ? (
             <ManagersPanel onBuy={actions.buyManager} state={state} />
           ) : null}
-          {panel === "upgrades" ? (
+          {panel === 'upgrades' ? (
             <UpgradesPanel onBuy={actions.buyUpgrade} state={state} />
           ) : null}
-          {panel === "angels" ? (
+          {panel === 'angels' ? (
             <AngelsPanel
               angelBonusPercent={angelBonusPercent}
               claimableAngels={claimableAngels}
@@ -326,8 +385,8 @@ const App = () => {
               state={state}
             />
           ) : null}
-          {panel === "unlocks" ? <UnlocksPanel state={state} /> : null}
-          {panel === "stats" ? (
+          {panel === 'unlocks' ? <UnlocksPanel state={state} /> : null}
+          {panel === 'stats' ? (
             <StatsPanel
               angelBonusPercent={angelBonusPercent}
               claimableAngels={claimableAngels}
@@ -340,12 +399,12 @@ const App = () => {
         </PanelModal>
       ) : null}
     </div>
-  );
-};
+  )
+}
 
 interface SidebarProps {
-  panel: Panel | null;
-  setPanel: (panel: Panel) => void;
+  panel: Panel | null
+  setPanel: (panel: Panel) => void
 }
 
 const Sidebar = ({ panel, setPanel }: SidebarProps) => (
@@ -360,11 +419,11 @@ const Sidebar = ({ panel, setPanel }: SidebarProps) => (
 
     <nav className="nav-rail" aria-label="Game menu">
       {panelTabs.slice(1).map((tab) => {
-        const Icon = tab.icon;
+        const Icon = tab.icon
 
         return (
           <button
-            className={`paper-tab ${panel === tab.id ? "active" : ""}`}
+            className={`paper-tab ${panel === tab.id ? 'active' : ''}`}
             key={tab.id}
             onClick={() => setPanel(tab.id)}
             type="button"
@@ -372,38 +431,43 @@ const Sidebar = ({ panel, setPanel }: SidebarProps) => (
             <Icon className="h-5 w-5" />
             <span>{tab.label}</span>
           </button>
-        );
+        )
       })}
     </nav>
 
     <button
-      className={`shop-card ${panel === "stats" ? "active" : ""}`}
-      onClick={() => setPanel("stats")}
+      className={`shop-card ${panel === 'stats' ? 'active' : ''}`}
+      onClick={() => setPanel('stats')}
       type="button"
     >
       <span>Shop</span>
       <BadgeDollarSign className="h-11 w-11" />
     </button>
   </aside>
-);
+)
 
 interface PanelModalProps {
-  panel: Panel;
-  children: ReactNode;
-  onClose: () => void;
+  panel: Panel
+  children: ReactNode
+  onClose: () => void
 }
 
 const PanelModal = ({ panel, children, onClose }: PanelModalProps) => {
-  const meta = panelMeta[panel];
-  const [showHelp, setShowHelp] = useState(false);
+  const meta = panelMeta[panel]
+  const [showHelp, setShowHelp] = useState(false)
 
   return (
-    <div className="modal-backdrop" onClick={onClose} role="presentation">
+    <div className="modal-backdrop" role="presentation">
+      <button
+        aria-label="Close modal"
+        className="modal-dismiss-layer"
+        onClick={onClose}
+        type="button"
+      />
       <section
         aria-labelledby="modal-title"
         aria-modal="true"
         className={`adcap-modal ${meta.tone}`}
-        onClick={(event) => event.stopPropagation()}
         role="dialog"
       >
         <div className="modal-side-tab left" />
@@ -412,7 +476,12 @@ const PanelModal = ({ panel, children, onClose }: PanelModalProps) => {
           <span className="node-burst" aria-hidden="true" />
           <h2 id="modal-title">{meta.title}</h2>
         </div>
-        <button aria-label="Close modal" className="modal-close" onClick={onClose} type="button">
+        <button
+          aria-label="Close modal"
+          className="modal-close"
+          onClick={onClose}
+          type="button"
+        >
           X
         </button>
         <button
@@ -437,166 +506,202 @@ const PanelModal = ({ panel, children, onClose }: PanelModalProps) => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
 const splitMoney = (value: number) => {
-  const formatted = formatMoney(value);
-  const [amount, ...scale] = formatted.split(" ");
+  const formatted = formatMoney(value)
+  const [amount, ...scale] = formatted.split(' ')
 
   return {
     amount,
-    scale: scale.join(" ").toUpperCase() || "CASH",
-  };
-};
+    scale: scale.join(' ').toUpperCase() || 'CASH',
+  }
+}
 
 const CashHeadline = ({ value }: { value: number }) => {
-  const money = splitMoney(value);
+  const money = splitMoney(value)
 
   return (
     <div className="cash-headline">
       <strong>{money.amount}</strong>
       <span>{money.scale}</span>
     </div>
-  );
-};
-
-interface QuickBuyActionProps {
-  option: QuickBuyOption | null;
-  onBuyManager: (businessId: BusinessId) => void;
-  onBuyUpgrade: (upgradeId: string) => void;
+  )
 }
 
-const QuickBuyAction = ({ option, onBuyManager, onBuyUpgrade }: QuickBuyActionProps) => {
+interface QuickBuyActionProps {
+  option: QuickBuyOption | null
+  onBuyManager: (businessId: BusinessId) => void
+  onBuyUpgrade: (upgradeId: string) => void
+}
+
+const QuickBuyAction = ({
+  option,
+  onBuyManager,
+  onBuyUpgrade,
+}: QuickBuyActionProps) => {
   if (!option) {
-    return null;
+    return null
   }
 
   const buy = () => {
-    if (option.kind === "manager") {
-      onBuyManager(option.id);
-      return;
+    if (option.kind === 'manager') {
+      onBuyManager(option.id)
+      return
     }
 
-    onBuyUpgrade(option.id);
-  };
-  const title = `Buy ${option.name}: ${option.description} (${formatMoney(option.cost)})`;
+    onBuyUpgrade(option.id)
+  }
+  const title = `Buy ${option.name}: ${option.description} (${formatMoney(option.cost)})`
 
   return (
     <div className={`quick-buy-action ${option.kind}`} title={title}>
       <button className="quick-buy-button" onClick={buy} type="button">
         Buy
       </button>
-      <button className="quick-buy-card" onClick={buy} type="button" aria-label={title}>
-        <img alt="" className="quick-buy-image" draggable={false} src={option.image} />
+      <button
+        className="quick-buy-card"
+        onClick={buy}
+        type="button"
+        aria-label={title}
+      >
+        <img
+          alt=""
+          className="quick-buy-image"
+          draggable={false}
+          src={option.image}
+        />
         <strong>{option.badge}</strong>
       </button>
     </div>
-  );
-};
+  )
+}
 
 interface BuyModeTagProps {
-  buyMode: BuyMode;
-  onCycle: () => void;
+  buyMode: BuyMode
+  onCycle: () => void
 }
 
 const BuyModeTag = ({ buyMode, onCycle }: BuyModeTagProps) => {
-  const label = buyMode === "max" ? "Max" : buyMode === "next" ? "Next" : `x${buyMode}`;
+  const label =
+    buyMode === 'max' ? 'Max' : buyMode === 'next' ? 'Next' : `x${buyMode}`
 
   return (
     <button
       aria-label={`Cycle buy multiplier, currently ${label}`}
       className="buy-tag"
       onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          onCycle();
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onCycle()
         }
       }}
       onPointerDown={(event) => {
-        event.preventDefault();
-        onCycle();
+        event.preventDefault()
+        onCycle()
       }}
       type="button"
     >
       <span>Buy</span>
       <strong>{label}</strong>
     </button>
-  );
-};
+  )
+}
 
 const formatCountdown = (seconds: number): string => {
-  const safeSeconds = Math.max(0, seconds);
+  const safeSeconds = Math.max(0, seconds)
 
   if (safeSeconds < 0.1) {
-    return "0.0s";
+    return '0.0s'
   }
 
   if (safeSeconds < 10) {
-    return `${Math.min(9.9, safeSeconds).toFixed(1)}s`;
+    return `${Math.min(9.9, safeSeconds).toFixed(1)}s`
   }
 
-  const totalSeconds = Math.ceil(safeSeconds);
-  const secs = totalSeconds % 60;
-  const minutes = Math.floor(totalSeconds / 60) % 60;
-  const hours = Math.floor(totalSeconds / 3_600) % 24;
-  const days = Math.floor(totalSeconds / 86_400);
+  const totalSeconds = Math.ceil(safeSeconds)
+  const secs = totalSeconds % 60
+  const minutes = Math.floor(totalSeconds / 60) % 60
+  const hours = Math.floor(totalSeconds / 3_600) % 24
+  const days = Math.floor(totalSeconds / 86_400)
 
   if (days > 0) {
-    return `${days}d ${String(hours).padStart(2, "0")}h`;
+    return `${days}d ${String(hours).padStart(2, '0')}h`
   }
 
   if (hours > 0) {
-    return `${hours}h ${String(minutes).padStart(2, "0")}m`;
+    return `${hours}h ${String(minutes).padStart(2, '0')}m`
   }
 
   if (minutes > 0) {
-    return `${minutes}m ${String(secs).padStart(2, "0")}s`;
+    return `${minutes}m ${String(secs).padStart(2, '0')}s`
   }
 
-  return `${totalSeconds}s`;
-};
-
-const getScaleLabel = (value: number) => {
-  const [, ...scale] = formatCompact(value, 3).split(" ");
-
-  return scale.join(" ").toUpperCase() || "CASH";
-};
-
-const getAmountLabel = (value: number) => formatCompact(value, 3).split(" ")[0];
-
-interface BusinessRowProps {
-  business: BusinessDefinition;
-  buyMode: BuyMode;
-  state: GameState;
-  onBuy: (businessId: BusinessId, mode: BuyMode) => void;
-  onStart: (businessId: BusinessId) => void;
+  return `${totalSeconds}s`
 }
 
-const BusinessRow = ({ business, buyMode, state, onBuy, onStart }: BusinessRowProps) => {
-  const businessState = state.businesses[business.id];
-  const quantity = getBuyQuantity(state, business, buyMode);
-  const purchaseCost = getPurchaseCost(business, businessState.owned, quantity);
-  const canBuy = quantity > 0 && state.cash >= purchaseCost;
-  const buyLabel = `Buy ${quantity}`;
+const getScaleLabel = (value: number) => {
+  const [, ...scale] = formatCompact(value, 3).split(' ')
+
+  return scale.join(' ').toUpperCase() || 'CASH'
+}
+
+const getAmountLabel = (value: number) => formatCompact(value, 3).split(' ')[0]
+
+interface BusinessRowProps {
+  business: BusinessDefinition
+  buyMode: BuyMode
+  state: GameState
+  onBuy: (businessId: BusinessId, mode: BuyMode) => void
+  onStart: (businessId: BusinessId) => void
+}
+
+const BusinessRow = ({
+  business,
+  buyMode,
+  state,
+  onBuy,
+  onStart,
+}: BusinessRowProps) => {
+  const businessState = state.businesses[business.id]
+  const quantity = getBuyQuantity(state, business, buyMode)
+  const purchaseCost = getPurchaseCost(business, businessState.owned, quantity)
+  const canBuy = quantity > 0 && state.cash >= purchaseCost
+  const buyLabel = `Buy ${quantity}`
   const displayCost =
-    quantity > 0 ? purchaseCost : getPurchaseCost(business, businessState.owned, 1);
-  const duration = getBusinessDuration(state, business);
-  const revenue = getBusinessRevenue(state, business);
-  const progressPercent = Math.min(100, (businessState.progress / duration) * 100);
-  const automated = state.managers[business.id];
-  const showProgress = businessState.running || automated;
-  const fastCycle = duration < 0.5 && showProgress;
-  const barPercent = fastCycle ? 100 : showProgress ? progressPercent : businessState.owned > 0 ? 100 : 0;
-  const canStart = businessState.owned > 0 && !businessState.running && !automated;
-  const timeRemaining = businessState.running || automated ? duration - businessState.progress : 0;
-  const nextUnlock = getNextUnlock(state, business.id);
+    quantity > 0
+      ? purchaseCost
+      : getPurchaseCost(business, businessState.owned, 1)
+  const duration = getBusinessDuration(state, business)
+  const revenue = getBusinessRevenue(state, business)
+  const progressPercent = Math.min(
+    100,
+    (businessState.progress / duration) * 100,
+  )
+  const automated = state.managers[business.id]
+  const showProgress = businessState.running || automated
+  const fastCycle = duration < 0.5 && showProgress
+  const barPercent = fastCycle
+    ? 100
+    : showProgress
+      ? progressPercent
+      : businessState.owned > 0
+        ? 100
+        : 0
+  const canStart =
+    businessState.owned > 0 && !businessState.running && !automated
+  const timeRemaining =
+    businessState.running || automated
+      ? duration - businessState.progress
+      : duration
+  const nextUnlock = getNextUnlock(state, business.id)
   const unlockGoals = businessUnlocks
     .filter((unlock) => unlock.target === business.id)
-    .map((unlock) => unlock.goal);
+    .map((unlock) => unlock.goal)
   const previousUnlockGoal = nextUnlock
     ? Math.max(0, ...unlockGoals.filter((goal) => goal < nextUnlock.goal))
-    : Math.max(0, ...unlockGoals);
+    : Math.max(0, ...unlockGoals)
   const ownedProgressPercent = nextUnlock
     ? Math.min(
         100,
@@ -607,25 +712,75 @@ const BusinessRow = ({ business, buyMode, state, onBuy, onStart }: BusinessRowPr
             100,
         ),
       )
-    : 100;
+    : 100
   const revenueLabel = automated
     ? `${formatMoney(getBusinessCashPerSecond(state, business))} /sec`
-    : `${formatMoney(revenue)} /run`;
+    : `${formatMoney(revenue)} /run`
+
+  if (businessState.owned === 0) {
+    const firstPurchaseCost = getPurchaseCost(business, 0, 1)
+    const canUnlock = state.cash >= firstPurchaseCost
+
+    return (
+      <article
+        className={`business-unlock-card ${canUnlock ? 'affordable' : 'locked'}`}
+        style={{ '--business-accent': business.accent } as CSSProperties}
+      >
+        <button
+          aria-label={`Buy ${business.name} for ${formatMoney(firstPurchaseCost)}`}
+          className="business-unlock-button"
+          disabled={!canUnlock}
+          onClick={() => onBuy(business.id, 1)}
+          title={business.caption}
+          type="button"
+        >
+          <span className="business-unlock-icon">
+            <img
+              alt=""
+              className="business-image"
+              draggable={false}
+              src={businessImages[business.id]}
+            />
+          </span>
+          <span className="business-unlock-copy">
+            <strong>{business.name}</strong>
+            <span>{formatMoney(firstPurchaseCost)}</span>
+          </span>
+        </button>
+      </article>
+    )
+  }
 
   return (
-    <article className="investment-card" style={{ "--business-accent": business.accent } as CSSProperties}>
+    <article
+      className="investment-card"
+      style={{ '--business-accent': business.accent } as CSSProperties}
+    >
       <div className="investment-icon-wrap">
-        <div className="investment-icon">
+        <button
+          aria-disabled={!canStart}
+          aria-label={canStart ? `Start ${business.name}` : business.caption}
+          className={`investment-icon ${canStart ? 'ready' : ''}`}
+          onClick={() => {
+            if (canStart) {
+              onStart(business.id)
+            }
+          }}
+          title={canStart ? `Start ${business.name}` : business.caption}
+          type="button"
+        >
           <img
             alt=""
             className="business-image"
             draggable={false}
             src={businessImages[business.id]}
           />
-        </div>
+        </button>
         <div
           className="owned-count"
-          style={{ "--owned-progress": `${ownedProgressPercent}%` } as CSSProperties}
+          style={
+            { '--owned-progress': `${ownedProgressPercent}%` } as CSSProperties
+          }
         >
           <span>{formatLevel(businessState.owned)}</span>
         </div>
@@ -634,21 +789,22 @@ const BusinessRow = ({ business, buyMode, state, onBuy, onStart }: BusinessRowPr
       <div className="investment-control">
         <div className="investment-name-row">
           <h2>{business.shortName}</h2>
-          {automated ? <span>Managed</span> : <span>{formatDuration(duration)}</span>}
         </div>
         <button
-          className={`revenue-arrow ${canStart ? "ready" : ""} ${fastCycle ? "fast-cycle" : ""}`}
+          className={`revenue-arrow ${canStart ? 'ready' : ''} ${fastCycle ? 'fast-cycle' : ''}`}
           onClick={() => {
             if (canStart) {
-              onStart(business.id);
+              onStart(business.id)
             }
           }}
-          title={canStart ? "Start production" : business.caption}
+          title={canStart ? 'Start production' : business.caption}
           type="button"
         >
           <span className="revenue-fill" style={{ width: `${barPercent}%` }} />
           <span className="revenue-text">{revenueLabel}</span>
-          {canStart ? <Play className="revenue-play h-4 w-4" fill="currentColor" /> : null}
+          {canStart ? (
+            <Play className="revenue-play h-4 w-4" fill="currentColor" />
+          ) : null}
         </button>
 
         <div className="purchase-row">
@@ -664,20 +820,14 @@ const BusinessRow = ({ business, buyMode, state, onBuy, onStart }: BusinessRowPr
           </button>
           <div className="time-block">{formatCountdown(timeRemaining)}</div>
         </div>
-
-        <div className="unlock-hint">
-          {nextUnlock
-            ? `${nextUnlock.goal} owned unlocks ${formatMultiplier(nextUnlock.multiplier)} ${nextUnlock.kind}`
-            : "All ownership unlocks cleared"}
-        </div>
       </div>
     </article>
-  );
-};
+  )
+}
 
 interface ManagersPanelProps {
-  state: GameState;
-  onBuy: (businessId: BusinessId) => void;
+  state: GameState
+  onBuy: (businessId: BusinessId) => void
 }
 
 const CurrencyPills = ({
@@ -685,101 +835,135 @@ const CurrencyPills = ({
   onSelect,
   state,
 }: {
-  active: "cash" | "angels";
-  onSelect?: (currency: "cash" | "angels") => void;
-  state: GameState;
+  active: 'cash' | 'angels'
+  onSelect?: (currency: 'cash' | 'angels') => void
+  state: GameState
 }) => (
   <div className="modal-pills">
     <button
-      className={active === "cash" ? "active" : ""}
+      className={active === 'cash' ? 'active' : ''}
       disabled={!onSelect}
-      onClick={() => onSelect?.("cash")}
+      onClick={() => onSelect?.('cash')}
       type="button"
     >
       <BadgeDollarSign className="h-9 w-9" />
       <span>Cash</span>
     </button>
     <button
-      className={active === "angels" ? "active" : ""}
+      className={active === 'angels' ? 'active' : ''}
       disabled={!onSelect}
-      onClick={() => onSelect?.("angels")}
+      onClick={() => onSelect?.('angels')}
       type="button"
     >
       <Sparkles className="h-9 w-9" />
       <span>Angels</span>
     </button>
-    <strong>{active === "cash" ? formatMoney(state.cash) : `${formatCompact(state.angels, 1)} angels`}</strong>
+    <strong>
+      {active === 'cash'
+        ? formatMoney(state.cash)
+        : `${formatCompact(state.angels, 1)} angels`}
+    </strong>
   </div>
-);
+)
 
 const ManagersPanel = ({ state, onBuy }: ManagersPanelProps) => (
   <div className="space-y-2">
     <CurrencyPills active="cash" state={state} />
     {[...businesses]
-      .sort((a, b) => Number(state.managers[a.id]) - Number(state.managers[b.id]))
+      .sort(
+        (a, b) => Number(state.managers[a.id]) - Number(state.managers[b.id]),
+      )
       .map((business) => {
-      const hired = state.managers[business.id];
-      const affordable = state.cash >= business.managerCost;
+        const hired = state.managers[business.id]
+        const affordable = state.cash >= business.managerCost
 
-      return (
-        <div className={`shop-row ${hired ? "complete" : ""}`} key={business.id}>
-          <img alt="" className="modal-row-icon" draggable={false} src={businessImages[business.id]} />
-          <div className="min-w-0">
-            <div className="font-black uppercase text-[#3a2208]">{business.managerName}</div>
-            <div className="text-sm font-bold text-[#684114]">Runs {business.name}</div>
-          </div>
-          <button
-            className="adcap-button green shrink-0 px-3 py-2 text-sm"
-            disabled={hired || !affordable}
-            onClick={() => onBuy(business.id)}
-            type="button"
+        return (
+          <div
+            className={`shop-row ${hired ? 'complete' : ''}`}
+            key={business.id}
           >
-            {hired ? "Hired" : formatMoney(business.managerCost)}
-          </button>
-        </div>
-      );
-    })}
+            <img
+              alt=""
+              className="modal-row-icon"
+              draggable={false}
+              src={businessImages[business.id]}
+            />
+            <div className="min-w-0">
+              <div className="font-black uppercase text-[#3a2208]">
+                {business.managerName}
+              </div>
+              <div className="text-sm font-bold text-[#684114]">
+                Runs {business.name}
+              </div>
+            </div>
+            <button
+              className="adcap-button green shrink-0 px-3 py-2 text-sm"
+              disabled={hired || !affordable}
+              onClick={() => onBuy(business.id)}
+              type="button"
+            >
+              {hired ? 'Hired' : formatMoney(business.managerCost)}
+            </button>
+          </div>
+        )
+      })}
   </div>
-);
+)
 
 interface UpgradesPanelProps {
-  state: GameState;
-  onBuy: (upgradeId: string) => void;
+  state: GameState
+  onBuy: (upgradeId: string) => void
 }
 
 const UpgradesPanel = ({ state, onBuy }: UpgradesPanelProps) => {
-  const [currency, setCurrency] = useState<"cash" | "angels">("cash");
-  const upgrades = currency === "cash" ? cashUpgrades : angelUpgrades;
+  const [currency, setCurrency] = useState<'cash' | 'angels'>('cash')
+  const upgrades = currency === 'cash' ? cashUpgrades : angelUpgrades
   const sorted = [...upgrades].sort((a, b) => {
     const aOwned =
-      a.currency === "cash" ? state.cashUpgrades.includes(a.id) : state.angelUpgrades.includes(a.id);
+      a.currency === 'cash'
+        ? state.cashUpgrades.includes(a.id)
+        : state.angelUpgrades.includes(a.id)
     const bOwned =
-      b.currency === "cash" ? state.cashUpgrades.includes(b.id) : state.angelUpgrades.includes(b.id);
+      b.currency === 'cash'
+        ? state.cashUpgrades.includes(b.id)
+        : state.angelUpgrades.includes(b.id)
 
     if (aOwned !== bOwned) {
-      return Number(aOwned) - Number(bOwned);
+      return Number(aOwned) - Number(bOwned)
     }
 
-    return a.cost - b.cost;
-  });
+    return a.cost - b.cost
+  })
 
   return (
     <div className="space-y-2">
       <CurrencyPills active={currency} onSelect={setCurrency} state={state} />
       {sorted.map((upgrade) => {
         const owned =
-          upgrade.currency === "cash"
+          upgrade.currency === 'cash'
             ? state.cashUpgrades.includes(upgrade.id)
-            : state.angelUpgrades.includes(upgrade.id);
-        const balance = upgrade.currency === "cash" ? state.cash : state.angels;
-        const affordable = balance >= upgrade.cost;
+            : state.angelUpgrades.includes(upgrade.id)
+        const balance = upgrade.currency === 'cash' ? state.cash : state.angels
+        const affordable = balance >= upgrade.cost
 
         return (
-          <div className={`shop-row ${owned ? "complete" : ""}`} key={upgrade.id}>
-            <img alt="" className="modal-row-icon" draggable={false} src={getUpgradeImage(upgrade)} />
+          <div
+            className={`shop-row ${owned ? 'complete' : ''}`}
+            key={upgrade.id}
+          >
+            <img
+              alt=""
+              className="modal-row-icon"
+              draggable={false}
+              src={getUpgradeImage(upgrade)}
+            />
             <div className="min-w-0">
-              <div className="font-black uppercase text-[#3a2208]">{upgrade.name}</div>
-              <div className="text-sm font-bold text-[#684114]">{upgrade.description}</div>
+              <div className="font-black uppercase text-[#3a2208]">
+                {upgrade.name}
+              </div>
+              <div className="text-sm font-bold text-[#684114]">
+                {upgrade.description}
+              </div>
             </div>
             <button
               className="adcap-button gold shrink-0 px-3 py-2 text-sm"
@@ -788,26 +972,31 @@ const UpgradesPanel = ({ state, onBuy }: UpgradesPanelProps) => {
               type="button"
             >
               {owned
-                ? "Owned"
-                : upgrade.currency === "cash"
+                ? 'Owned'
+                : upgrade.currency === 'cash'
                   ? formatMoney(upgrade.cost)
                   : `${formatCompact(upgrade.cost, 0)} angels`}
             </button>
           </div>
-        );
+        )
       })}
     </div>
-  );
-};
-
-interface AngelsPanelProps {
-  state: GameState;
-  claimableAngels: number;
-  angelBonusPercent: number;
-  onReset: () => void;
+  )
 }
 
-const AngelsPanel = ({ state, claimableAngels, angelBonusPercent, onReset }: AngelsPanelProps) => (
+interface AngelsPanelProps {
+  state: GameState
+  claimableAngels: number
+  angelBonusPercent: number
+  onReset: () => void
+}
+
+const AngelsPanel = ({
+  state,
+  claimableAngels,
+  angelBonusPercent,
+  onReset,
+}: AngelsPanelProps) => (
   <div className="investor-layout">
     <div className="angel-total-banner">
       <div>Your Total Angels</div>
@@ -823,77 +1012,89 @@ const AngelsPanel = ({ state, claimableAngels, angelBonusPercent, onReset }: Ang
       <div className="investor-card claim">
         <strong>{formatCompact(claimableAngels, 2)}</strong>
         <span>Angels Claimed With Restart</span>
-        <button className="adcap-button" disabled={claimableAngels <= 0} onClick={onReset} type="button">
+        <button
+          className="adcap-button"
+          disabled={claimableAngels <= 0}
+          onClick={onReset}
+          type="button"
+        >
           Claim
         </button>
         <em>Restart your businesses</em>
       </div>
     </div>
   </div>
-);
+)
 
 const UnlocksPanel = ({ state }: { state: GameState }) => {
-  const [view, setView] = useState<"upcoming" | "gallery">("upcoming");
-  const [activeGalleryUnlockId, setActiveGalleryUnlockId] = useState<string | null>(null);
-  const galleryDetailTimerRef = useRef<number | null>(null);
+  const [view, setView] = useState<'upcoming' | 'gallery'>('upcoming')
+  const [activeGalleryUnlockId, setActiveGalleryUnlockId] = useState<
+    string | null
+  >(null)
+  const galleryDetailTimerRef = useRef<number | null>(null)
   const nextBusinessUnlocks = businesses
     .map((business) => getNextUnlock(state, business.id))
-    .filter((unlock): unlock is UnlockDefinition => Boolean(unlock));
-  const nextAllUnlock = getNextAllUnlock(state);
+    .filter((unlock): unlock is UnlockDefinition => Boolean(unlock))
+  const nextAllUnlock = getNextAllUnlock(state)
   const upcomingUnlocks = nextAllUnlock
     ? [...nextBusinessUnlocks, nextAllUnlock]
-    : nextBusinessUnlocks;
-  const galleryUnlocks = [...businessUnlocks, ...allBusinessUnlocks];
-  const completedUnlocks = galleryUnlocks.filter((unlock) => isUnlockComplete(state, unlock)).length;
-  const visibleUnlocks = view === "upcoming" ? upcomingUnlocks : galleryUnlocks;
+    : nextBusinessUnlocks
+  const galleryUnlocks = [...businessUnlocks, ...allBusinessUnlocks]
+  const completedUnlocks = galleryUnlocks.filter((unlock) =>
+    isUnlockComplete(state, unlock),
+  ).length
+  const visibleUnlocks = view === 'upcoming' ? upcomingUnlocks : galleryUnlocks
   const activeGalleryUnlock =
-    view === "gallery"
-      ? galleryUnlocks.find((unlock) => unlock.id === activeGalleryUnlockId) ?? null
-      : null;
+    view === 'gallery'
+      ? (galleryUnlocks.find((unlock) => unlock.id === activeGalleryUnlockId) ??
+        null)
+      : null
 
   const clearGalleryDetailTimer = () => {
     if (galleryDetailTimerRef.current !== null) {
-      window.clearTimeout(galleryDetailTimerRef.current);
-      galleryDetailTimerRef.current = null;
+      window.clearTimeout(galleryDetailTimerRef.current)
+      galleryDetailTimerRef.current = null
     }
-  };
+  }
 
   const hideGalleryDetail = () => {
-    clearGalleryDetailTimer();
-    setActiveGalleryUnlockId(null);
-  };
+    clearGalleryDetailTimer()
+    setActiveGalleryUnlockId(null)
+  }
 
   const showGalleryDetail = (unlock: UnlockDefinition, timed = false) => {
-    clearGalleryDetailTimer();
-    setActiveGalleryUnlockId(unlock.id);
+    clearGalleryDetailTimer()
+    setActiveGalleryUnlockId(unlock.id)
 
     if (timed) {
       galleryDetailTimerRef.current = window.setTimeout(() => {
-        setActiveGalleryUnlockId((current) => (current === unlock.id ? null : current));
-        galleryDetailTimerRef.current = null;
-      }, 3_000);
+        setActiveGalleryUnlockId((current) =>
+          current === unlock.id ? null : current,
+        )
+        galleryDetailTimerRef.current = null
+      }, 3_000)
     }
-  };
+  }
 
   useEffect(
     () => () => {
-      clearGalleryDetailTimer();
+      clearGalleryDetailTimer()
     },
     [],
-  );
+  )
 
   useEffect(() => {
-    if (view !== "gallery") {
-      hideGalleryDetail();
+    if (view !== 'gallery') {
+      hideGalleryDetail()
     }
-  }, [view]);
+  }, [view])
 
   return (
     <div className="unlock-panel">
       <div className="unlock-view-tabs" aria-label="Unlock views">
         <button
-          className={`unlock-view-tab ${view === "upcoming" ? "active" : ""}`}
-          onClick={() => setView("upcoming")}
+          className={`unlock-view-tab ${view === 'upcoming' ? 'active' : ''}`}
+          onClick={() => setView('upcoming')}
           type="button"
         >
           <span className="unlock-view-icon">
@@ -902,8 +1103,8 @@ const UnlocksPanel = ({ state }: { state: GameState }) => {
           <strong>Unlocks</strong>
         </button>
         <button
-          className={`unlock-view-tab ${view === "gallery" ? "active" : ""}`}
-          onClick={() => setView("gallery")}
+          className={`unlock-view-tab ${view === 'gallery' ? 'active' : ''}`}
+          onClick={() => setView('gallery')}
           type="button"
         >
           <span className="unlock-view-icon">
@@ -917,12 +1118,12 @@ const UnlocksPanel = ({ state }: { state: GameState }) => {
       </div>
 
       <p className="unlock-panel-copy">
-        {view === "upcoming"
-          ? "Get your investments to these quotas to unlock sweet profit bonuses."
-          : "Every quota in your data center empire. Completed levels are checked off."}
+        {view === 'upcoming'
+          ? 'Get your investments to these quotas to unlock sweet profit bonuses.'
+          : 'Every quota in your data center empire. Completed levels are checked off.'}
       </p>
 
-      {view === "gallery" ? (
+      {view === 'gallery' ? (
         <div className="unlock-gallery-shell">
           <div className="unlock-card-grid gallery">
             {galleryUnlocks.map((unlock) => (
@@ -932,22 +1133,22 @@ const UnlocksPanel = ({ state }: { state: GameState }) => {
                 key={unlock.id}
                 onBlur={() => {
                   if (galleryDetailTimerRef.current === null) {
-                    setActiveGalleryUnlockId(null);
+                    setActiveGalleryUnlockId(null)
                   }
                 }}
                 onFocus={() => {
                   if (galleryDetailTimerRef.current === null) {
-                    showGalleryDetail(unlock);
+                    showGalleryDetail(unlock)
                   }
                 }}
                 onMouseEnter={() => {
                   if (galleryDetailTimerRef.current === null) {
-                    showGalleryDetail(unlock);
+                    showGalleryDetail(unlock)
                   }
                 }}
                 onMouseLeave={() => {
                   if (galleryDetailTimerRef.current === null) {
-                    setActiveGalleryUnlockId(null);
+                    setActiveGalleryUnlockId(null)
                   }
                 }}
                 onTouchActivate={() => showGalleryDetail(unlock, true)}
@@ -956,7 +1157,10 @@ const UnlocksPanel = ({ state }: { state: GameState }) => {
               />
             ))}
           </div>
-          <UnlockGalleryDetail onClose={hideGalleryDetail} unlock={activeGalleryUnlock} />
+          <UnlockGalleryDetail
+            onClose={hideGalleryDetail}
+            unlock={activeGalleryUnlock}
+          />
         </div>
       ) : visibleUnlocks.length > 0 ? (
         <div className={`unlock-card-grid ${view}`}>
@@ -972,8 +1176,8 @@ const UnlocksPanel = ({ state }: { state: GameState }) => {
         <div className="unlock-empty">All unlock quotas cleared.</div>
       )}
     </div>
-  );
-};
+  )
+}
 
 const UnlockCard = ({
   active = false,
@@ -984,23 +1188,25 @@ const UnlockCard = ({
   onMouseLeave,
   onTouchActivate,
   unlock,
-  variant = "upcoming",
+  variant = 'upcoming',
 }: {
-  active?: boolean;
-  complete: boolean;
-  onBlur?: () => void;
-  onFocus?: () => void;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
-  onTouchActivate?: () => void;
-  unlock: UnlockDefinition;
-  variant?: "upcoming" | "gallery";
+  active?: boolean
+  complete: boolean
+  onBlur?: () => void
+  onFocus?: () => void
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
+  onTouchActivate?: () => void
+  unlock: UnlockDefinition
+  variant?: 'upcoming' | 'gallery'
 }) => {
-  const className = `unlock-card ${variant} ${complete ? "complete" : "locked"} ${active ? "active" : ""}`;
+  const className = `unlock-card ${variant} ${complete ? 'complete' : 'locked'} ${active ? 'active' : ''}`
   const content = (
     <>
       {complete ? <CheckCircle2 className="unlock-check h-9 w-9" /> : null}
-      {!complete && variant === "gallery" ? <Lock className="unlock-lock h-8 w-8" /> : null}
+      {!complete && variant === 'gallery' ? (
+        <Lock className="unlock-lock h-8 w-8" />
+      ) : null}
       <img alt="" draggable={false} src={getUnlockImage(unlock)} />
       <strong>{unlock.goal}</strong>
       <span>{getUnlockTargetName(unlock)}</span>
@@ -1008,9 +1214,9 @@ const UnlockCard = ({
         {unlock.kind} {formatMultiplier(unlock.multiplier)}
       </small>
     </>
-  );
+  )
 
-  if (variant === "gallery") {
+  if (variant === 'gallery') {
     return (
       <button
         aria-label={`${unlock.name}: ${getUnlockDetailText(unlock)}`}
@@ -1020,8 +1226,8 @@ const UnlockCard = ({
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onPointerDown={(event) => {
-          if (event.pointerType !== "mouse") {
-            onTouchActivate?.();
+          if (event.pointerType !== 'mouse') {
+            onTouchActivate?.()
           }
         }}
         title={unlock.name}
@@ -1029,27 +1235,34 @@ const UnlockCard = ({
       >
         {content}
       </button>
-    );
+    )
   }
 
   return (
     <div className={className} title={unlock.name}>
       {content}
     </div>
-  );
-};
+  )
+}
 
 const UnlockGalleryDetail = ({
   unlock,
   onClose,
 }: {
-  unlock: UnlockDefinition | null;
-  onClose: () => void;
+  unlock: UnlockDefinition | null
+  onClose: () => void
 }) => (
-  <div className={`unlock-gallery-detail ${unlock ? "visible" : ""}`} aria-hidden={!unlock}>
+  <div
+    className={`unlock-gallery-detail ${unlock ? 'visible' : ''}`}
+    aria-hidden={!unlock}
+  >
     {unlock ? (
       <>
-        <button aria-label="Close unlock detail" onClick={onClose} type="button">
+        <button
+          aria-label="Close unlock detail"
+          onClick={onClose}
+          type="button"
+        >
           X
         </button>
         <strong>{getUnlockDetailTitle(unlock)}</strong>
@@ -1057,15 +1270,15 @@ const UnlockGalleryDetail = ({
       </>
     ) : null}
   </div>
-);
+)
 
 interface StatsPanelProps {
-  state: GameState;
-  totalCashPerSecond: number;
-  claimableAngels: number;
-  angelBonusPercent: number;
-  onSave: () => void;
-  onHardReset: () => void;
+  state: GameState
+  totalCashPerSecond: number
+  claimableAngels: number
+  angelBonusPercent: number
+  onSave: () => void
+  onHardReset: () => void
 }
 
 const StatsPanel = ({
@@ -1076,25 +1289,40 @@ const StatsPanel = ({
   onSave,
   onHardReset,
 }: StatsPanelProps) => {
-  const unlockedAchievements = new Set(state.achievements);
+  const unlockedAchievements = new Set(state.achievements)
 
   return (
     <div className="space-y-3">
       <div className="stats-grid">
         <StatTile label="Session" value={formatMoney(state.sessionEarnings)} />
-        <StatTile label="Lifetime" value={formatMoney(state.lifetimeEarnings)} />
+        <StatTile
+          label="Lifetime"
+          value={formatMoney(state.lifetimeEarnings)}
+        />
         <StatTile label="Cash/sec" value={formatMoney(totalCashPerSecond)} />
-        <StatTile label="Prestiges" value={formatCompact(state.prestigeCount, 0)} />
+        <StatTile
+          label="Prestiges"
+          value={formatCompact(state.prestigeCount, 0)}
+        />
         <StatTile label="Claimable" value={formatCompact(claimableAngels, 1)} />
-        <StatTile label="Angel bonus" value={`${formatCompact(angelBonusPercent, 1)}%`} />
+        <StatTile
+          label="Angel bonus"
+          value={`${formatCompact(angelBonusPercent, 1)}%`}
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <button className="adcap-button green flex items-center justify-center gap-2 px-3 py-3" onClick={onSave}>
+        <button
+          className="adcap-button green flex items-center justify-center gap-2 px-3 py-3"
+          onClick={onSave}
+        >
           <Save className="h-4 w-4" />
           Save
         </button>
-        <button className="adcap-button red flex items-center justify-center gap-2 px-3 py-3" onClick={onHardReset}>
+        <button
+          className="adcap-button red flex items-center justify-center gap-2 px-3 py-3"
+          onClick={onHardReset}
+        >
           <Trash2 className="h-4 w-4" />
           Reset
         </button>
@@ -1107,29 +1335,36 @@ const StatsPanel = ({
         </div>
         <div className="space-y-2">
           {achievements.map((achievement) => {
-            const unlocked = unlockedAchievements.has(achievement.id);
+            const unlocked = unlockedAchievements.has(achievement.id)
 
             return (
-              <div className={`achievement-row ${unlocked ? "unlocked" : ""}`} key={achievement.id}>
+              <div
+                className={`achievement-row ${unlocked ? 'unlocked' : ''}`}
+                key={achievement.id}
+              >
                 <div>
                   <div className="font-black uppercase">{achievement.name}</div>
-                  <div className="text-sm font-bold">{achievement.description}</div>
+                  <div className="text-sm font-bold">
+                    {achievement.description}
+                  </div>
                 </div>
-                {unlocked ? <CheckCircle2 className="h-5 w-5 shrink-0" /> : null}
+                {unlocked ? (
+                  <CheckCircle2 className="h-5 w-5 shrink-0" />
+                ) : null}
               </div>
-            );
+            )
           })}
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 const StatTile = ({ label, value }: { label: string; value: string }) => (
   <div className="stat-tile">
     <div>{label}</div>
     <strong>{value}</strong>
   </div>
-);
+)
 
-export default App;
+export default App

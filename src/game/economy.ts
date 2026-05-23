@@ -2,9 +2,12 @@ import type {
   AchievementDefinition,
   BusinessDefinition,
   BusinessId,
+  Currency,
   UnlockDefinition,
   UpgradeDefinition,
+  UpgradeTarget,
 } from "./types";
+import { earthAngelUpgradeRows, earthCashUpgradeRows } from "./adventureCapitalistEarthData";
 
 export const SAVE_VERSION = 2;
 export const BASE_ANGEL_BONUS = 0.02;
@@ -72,7 +75,7 @@ export const businesses: BusinessDefinition[] = [
     costMultiplier: 1.12,
     baseRevenue: 51_840,
     baseDuration: 24,
-    managerCost: 2_500_000,
+    managerCost: 1_200_000,
     managerName: "Holly Aisle",
     accent: "#ff6f91",
   },
@@ -98,7 +101,7 @@ export const businesses: BusinessDefinition[] = [
     costMultiplier: 1.1,
     baseRevenue: 7_464_960,
     baseDuration: 384,
-    managerCost: 100_000_000,
+    managerCost: 111_111_111,
     managerName: "Reg Ion",
     accent: "#78f5c5",
   },
@@ -121,9 +124,9 @@ export const businesses: BusinessDefinition[] = [
     shortName: "Supercomputer",
     caption: "One national-lab-sized machine, billed one miracle at a time.",
     baseCost: 2_149_908_480,
-    costMultiplier: 1.085,
+    costMultiplier: 1.08,
     baseRevenue: 1_074_954_240,
-    baseDuration: 3_072,
+    baseDuration: 6_144,
     managerCost: 10_000_000_000,
     managerName: "Vector Prime",
     accent: "#a4e86f",
@@ -134,210 +137,61 @@ export const businesses: BusinessDefinition[] = [
     shortName: "Orbital DC",
     caption: "Solar-powered racks with latency measured in ambition.",
     baseCost: 25_798_901_760,
-    costMultiplier: 1.08,
-    baseRevenue: 12_899_450_880,
-    baseDuration: 6_144,
+    costMultiplier: 1.07,
+    baseRevenue: 29_668_737_024,
+    baseDuration: 36_864,
     managerCost: 100_000_000_000,
     managerName: "Nova Station",
     accent: "#8ad9ff",
   },
 ];
 
-const businessUpgradeNames: Record<BusinessId, string[]> = {
-  "single-gpu-rig": ["RGB Fans", "Used Enterprise Cards", "Weekend Overclock", "Firmware Flash", "Liquid Metal Lottery"],
-  "render-rack": ["Shader Cache", "Queue Optimizer", "Specular Upsell", "Render Wrangler", "Frame Futures Desk"],
-  "inference-cluster": ["Tokenizer Turbo", "Batching Broker", "Low-Latency Lobbies", "Prompt Cache Vault", "Model Routing Cartel"],
-  "training-pod": ["Gradient Grease", "Checkpoint Vault", "Epoch Express", "Loss Curve Lawyers", "Tensor Treaty"],
-  "colocation-hall": ["Raised Floor", "Smart PDUs", "Contractual Uptime", "Cross-Connect Concierge", "Mega-Watt Retainer"],
-  "asic-farm": ["Immersion Baths", "Hashrate Hedges", "Firmware Fortune", "Silicon Sorting", "Nonce Nobility"],
-  "cloud-region": ["Availability Zones", "Reserved Instances", "Premium Egress", "Region Replication", "SLA Royalty Clause"],
-  "hyperscale-campus": ["Substation Handshake", "Lake Loop Cooling", "Sovereign Campus", "Rail Spur Procurement", "Megawatt Monarchy"],
-  "ai-supercomputer": ["Exascale Scheduler", "Tensor Cathedral", "Wafer-Scale Wings", "National Lab Leaseback", "Benchmark Bragging Rights"],
-  "orbital-data-center": ["Solar Array Upsell", "Vacuum Cooling", "Launch Window Lobby", "Orbital Peering", "Zero-Gravity Gross Margin"],
+const formatUpgradeNumber = (value: number) => Number(value.toFixed(8)).toString();
+
+const getTargetName = (target: UpgradeTarget) =>
+  target === "all" ? "All businesses" : businesses.find((business) => business.id === target)?.shortName ?? target;
+
+const getUpgradeDescription = (target: UpgradeTarget, kind: UpgradeDefinition["kind"], value: number) => {
+  switch (kind) {
+    case "angelEffectiveness":
+      return `Angel investor effectiveness +${formatUpgradeNumber(value)}%.`;
+    case "owned":
+      return `+${formatUpgradeNumber(value)} ${getTargetName(target)}.`;
+    case "speed":
+      return target === "all"
+        ? `All business speeds x${formatUpgradeNumber(value)}.`
+        : `${getTargetName(target)} speeds x${formatUpgradeNumber(value)}.`;
+    case "profit":
+      return target === "all"
+        ? `All profits x${formatUpgradeNumber(value)}.`
+        : `${getTargetName(target)} profits x${formatUpgradeNumber(value)}.`;
+  }
 };
 
-const businessCashUpgradeCosts: Record<BusinessId, number[]> = {
-  "single-gpu-rig": [250, 25_000, 2_500_000, 250_000_000, 25_000_000_000],
-  "render-rack": [1_000, 100_000, 10_000_000, 1_000_000_000, 100_000_000_000],
-  "inference-cluster": [10_000, 1_000_000, 100_000_000, 10_000_000_000, 1_000_000_000_000],
-  "training-pod": [100_000, 10_000_000, 1_000_000_000, 100_000_000_000, 10_000_000_000_000],
-  "colocation-hall": [1_000_000, 100_000_000, 10_000_000_000, 1_000_000_000_000, 100_000_000_000_000],
-  "asic-farm": [10_000_000, 1_000_000_000, 100_000_000_000, 10_000_000_000_000, 1_000_000_000_000_000],
-  "cloud-region": [100_000_000, 10_000_000_000, 1_000_000_000_000, 100_000_000_000_000, 10_000_000_000_000_000],
-  "hyperscale-campus": [1_000_000_000, 100_000_000_000, 10_000_000_000_000, 1_000_000_000_000_000, 100_000_000_000_000_000],
-  "ai-supercomputer": [10_000_000_000, 1_000_000_000_000, 100_000_000_000_000, 10_000_000_000_000_000, 1_000_000_000_000_000_000],
-  "orbital-data-center": [100_000_000_000, 10_000_000_000_000, 1_000_000_000_000_000, 100_000_000_000_000_000, 10_000_000_000_000_000_000],
-};
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 
-const generatedCashUpgrades = businesses.flatMap((business) =>
-  businessUpgradeNames[business.id].map<UpgradeDefinition>((name, index) => ({
-    id: `${business.id}-cash-${index + 1}`,
+const createUpgrades = (
+  rows: typeof earthCashUpgradeRows | typeof earthAngelUpgradeRows,
+  currency: Currency,
+) =>
+  rows.map<UpgradeDefinition>(([name, target, cost, kind, multiplier], index) => ({
+    id: `${currency}-${index + 1}-${slugify(name)}`,
     name,
-    description: `${business.shortName} profits x${index >= 4 ? 7 : index >= 2 ? 5 : 3}.`,
-    cost: businessCashUpgradeCosts[business.id][index],
-    currency: "cash",
-    target: business.id,
-    kind: "profit",
-    multiplier: index >= 4 ? 7 : index >= 2 ? 5 : 3,
-  })),
-);
+    description: getUpgradeDescription(target, kind, multiplier),
+    cost,
+    currency,
+    target,
+    kind,
+    multiplier,
+  }));
 
-export const cashUpgrades: UpgradeDefinition[] = [
-  ...generatedCashUpgrades,
-  {
-    id: "all-liquid-cooling",
-    name: "Liquid Cooling Lobbyists",
-    description: "All profits x3.",
-    cost: 50_000_000,
-    currency: "cash",
-    target: "all",
-    kind: "profit",
-    multiplier: 3,
-  },
-  {
-    id: "all-power-contract",
-    name: "Suspiciously Cheap Power",
-    description: "All profits x5.",
-    cost: 5_000_000_000,
-    currency: "cash",
-    target: "all",
-    kind: "profit",
-    multiplier: 5,
-  },
-  {
-    id: "all-fiber-backbone",
-    name: "Private Fiber Backbone",
-    description: "All profits x7.",
-    cost: 500_000_000_000,
-    currency: "cash",
-    target: "all",
-    kind: "profit",
-    multiplier: 7,
-  },
-  {
-    id: "all-grid-scale-contract",
-    name: "Grid-Scale Power Contract",
-    description: "All profits x9.",
-    cost: 50_000_000_000_000,
-    currency: "cash",
-    target: "all",
-    kind: "profit",
-    multiplier: 9,
-  },
-  {
-    id: "all-sovereign-compute",
-    name: "Sovereign Compute Charter",
-    description: "All profits x11.",
-    cost: 5_000_000_000_000_000,
-    currency: "cash",
-    target: "all",
-    kind: "profit",
-    multiplier: 11,
-  },
-  {
-    id: "all-orbital-backhaul",
-    name: "Orbital Backhaul Rights",
-    description: "All business speeds x2.",
-    cost: 500_000_000_000_000_000,
-    currency: "cash",
-    target: "all",
-    kind: "speed",
-    multiplier: 2,
-  },
-];
+export const cashUpgrades: UpgradeDefinition[] = createUpgrades(earthCashUpgradeRows, "cash");
 
-export const angelUpgrades: UpgradeDefinition[] = [
-  {
-    id: "angel-seed-round",
-    name: "Seed Round From Above",
-    description: "All profits x3.",
-    cost: 10,
-    currency: "angels",
-    target: "all",
-    kind: "profit",
-    multiplier: 3,
-  },
-  {
-    id: "angel-cooling",
-    name: "Celestial Cooling",
-    description: "All business speeds x2.",
-    cost: 50,
-    currency: "angels",
-    target: "all",
-    kind: "speed",
-    multiplier: 2,
-  },
-  {
-    id: "angel-inference",
-    name: "Prophetic Inference",
-    description: "Inference Cluster profits x9.",
-    cost: 250,
-    currency: "angels",
-    target: "inference-cluster",
-    kind: "profit",
-    multiplier: 9,
-  },
-  {
-    id: "angel-training",
-    name: "Heavenly Hyperparameters",
-    description: "Training Pod profits x9.",
-    cost: 1_000,
-    currency: "angels",
-    target: "training-pod",
-    kind: "profit",
-    multiplier: 9,
-  },
-  {
-    id: "angel-campus",
-    name: "Clouds Above The Cloud",
-    description: "All profits x15.",
-    cost: 10_000,
-    currency: "angels",
-    target: "all",
-    kind: "profit",
-    multiplier: 15,
-  },
-  {
-    id: "angel-supercomputer",
-    name: "Seraphic Supercomputing",
-    description: "AI Supercomputer profits x21.",
-    cost: 50_000,
-    currency: "angels",
-    target: "ai-supercomputer",
-    kind: "profit",
-    multiplier: 21,
-  },
-  {
-    id: "angel-orbital",
-    name: "Heavenly Orbital Lease",
-    description: "Orbital Data Center profits x25.",
-    cost: 250_000,
-    currency: "angels",
-    target: "orbital-data-center",
-    kind: "profit",
-    multiplier: 25,
-  },
-  {
-    id: "angel-singularity",
-    name: "Singularity Syndicate",
-    description: "All profits x25.",
-    cost: 1_000_000,
-    currency: "angels",
-    target: "all",
-    kind: "profit",
-    multiplier: 25,
-  },
-  {
-    id: "angel-light-speed",
-    name: "Light-Speed Operations",
-    description: "All business speeds x2.",
-    cost: 5_000_000,
-    currency: "angels",
-    target: "all",
-    kind: "speed",
-    multiplier: 2,
-  },
-];
+export const angelUpgrades: UpgradeDefinition[] = createUpgrades(earthAngelUpgradeRows, "angels");
 
 const businessUnlockGoals = [
   { goal: 25, kind: "speed", multiplier: 2, label: "Thermal Paste Applied" },

@@ -14,7 +14,7 @@ export type BuyMode = 1 | 10 | 100 | "next" | "max";
 
 export type Currency = "cash" | "angels";
 
-export type ModifierKind = "profit" | "speed";
+export type ModifierKind = "profit" | "speed" | "angelEffectiveness" | "owned";
 
 export type UpgradeTarget = BusinessId | "all";
 
