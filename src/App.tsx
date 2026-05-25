@@ -504,7 +504,7 @@ const App = () => {
   )
 
   return (
-    <div className="adcap-screen min-h-screen text-[#241d17]">
+    <div className={`adcap-screen theme-${world.id} min-h-screen text-[#241d17]`}>
       <div className="adcap-stage">
         <Sidebar
           availability={sidebarAvailability}
@@ -1632,37 +1632,87 @@ const AngelsPanel = ({
   claimableAngels,
   angelBonusPercent,
   onReset,
-}: AngelsPanelProps) => (
-  <div className="investor-layout">
-    <div className="angel-total-banner">
-      <div>Your Total Angels</div>
-      <strong>{formatCompact(state.angels, 2)}</strong>
-    </div>
+}: AngelsPanelProps) => {
+  const [confirmResetOpen, setConfirmResetOpen] = useState(false)
 
-    <div className="investor-cards">
-      <div className="investor-card">
-        <strong>
-          {formatCompact(getAngelEffectiveness(state, world) * 100, 2)}%
-        </strong>
-        <span>Profit Bonus Per Angel</span>
-        <em>{formatCompact(angelBonusPercent, 2)}% total bonus</em>
+  const confirmReset = () => {
+    setConfirmResetOpen(false)
+    onReset()
+  }
+
+  return (
+    <div className="investor-layout">
+      <div className="angel-total-banner">
+        <div>Your Total Angels</div>
+        <strong>{formatCompact(state.angels, 2)}</strong>
       </div>
-      <div className="investor-card claim">
-        <strong>{formatCompact(claimableAngels, 2)}</strong>
-        <span>Angels Claimed With Restart</span>
-        <button
-          className="adcap-button"
-          disabled={claimableAngels <= 0}
-          onClick={onReset}
-          type="button"
+
+      <div className="investor-cards">
+        <div className="investor-card">
+          <strong>
+            {formatCompact(getAngelEffectiveness(state, world) * 100, 2)}%
+          </strong>
+          <span>Profit Bonus Per Angel</span>
+          <em>{formatCompact(angelBonusPercent, 2)}% total bonus</em>
+        </div>
+        <div className="investor-card claim">
+          <strong>{formatCompact(claimableAngels, 2)}</strong>
+          <span>Angels Claimed With Restart</span>
+          <button
+            className="adcap-button"
+            disabled={claimableAngels <= 0}
+            onClick={() => setConfirmResetOpen(true)}
+            type="button"
+          >
+            Claim
+          </button>
+          <em>Restart your businesses</em>
+        </div>
+      </div>
+
+      {confirmResetOpen ? (
+        <div
+          aria-labelledby="investor-confirm-title"
+          aria-modal="true"
+          className="investor-confirm-backdrop"
+          onClick={() => setConfirmResetOpen(false)}
+          role="dialog"
         >
-          Claim
-        </button>
-        <em>Restart your businesses</em>
-      </div>
+          <div
+            className="investor-confirm-card"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <span className="investor-confirm-kicker">
+              Reset {world.name}
+            </span>
+            <h3 id="investor-confirm-title">Claim your new angels?</h3>
+            <strong>{formatCompact(claimableAngels, 2)}</strong>
+            <p>
+              This restarts your businesses, cash, managers, and upgrades in
+              this market. Your current angels and completed achievements stay.
+            </p>
+            <div className="investor-confirm-actions">
+              <button
+                className="adcap-button red"
+                onClick={() => setConfirmResetOpen(false)}
+                type="button"
+              >
+                Cancel
+              </button>
+              <button
+                className="adcap-button green"
+                onClick={confirmReset}
+                type="button"
+              >
+                Claim
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
-  </div>
-)
+  )
+}
 
 const UnlocksPanel = ({
   state,

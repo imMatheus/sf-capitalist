@@ -50,6 +50,50 @@ button:disabled {
   background-attachment: fixed;
 }
 
+.adcap-screen.theme-china {
+  background:
+    radial-gradient(
+      circle at 82% 16%,
+      rgba(255, 218, 142, 0.22) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 16% 38%,
+      rgba(176, 62, 53, 0.2) 0 2px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      175deg,
+      rgba(255, 222, 165, 0.1) 0 2px,
+      transparent 2px 86px
+    ),
+    linear-gradient(90deg, rgba(72, 38, 35, 0.5), transparent 24%),
+    linear-gradient(120deg, #735f57, #77685b 62%, #6f574d);
+  background-attachment: fixed;
+}
+
+.adcap-screen.theme-europe {
+  background:
+    radial-gradient(
+      circle at 80% 18%,
+      rgba(188, 224, 255, 0.2) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 15% 40%,
+      rgba(101, 145, 214, 0.18) 0 2px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      175deg,
+      rgba(223, 238, 255, 0.1) 0 2px,
+      transparent 2px 86px
+    ),
+    linear-gradient(90deg, rgba(38, 50, 68, 0.48), transparent 24%),
+    linear-gradient(120deg, #626970, #63766d 66%, #526a6f);
+  background-attachment: fixed;
+}
+
 .adcap-stage {
   display: grid;
   grid-template-columns: 232px minmax(0, 1fr);
@@ -72,6 +116,26 @@ button:disabled {
       transparent 2px 52px
     );
   box-shadow: inset -10px 0 20px rgba(0, 0, 0, 0.18);
+}
+
+.theme-china .left-menu {
+  background:
+    linear-gradient(90deg, rgba(67, 43, 39, 0.88), rgba(99, 68, 54, 0.76)),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 210, 140, 0.1) 0 2px,
+      transparent 2px 52px
+    );
+}
+
+.theme-europe .left-menu {
+  background:
+    linear-gradient(90deg, rgba(42, 53, 66, 0.88), rgba(67, 83, 82, 0.76)),
+    repeating-linear-gradient(
+      0deg,
+      rgba(201, 226, 255, 0.1) 0 2px,
+      transparent 2px 52px
+    );
 }
 
 .mascot-card {
@@ -252,6 +316,28 @@ button:disabled {
   min-height: 90px;
   padding: 6px 0;
   border-bottom: 3px solid rgba(255, 255, 255, 0.14);
+}
+
+.theme-china .cash-ribbon {
+  border-bottom-color: rgba(255, 215, 148, 0.2);
+  background:
+    radial-gradient(
+      circle at 52% 18%,
+      rgba(255, 218, 154, 0.12),
+      transparent 34%
+    ),
+    linear-gradient(90deg, rgba(89, 45, 43, 0.26), rgba(114, 76, 53, 0.12));
+}
+
+.theme-europe .cash-ribbon {
+  border-bottom-color: rgba(188, 222, 255, 0.22);
+  background:
+    radial-gradient(
+      circle at 52% 18%,
+      rgba(194, 226, 255, 0.13),
+      transparent 34%
+    ),
+    linear-gradient(90deg, rgba(43, 61, 86, 0.24), rgba(58, 91, 88, 0.12));
 }
 
 .brand-chip {
@@ -828,6 +914,14 @@ button:disabled {
   transition: width 180ms ease;
 }
 
+.theme-china .owned-count::before {
+  background: linear-gradient(#f2c66a, #bd7d2f);
+}
+
+.theme-europe .owned-count::before {
+  background: linear-gradient(#86c7f4, #4f91c7);
+}
+
 .owned-count span {
   position: relative;
   z-index: 1;
@@ -939,6 +1033,52 @@ button:disabled {
   transition: none;
   transform: scaleX(1);
   animation: revenue-stripes 650ms linear infinite;
+}
+
+.theme-china .revenue-fill {
+  background:
+    linear-gradient(
+      120deg,
+      rgba(255, 246, 219, 0.16) 0 30%,
+      transparent 31% 58%,
+      rgba(255, 239, 194, 0.18) 59%
+    ),
+    linear-gradient(#f0c86e, #c88934);
+}
+
+.theme-china .revenue-fill.fast-progress {
+  background:
+    repeating-linear-gradient(
+      120deg,
+      rgba(255, 248, 218, 0.2) 0 14px,
+      transparent 14px 29px,
+      rgba(255, 232, 172, 0.14) 29px 43px,
+      transparent 43px 58px
+    ),
+    linear-gradient(#f0c86e, #c88934);
+}
+
+.theme-europe .revenue-fill {
+  background:
+    linear-gradient(
+      120deg,
+      rgba(231, 244, 255, 0.16) 0 30%,
+      transparent 31% 58%,
+      rgba(211, 235, 255, 0.18) 59%
+    ),
+    linear-gradient(#86c7f4, #5c9fd1);
+}
+
+.theme-europe .revenue-fill.fast-progress {
+  background:
+    repeating-linear-gradient(
+      120deg,
+      rgba(238, 249, 255, 0.22) 0 14px,
+      transparent 14px 29px,
+      rgba(209, 234, 255, 0.14) 29px 43px,
+      transparent 43px 58px
+    ),
+    linear-gradient(#86c7f4, #5c9fd1);
 }
 
 @keyframes revenue-stripes {
@@ -1926,6 +2066,92 @@ button.unlock-card {
   font-size: 34px;
 }
 
+.investor-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(
+      circle at 50% 34%,
+      rgba(255, 255, 255, 0.2),
+      transparent 0 28%
+    ),
+    rgba(13, 10, 18, 0.58);
+  padding: 24px;
+}
+
+.investor-confirm-card {
+  display: grid;
+  width: min(520px, calc(100vw - 36px));
+  gap: 12px;
+  justify-items: center;
+  border: 6px solid #d1cabd;
+  border-radius: 14px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.95) 0 28px,
+      rgba(231, 226, 220, 0.88) 29px 31px
+    ),
+    #fffefa;
+  color: #353230;
+  padding: 28px 28px 24px;
+  text-align: center;
+  text-shadow: 0 1px 0 #fff;
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.8),
+    0 10px 0 rgba(0, 0, 0, 0.16),
+    0 24px 46px rgba(0, 0, 0, 0.38);
+}
+
+.investor-confirm-kicker {
+  color: #a56d98;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.investor-confirm-card h3 {
+  margin: 0;
+  color: #3f3934;
+  font-size: clamp(30px, 5vw, 48px);
+  font-weight: 900;
+  line-height: 0.95;
+}
+
+.investor-confirm-card strong {
+  color: #a56d98;
+  font-size: clamp(48px, 8vw, 76px);
+  font-weight: 900;
+  line-height: 0.9;
+}
+
+.investor-confirm-card p {
+  max-width: 420px;
+  margin: 0;
+  color: #665f58;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.18;
+}
+
+.investor-confirm-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(390px, 100%);
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.investor-confirm-actions .adcap-button {
+  min-height: 56px;
+  padding: 10px 14px;
+  font-size: 20px;
+}
+
 .paper-button,
 .adcap-button {
   border: 3px solid #4a4037;
@@ -2514,6 +2740,12 @@ button.unlock-card {
     position: static;
     min-height: 0;
     padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .theme-china .left-menu,
+  .theme-europe .left-menu {
     background: transparent;
     box-shadow: none;
   }
@@ -3107,6 +3339,18 @@ button.unlock-card {
   }
 
   .investor-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .investor-confirm-card {
+    padding: 22px 18px 20px;
+  }
+
+  .investor-confirm-card p {
+    font-size: 15px;
+  }
+
+  .investor-confirm-actions {
     grid-template-columns: minmax(0, 1fr);
   }
 
