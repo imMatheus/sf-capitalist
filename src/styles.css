@@ -29,6 +29,7 @@ button:disabled {
 }
 
 .adcap-screen {
+  overflow-x: clip;
   background:
     radial-gradient(
       circle at 78% 18%,
@@ -231,6 +232,7 @@ button:disabled {
 }
 
 .mobile-player-card,
+.mobile-header-portrait,
 .mobile-bottom-nav,
 .mobile-menu-backdrop {
   display: none;
@@ -242,16 +244,18 @@ button:disabled {
 }
 
 .cash-ribbon {
-  position: relative;
   display: grid;
-  grid-template-columns: 190px minmax(0, 1fr) 280px;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: 'cash controls';
   align-items: center;
-  gap: 18px;
+  column-gap: 18px;
   min-height: 90px;
+  padding: 6px 0;
   border-bottom: 3px solid rgba(255, 255, 255, 0.14);
 }
 
 .brand-chip {
+  grid-area: brand;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -266,12 +270,22 @@ button:disabled {
   color: #f49b34;
 }
 
+.cash-info {
+  grid-area: cash;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  gap: 2px;
+}
+
 .cash-headline {
   display: flex;
   min-width: 0;
   align-items: baseline;
   justify-content: center;
-  gap: 28px;
+  gap: 18px;
   color: #fff7ee;
   text-shadow: 0 3px 0 rgba(0, 0, 0, 0.28);
 }
@@ -279,7 +293,7 @@ button:disabled {
 .cash-headline strong {
   min-width: 0;
   overflow: hidden;
-  font-size: clamp(42px, 6.2vw, 72px);
+  font-size: 56px;
   font-weight: 900;
   line-height: 0.95;
   text-overflow: ellipsis;
@@ -287,16 +301,12 @@ button:disabled {
 }
 
 .cash-headline span {
-  font-size: clamp(24px, 3.2vw, 42px);
+  font-size: 28px;
   font-weight: 900;
   text-transform: uppercase;
 }
 
 .cash-subline {
-  position: absolute;
-  right: 300px;
-  bottom: 5px;
-  left: 220px;
   display: flex;
   justify-content: center;
   gap: 22px;
@@ -307,6 +317,7 @@ button:disabled {
 }
 
 .top-controls {
+  grid-area: controls;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -2426,19 +2437,51 @@ button.unlock-card {
   }
 
   .cash-ribbon {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 8px;
+    grid-template-columns: 165px minmax(0, 1fr) 250px;
+    grid-template-areas: 'brand cash controls';
+    column-gap: 12px;
+    padding: 8px 0;
   }
 
-  .brand-chip,
-  .top-controls,
-  .cash-subline {
-    position: static;
-    justify-content: center;
+  .brand-chip {
+    justify-content: flex-start;
+  }
+
+  .cash-headline strong {
+    font-size: 48px;
+  }
+
+  .cash-headline span {
+    font-size: 24px;
   }
 
   .cash-subline {
-    display: flex;
+    gap: 16px;
+    font-size: 12px;
+  }
+
+  .top-controls {
+    justify-content: flex-end;
+    gap: 7px;
+  }
+
+  .quick-buy-card {
+    width: 68px;
+    height: 68px;
+  }
+
+  .buy-tag {
+    width: 138px;
+    height: 64px;
+    flex-basis: 138px;
+  }
+
+  .buy-tag span {
+    font-size: 15px;
+  }
+
+  .buy-tag strong {
+    font-size: 28px;
   }
 
   .investment-grid {
@@ -2459,13 +2502,7 @@ button.unlock-card {
         rgba(255, 255, 255, 0.22) 0 2px,
         transparent 3px
       ),
-      linear-gradient(
-        180deg,
-        #111b31 0,
-        #293552 220px,
-        rgba(255, 255, 255, 0.12) 221px,
-        transparent 222px
-      ),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0, transparent 222px),
       linear-gradient(120deg, #6f6a71, #6c816b 68%, #496647);
   }
 
@@ -2487,46 +2524,20 @@ button.unlock-card {
     display: none;
   }
 
-  .mobile-player-card {
-    position: absolute;
-    top: 30px;
-    left: clamp(10px, 2.6vw, 18px);
-    z-index: 12;
-    display: grid;
-    width: clamp(94px, 22vw, 132px);
-    height: clamp(94px, 22vw, 132px);
-    place-items: center;
-    overflow: hidden;
-    border: 4px solid #27333a;
-    border-radius: 10px;
-    background: linear-gradient(#b7e4ee, #7694a0);
-    box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.58),
-      0 4px 0 rgba(0, 0, 0, 0.28);
-  }
-
-  .mobile-player-portrait {
-    width: clamp(94px, 22vw, 132px);
-    height: clamp(102px, 24vw, 144px);
-    object-fit: contain;
-    object-position: center bottom;
-    user-select: none;
-  }
-
-  .mobile-player-portrait.mirrored {
-    transform: scaleX(-1);
-  }
-
   .capital-floor {
     padding: 0 10px calc(112px + env(safe-area-inset-bottom));
   }
 
   .cash-ribbon {
-    position: relative;
-    display: block;
-    min-height: clamp(246px, 52vw, 300px);
+    position: sticky;
+    top: 0;
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
     margin: 0 -10px 12px;
-    padding: 0;
+    padding: 22px 12px;
     border-bottom: 3px solid rgba(255, 255, 255, 0.12);
     background:
       radial-gradient(
@@ -2546,72 +2557,116 @@ button.unlock-card {
     display: none;
   }
 
+  .mobile-header-portrait {
+    display: grid;
+    flex: 0 0 auto;
+    width: 124px;
+    height: 124px;
+    place-items: center;
+    overflow: hidden;
+    border: 4px solid #27333a;
+    border-radius: 10px;
+    background: linear-gradient(#b7e4ee, #7694a0);
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.58),
+      0 4px 0 rgba(0, 0, 0, 0.28);
+  }
+
+  .mobile-header-portrait-img {
+    width: 124px;
+    height: 136px;
+    object-fit: contain;
+    object-position: center bottom;
+    user-select: none;
+  }
+
+  .mobile-header-portrait-img.mirrored {
+    transform: scaleX(-1);
+  }
+
+  .cash-info {
+    flex: 1 1 auto;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 4px;
+  }
+
   .cash-headline {
-    position: absolute;
-    top: clamp(46px, 10vw, 68px);
-    right: clamp(108px, 24vw, 166px);
-    left: clamp(118px, 27vw, 166px);
     flex-direction: column;
     align-items: flex-start;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 0;
   }
 
   .cash-headline strong {
-    font-size: clamp(31px, 8vw, 48px);
+    font-size: 36px;
     max-width: 100%;
   }
 
   .cash-headline span {
-    font-size: clamp(15px, 3.8vw, 23px);
+    font-size: 18px;
   }
 
   .cash-subline {
-    position: absolute;
-    top: clamp(108px, 22vw, 130px);
-    right: clamp(108px, 24vw, 166px);
-    bottom: auto;
-    left: clamp(118px, 27vw, 166px);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: flex-start;
-    gap: 12px;
+    gap: 2px;
     color: #f5ebd9;
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .top-controls {
-    position: absolute;
-    top: clamp(58px, 13vw, 82px);
-    right: clamp(10px, 2.6vw, 18px);
-    width: clamp(104px, 22vw, 132px);
-    align-self: start;
+    flex: 0 0 144px;
+    width: 144px;
     flex-direction: column-reverse;
     align-items: center;
-    justify-content: start;
-    gap: clamp(8px, 2vw, 12px);
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .buy-tag {
+    width: 122px;
+    height: 52px;
+    flex: 0 0 auto;
+    padding: 5px 10px 7px 26px;
+  }
+
+  .buy-tag span {
+    font-size: 13px;
+  }
+
+  .buy-tag strong {
+    font-size: 25px;
   }
 
   .quick-buy-action {
-    position: relative;
     display: grid;
-    width: clamp(92px, 20vw, 122px);
-    transform: rotate(0.4deg);
-    justify-items: stretch;
-    padding-right: clamp(18px, 4vw, 24px);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    width: 112px;
+    transform: none;
   }
 
   .quick-buy-button {
-    z-index: 1;
+    grid-row: 1;
+    grid-column: 1;
+    position: relative;
+    z-index: 0;
+    display: block;
     width: 100%;
-    min-height: clamp(38px, 7.6vw, 50px);
+    min-height: 44px;
     margin: 0;
     border: 3px solid #4a4947;
     border-radius: 5px 5px 3px 3px;
     background: linear-gradient(#9a9a96, #737370);
     color: #fffefa;
-    padding: 4px clamp(23px, 4.8vw, 31px) 5px 7px;
-    font-size: clamp(23px, 5.4vw, 34px);
+    padding: 4px 10px 5px 11px;
+    font-size: 24px;
     line-height: 1;
-    text-align: center;
+    text-align: left;
     text-shadow:
       0 3px 0 rgba(0, 0, 0, 0.38),
       0 0 1px rgba(0, 0, 0, 0.35);
@@ -2621,12 +2676,16 @@ button.unlock-card {
   }
 
   .quick-buy-card {
-    position: absolute;
-    top: -12px;
-    right: 0;
-    z-index: 2;
-    width: clamp(48px, 10vw, 64px);
-    height: clamp(48px, 10vw, 64px);
+    grid-row: 1;
+    grid-column: 1;
+    position: relative;
+    z-index: 1;
+    justify-self: end;
+    align-self: start;
+    width: 54px;
+    height: 54px;
+    margin-top: -9px;
+    margin-right: -5px;
     overflow: hidden;
     border: 3px solid #4d5b63;
     border-radius: 50%;
@@ -2647,39 +2706,33 @@ button.unlock-card {
   }
 
   .quick-buy-caption {
-    display: grid;
-    min-height: clamp(27px, 5.4vw, 35px);
-    place-items: center;
+    grid-row: 2;
+    grid-column: 1;
+    display: block;
     justify-self: center;
-    width: calc(100% - clamp(16px, 4vw, 24px));
+    width: fit-content;
     margin-top: -1px;
     border: 2px solid #c8c0b5;
     border-top: 0;
     border-radius: 0 0 4px 4px;
     background: linear-gradient(#f4eee4, #ddd5c8);
     color: #393532;
-    padding: 2px 6px 5px;
-    font-size: clamp(13px, 3.4vw, 20px);
+    padding: 4px 10px 5px;
+    font-size: 14px;
     font-weight: 900;
     line-height: 1;
     text-align: center;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
     box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
+    white-space: nowrap;
   }
 
-  .buy-tag {
-    width: clamp(96px, 21vw, 126px);
-    height: clamp(48px, 10.5vw, 62px);
-    flex-basis: auto;
-    padding: 6px 10px 8px 24px;
-  }
-
-  .buy-tag span {
-    font-size: clamp(12px, 2.9vw, 16px);
-  }
-
-  .buy-tag strong {
-    font-size: clamp(23px, 5vw, 31px);
+  .level-toast {
+    right: 12px;
+    left: 12px;
+    bottom: calc(96px + env(safe-area-inset-bottom));
+    z-index: 80;
+    width: auto;
   }
 
   .mobile-bottom-nav {
@@ -3077,87 +3130,75 @@ button.unlock-card {
 }
 
 @media (max-width: 480px) {
-  .mobile-player-card {
-    top: 16px;
-    left: 8px;
-    width: clamp(76px, 22vw, 90px);
-    height: clamp(76px, 22vw, 90px);
+  .cash-ribbon {
+    gap: 10px;
+    min-height: 196px;
+    padding: 14px 10px 14px;
+  }
+
+  .mobile-header-portrait {
+    width: 86px;
+    height: 86px;
     border-width: 3px;
   }
 
-  .mobile-player-portrait {
-    width: clamp(76px, 22vw, 90px);
-    height: clamp(84px, 24vw, 100px);
-  }
-
-  .cash-ribbon {
-    min-height: 222px;
-  }
-
-  .top-controls {
-    top: 20px;
-    right: 16px;
-    width: 132px;
-    gap: 8px;
-  }
-
-  .cash-headline {
-    top: 22px;
-    right: 92px;
-    left: clamp(88px, 27vw, 104px);
-    gap: 0;
+  .mobile-header-portrait-img {
+    width: 86px;
+    height: 96px;
   }
 
   .cash-headline strong {
-    font-size: clamp(26px, 9vw, 34px);
+    font-size: 32px;
   }
 
   .cash-headline span {
-    font-size: clamp(13px, 4vw, 17px);
+    font-size: 16px;
   }
 
   .cash-subline {
-    top: 82px;
-    right: 92px;
-    left: clamp(88px, 27vw, 104px);
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 3px;
+    font-size: 10px;
   }
 
-  .quick-buy-card {
-    top: -10px;
-    right: -4px;
-    width: 50px;
-    height: 50px;
-    border-width: 3px;
-  }
-
-  .quick-buy-action {
-    width: 124px;
-    transform: none;
-    padding-right: 22px;
-  }
-
-  .quick-buy-button {
-    min-height: 46px;
-    border-width: 3px;
-    padding: 4px 28px 5px 7px;
-    font-size: 26px;
-  }
-
-  .quick-buy-caption {
-    min-height: 24px;
-    width: calc(100% - 22px);
-    border-width: 2px;
-    font-size: 13px;
+  .top-controls {
+    flex-basis: 120px;
+    width: 120px;
+    gap: 9px;
   }
 
   .buy-tag {
-    width: 138px;
-    height: 58px;
-    flex: 0 0 auto;
-    padding: 6px 12px 8px 28px;
+    width: 104px;
+    height: 46px;
+    padding: 5px 8px 6px 22px;
+  }
+
+  .buy-tag span {
+    font-size: 11px;
+  }
+
+  .buy-tag strong {
+    font-size: 22px;
+  }
+
+  .quick-buy-action {
+    width: 108px;
+  }
+
+  .quick-buy-button {
+    min-height: 38px;
+    padding: 4px 42px 5px 9px;
+    font-size: 20px;
+  }
+
+  .quick-buy-card {
+    width: 46px;
+    height: 46px;
+    margin-top: -7px;
+    margin-right: -4px;
+  }
+
+  .quick-buy-caption {
+    padding: 3px 8px 4px;
+    font-size: 11px;
   }
 
   .buy-tag::before {
@@ -3168,14 +3209,6 @@ button.unlock-card {
       radial-gradient(circle at 17px 27px, #6f432b 0 4px, transparent 5px),
       linear-gradient(90deg, transparent 0 79%, rgba(124, 71, 35, 0.24) 80%),
       linear-gradient(#e29a5d, #cf7b37);
-  }
-
-  .buy-tag span {
-    font-size: 14px;
-  }
-
-  .buy-tag strong {
-    font-size: 29px;
   }
 
   .mobile-bottom-nav {

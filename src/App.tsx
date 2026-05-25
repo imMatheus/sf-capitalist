@@ -250,8 +250,8 @@ const getUnlockTargetName = (
   }
 
   return (
-    world.businesses.find((business) => business.id === unlock.target)
-      ?.name ?? unlock.name
+    world.businesses.find((business) => business.id === unlock.target)?.name ??
+    unlock.name
   )
 }
 
@@ -504,7 +504,7 @@ const App = () => {
   )
 
   return (
-    <div className="adcap-screen min-h-screen overflow-x-hidden text-[#241d17]">
+    <div className="adcap-screen min-h-screen text-[#241d17]">
       <div className="adcap-stage">
         <Sidebar
           availability={sidebarAvailability}
@@ -517,16 +517,27 @@ const App = () => {
 
         <main className="capital-floor">
           <header className="cash-ribbon">
-            <div className="brand-chip">
-              <Cpu className="h-7 w-7" strokeWidth={3} />
-              <span>GPU Capitalist</span>
+            <div
+              className="mobile-header-portrait"
+              aria-label={`${world.name} player icon`}
+            >
+              <img
+                alt=""
+                className={`mobile-header-portrait-img${
+                  playerPortraits[world.id].mirrored ? ' mirrored' : ''
+                }`}
+                draggable={false}
+                src={playerPortraits[world.id].image}
+              />
             </div>
-            <CashHeadline value={worldState.cash} world={world} />
-            <div className="cash-subline">
-              <span>
-                {formatMoney(totalCashPerSecond, world.currencySymbol)} /sec
-              </span>
-              <span>{formatCompact(worldState.angels, 1)} angels</span>
+            <div className="cash-info">
+              <CashHeadline value={worldState.cash} world={world} />
+              <div className="cash-subline">
+                <span>
+                  {formatMoney(totalCashPerSecond, world.currencySymbol)} /sec
+                </span>
+                <span>{formatCompact(worldState.angels, 1)} angels</span>
+              </div>
             </div>
             <div className="top-controls">
               <QuickBuyAction
