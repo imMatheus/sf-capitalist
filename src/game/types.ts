@@ -57,12 +57,20 @@ export interface AchievementDefinition {
   description: string;
 }
 
+export interface AngelInvestorLabels {
+  singular: string;
+  plural: string;
+  shortSingular: string;
+  shortPlural: string;
+}
+
 export interface WorldDefinition {
   id: WorldId;
   name: string;
   description: string;
   currencyName: string;
   currencySymbol: string;
+  angelInvestorLabels: AngelInvestorLabels;
   unlockCost: WorldUnlockCost;
   startingCash: number;
   businesses: BusinessDefinition[];

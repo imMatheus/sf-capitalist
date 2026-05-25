@@ -28,8 +28,12 @@ import {
 import chinaTravelImage from '../china.png'
 import siliconValleyTravelImage from '../san-francisco.png'
 import europeTravelImage from '../europe.png'
+import welcomeImage from '../welcome.png'
 import jensenPlayerImage from '../jensen_huang_headshot_transparent.png'
 import jackMaImage from '../jack_ma_headshot_transparent.png'
+import siliconValleyScoutImage from '../silicon-valley-scout.png'
+import europeScoutImage from '../europe-scout.png'
+import chinaScoutImage from '../china-scout.png'
 import ursulaPlayerImage from '../ursula_von_der_leyen_headshot_transparent.png'
 import { businessIconImages } from './assets/businessIcons'
 import quickUpgradeImage from './assets/businesses/quick-upgrade.png'
@@ -120,13 +124,13 @@ const panelMeta: Record<
     title: 'Adventures',
     tone: 'travel',
     kicker: 'Choose which market you want to run.',
-    help: 'Each destination keeps separate money, angels, managers, upgrades, unlocks, and business progress.',
+    help: 'Each destination keeps separate money, investors, managers, upgrades, unlocks, and business progress.',
   },
   upgrades: {
     title: 'Upgrades',
     tone: 'orange',
     kicker: 'Spend money to make money.',
-    help: 'Cash upgrades spend current money. Angel upgrades spend angel investors. Both multiply profits or speed.',
+    help: 'Cash upgrades spend current money. Investor upgrades spend your prestige investors. Both multiply profits or speed.',
   },
   managers: {
     title: 'Managers',
@@ -137,8 +141,8 @@ const panelMeta: Record<
   angels: {
     title: 'Investors',
     tone: 'purple',
-    kicker: 'Reset for angel investors and bigger profit bonuses.',
-    help: 'Angel investors increase profits. Claiming them restarts your businesses, cash, managers, and cash upgrades.',
+    kicker: 'Reset for prestige investors and bigger profit bonuses.',
+    help: 'Prestige investors increase profits. Claiming them restarts your businesses, cash, managers, and cash upgrades.',
   },
 }
 
@@ -158,6 +162,55 @@ const playerPortraits: Record<WorldId, { image: string; mirrored?: boolean }> =
     china: { image: jackMaImage },
     europe: { image: ursulaPlayerImage, mirrored: true },
   }
+
+const getAngelSingularLabel = (world: WorldDefinition) =>
+  world.angelInvestorLabels.singular
+
+const getAngelPluralLabel = (world: WorldDefinition) =>
+  world.angelInvestorLabels.plural
+
+const getAngelShortSingularLabel = (world: WorldDefinition) =>
+  world.angelInvestorLabels.shortSingular
+
+const getAngelShortPluralLabel = (world: WorldDefinition) =>
+  world.angelInvestorLabels.shortPlural
+
+const getAngelShortAmountLabel = (
+  value: number,
+  world: WorldDefinition,
+  precision: number,
+) =>
+  `${formatCompact(value, precision)} ${
+    value === 1
+      ? getAngelShortSingularLabel(world)
+      : getAngelShortPluralLabel(world)
+  }`
+
+const getPanelKicker = (panel: Panel, world: WorldDefinition) => {
+  if (panel === 'angels') {
+    return `Reset for ${getAngelPluralLabel(world)} and bigger profit bonuses.`
+  }
+
+  return panelMeta[panel].kicker
+}
+
+const getPanelHelp = (panel: Panel, world: WorldDefinition) => {
+  if (panel === 'upgrades') {
+    return `Cash upgrades spend current money. ${getAngelShortSingularLabel(
+      world,
+    )} upgrades spend ${getAngelShortPluralLabel(
+      world,
+    )}. Both multiply profits or speed.`
+  }
+
+  if (panel === 'angels') {
+    return `${getAngelPluralLabel(
+      world,
+    )} increase profits. Claiming them restarts your businesses, cash, managers, and cash upgrades.`
+  }
+
+  return panelMeta[panel].help
+}
 
 const getNextBuyMode = (current: BuyMode): BuyMode => {
   switch (current) {
@@ -413,6 +466,7 @@ const App = () => {
   const [buyMode, setBuyMode] = useState<BuyMode>(1)
   const [panel, setPanel] = useState<Panel | null>(null)
   const [levelToast, setLevelToast] = useState<LevelToast | null>(null)
+  const [showStartupLoader, setShowStartupLoader] = useState(true)
   const levelToastTimerRef = useRef<number | null>(null)
   const levelToastKeyRef = useRef(0)
   const claimableAngels = getClaimableAngels(worldState)
@@ -503,8 +557,18 @@ const App = () => {
     [],
   )
 
+  useEffect(() => {
+    const startupLoaderTimer = window.setTimeout(() => {
+      setShowStartupLoader(false)
+    }, 1_900)
+
+    return () => window.clearTimeout(startupLoaderTimer)
+  }, [])
+
   return (
-    <div className={`adcap-screen theme-${world.id} min-h-screen text-[#241d17]`}>
+    <div
+      className={`adcap-screen theme-${world.id} min-h-screen text-[#241d17]`}
+    >
       <div className="adcap-stage">
         <Sidebar
           availability={sidebarAvailability}
@@ -536,7 +600,9 @@ const App = () => {
                 <span>
                   {formatMoney(totalCashPerSecond, world.currencySymbol)} /sec
                 </span>
-                <span>{formatCompact(worldState.angels, 1)} angels</span>
+                <span>
+                  {getAngelShortAmountLabel(worldState.angels, world, 1)}
+                </span>
               </div>
             </div>
             <div className="top-controls">
@@ -594,7 +660,7 @@ const App = () => {
       </div>
 
       {panel ? (
-        <PanelModal onClose={closePanel} panel={panel}>
+        <PanelModal onClose={closePanel} panel={panel} world={world}>
           {panel === 'managers' ? (
             <ManagersPanel
               onBuy={actions.buyManager}
@@ -648,9 +714,42 @@ const App = () => {
       {levelToast ? (
         <LevelToastView key={levelToast.key} toast={levelToast} />
       ) : null}
+      {showStartupLoader ? <StartupLoader image={welcomeImage} /> : null}
     </div>
   )
 }
+
+const StartupLoader = ({ image }: { image: string }) => (
+  <div
+    aria-label="Loading Silicon Valley"
+    className="startup-loader"
+    role="status"
+  >
+    <img
+      alt=""
+      className="startup-loader-image"
+      draggable={false}
+      src={image}
+    />
+    <svg
+      aria-hidden="true"
+      className="startup-loader-title"
+      preserveAspectRatio="xMidYMid meet"
+      viewBox="0 0 900 260"
+    >
+      <path d="M 120 160 Q 450 62 780 160" fill="none" id="startup-title-arc" />
+      <text>
+        <textPath
+          href="#startup-title-arc"
+          startOffset="50%"
+          textAnchor="middle"
+        >
+          SF Capitalist
+        </textPath>
+      </text>
+    </svg>
+  </div>
+)
 
 const LevelToastView = ({ toast }: { toast: LevelToast }) => (
   <div className="level-toast" role="status">
@@ -821,10 +920,11 @@ const Sidebar = ({
 interface PanelModalProps {
   panel: Panel
   children: ReactNode
+  world: WorldDefinition
   onClose: () => void
 }
 
-const PanelModal = ({ panel, children, onClose }: PanelModalProps) => {
+const PanelModal = ({ panel, children, world, onClose }: PanelModalProps) => {
   const meta = panelMeta[panel]
   const [showHelp, setShowHelp] = useState(false)
 
@@ -845,7 +945,6 @@ const PanelModal = ({ panel, children, onClose }: PanelModalProps) => {
         <div className="modal-side-tab left" />
         <div className="modal-side-tab right" />
         <div className="modal-title-card">
-          <span className="node-burst" aria-hidden="true" />
           <h2 id="modal-title">{meta.title}</h2>
         </div>
         <button
@@ -867,12 +966,12 @@ const PanelModal = ({ panel, children, onClose }: PanelModalProps) => {
         </button>
         {showHelp ? (
           <div className="modal-help-popover" role="status">
-            {meta.help}
+            {getPanelHelp(panel, world)}
           </div>
         ) : null}
 
         <div className="modal-content">
-          <p className="modal-kicker">{meta.kicker}</p>
+          <p className="modal-kicker">{getPanelKicker(panel, world)}</p>
           <div className="modal-divider" />
           <div className="modal-scroll">{children}</div>
         </div>
@@ -1348,12 +1447,12 @@ const CurrencyPills = ({
       type="button"
     >
       <Sparkles className="h-9 w-9" />
-      <span>Angels</span>
+      <span>{getAngelShortPluralLabel(world)}</span>
     </button>
     <strong>
       {active === 'cash'
         ? formatMoney(state.cash, world.currencySymbol)
-        : `${formatCompact(state.angels, 1)} angels`}
+        : getAngelShortAmountLabel(state.angels, world, 1)}
     </strong>
   </div>
 )
@@ -1609,7 +1708,7 @@ const UpgradesPanel = ({ state, world, onBuy }: UpgradesPanelProps) => {
                 ? 'Owned'
                 : upgrade.currency === 'cash'
                   ? formatMoney(upgrade.cost, world.currencySymbol)
-                  : `${formatCompact(upgrade.cost, 0)} angels`}
+                  : getAngelShortAmountLabel(upgrade.cost, world, 0)}
             </button>
           </div>
         )
@@ -1634,17 +1733,40 @@ const AngelsPanel = ({
   onReset,
 }: AngelsPanelProps) => {
   const [confirmResetOpen, setConfirmResetOpen] = useState(false)
+  const angelSingularLabel = getAngelSingularLabel(world)
+  const angelPluralLabel = getAngelPluralLabel(world)
 
   const confirmReset = () => {
     setConfirmResetOpen(false)
     onReset()
   }
 
+  const scoutImage =
+    world.id === 'china'
+      ? chinaScoutImage
+      : world.id === 'europe'
+        ? europeScoutImage
+        : siliconValleyScoutImage
+
   return (
     <div className="investor-layout">
-      <div className="angel-total-banner">
-        <div>Your Total Angels</div>
-        <strong>{formatCompact(state.angels, 2)}</strong>
+      <div className="investor-hero">
+        <img
+          alt=""
+          className="investor-scout investor-scout-left"
+          draggable={false}
+          src={scoutImage}
+        />
+        <div className="angel-total-banner">
+          <div>Total {angelPluralLabel}</div>
+          <strong>{formatCompact(state.angels, 2)}</strong>
+        </div>
+        <img
+          alt=""
+          className="investor-scout investor-scout-right"
+          draggable={false}
+          src={scoutImage}
+        />
       </div>
 
       <div className="investor-cards">
@@ -1652,12 +1774,12 @@ const AngelsPanel = ({
           <strong>
             {formatCompact(getAngelEffectiveness(state, world) * 100, 2)}%
           </strong>
-          <span>Profit Bonus Per Angel</span>
+          <span>Profit Bonus Per {angelSingularLabel}</span>
           <em>{formatCompact(angelBonusPercent, 2)}% total bonus</em>
         </div>
         <div className="investor-card claim">
           <strong>{formatCompact(claimableAngels, 2)}</strong>
-          <span>Angels Claimed With Restart</span>
+          <span>New {angelPluralLabel} after restart</span>
           <button
             className="adcap-button"
             disabled={claimableAngels <= 0}
@@ -1682,14 +1804,15 @@ const AngelsPanel = ({
             className="investor-confirm-card"
             onClick={(event) => event.stopPropagation()}
           >
-            <span className="investor-confirm-kicker">
-              Reset {world.name}
-            </span>
-            <h3 id="investor-confirm-title">Claim your new angels?</h3>
+            <span className="investor-confirm-kicker">Reset {world.name}</span>
+            <h3 id="investor-confirm-title">
+              Claim your new {angelPluralLabel}?
+            </h3>
             <strong>{formatCompact(claimableAngels, 2)}</strong>
             <p>
               This restarts your businesses, cash, managers, and upgrades in
-              this market. Your current angels and completed achievements stay.
+              this market. Your current {angelPluralLabel} and completed
+              achievements stay.
             </p>
             <div className="investor-confirm-actions">
               <button
@@ -1943,7 +2066,7 @@ const StatsPanel = ({
         />
         <StatTile label="Claimable" value={formatCompact(claimableAngels, 1)} />
         <StatTile
-          label="Angel bonus"
+          label={`${getAngelShortSingularLabel(world)} bonus`}
           value={`${formatCompact(angelBonusPercent, 1)}%`}
         />
       </div>

@@ -28,6 +28,108 @@ button:disabled {
   opacity: 0.62;
 }
 
+@property --startup-visible-radius {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 150vmax;
+}
+
+.startup-loader {
+  --startup-visible-radius: 150vmax;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  background: #101a31;
+  pointer-events: auto;
+  -webkit-mask-image: radial-gradient(
+    circle at center,
+    #000 var(--startup-visible-radius),
+    transparent calc(var(--startup-visible-radius) + 1px)
+  );
+  mask-image: radial-gradient(
+    circle at center,
+    #000 var(--startup-visible-radius),
+    transparent calc(var(--startup-visible-radius) + 1px)
+  );
+  animation: startup-loader-circle 1900ms cubic-bezier(0.18, 0.78, 0.18, 1)
+    forwards;
+}
+
+.startup-loader::after {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, transparent 0 18%, rgba(0, 0, 0, 0.08)),
+    linear-gradient(rgba(8, 14, 28, 0.05), rgba(8, 14, 28, 0.2));
+  content: '';
+}
+
+.startup-loader-title {
+  position: absolute;
+  top: 8vh;
+  left: 50%;
+  z-index: 2;
+  width: min(820px, 94vw);
+  height: auto;
+  transform: translateX(-50%) rotate(-2deg);
+  overflow: visible;
+  filter: drop-shadow(0 7px 0 rgba(52, 35, 24, 0.78))
+    drop-shadow(0 14px 18px rgba(0, 0, 0, 0.34));
+  pointer-events: none;
+}
+
+.startup-loader-title text {
+  fill: #fff4cd;
+  stroke: #4d3124;
+  stroke-linejoin: round;
+  stroke-width: 10px;
+  paint-order: stroke fill;
+  font-size: 92px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.startup-loader-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1);
+  transform-origin: center;
+  user-select: none;
+  animation: startup-loader-zoom 1900ms cubic-bezier(0.18, 0.78, 0.18, 1)
+    forwards;
+}
+
+@keyframes startup-loader-circle {
+  0%,
+  42% {
+    --startup-visible-radius: 150vmax;
+  }
+
+  100% {
+    --startup-visible-radius: 0px;
+  }
+}
+
+@keyframes startup-loader-zoom {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-loader {
+    display: none;
+  }
+}
+
 .adcap-screen {
   overflow-x: clip;
   background:
@@ -1331,42 +1433,6 @@ button:disabled {
   text-transform: none;
 }
 
-.node-burst,
-.node-burst::before,
-.node-burst::after {
-  position: absolute;
-  border-radius: 999px;
-  background: rgba(79, 70, 61, 0.5);
-  content: '';
-}
-
-.node-burst {
-  top: 20px;
-  right: 28px;
-  width: 12px;
-  height: 12px;
-  box-shadow:
-    31px 0 0 rgba(79, 70, 61, 0.5),
-    16px 27px 0 rgba(79, 70, 61, 0.5),
-    -12px 24px 0 rgba(79, 70, 61, 0.5);
-}
-
-.node-burst::before {
-  top: 4px;
-  right: -32px;
-  width: 44px;
-  height: 5px;
-  transform: rotate(36deg);
-}
-
-.node-burst::after {
-  top: 20px;
-  right: -18px;
-  width: 45px;
-  height: 5px;
-  transform: rotate(-32deg);
-}
-
 .modal-close {
   position: absolute;
   top: -57px;
@@ -1977,23 +2043,59 @@ button.unlock-card {
 
 .investor-layout {
   display: grid;
-  gap: 28px;
+  gap: 24px;
+}
+
+.investor-hero {
+  position: relative;
+  display: grid;
+  width: min(760px, 100%);
+  min-height: 238px;
+  place-items: center;
+  margin: 0 auto;
+  isolation: isolate;
 }
 
 .angel-total-banner {
   position: relative;
+  z-index: 1;
   display: grid;
-  max-width: 610px;
+  width: min(560px, 100%);
   min-height: 138px;
   place-items: center;
-  margin: 20px auto 0;
+  margin: 34px auto 0;
   transform: rotate(-1deg);
   background:
     linear-gradient(100deg, transparent 0 6%, #f8f8f8 6% 94%, transparent 94%),
     linear-gradient(#ffffff, #e5e5e5);
   color: #363330;
+  padding: 16px clamp(76px, 18vw, 146px);
   text-align: center;
   box-shadow: 0 9px 0 rgba(0, 0, 0, 0.12);
+}
+
+.investor-scout {
+  position: absolute;
+  z-index: 2;
+  bottom: 2px;
+  width: clamp(132px, 20vw, 205px);
+  height: auto;
+  filter: drop-shadow(0 9px 0 rgba(0, 0, 0, 0.12))
+    drop-shadow(0 14px 18px rgba(0, 0, 0, 0.16));
+  pointer-events: none;
+  user-select: none;
+}
+
+.investor-scout-left {
+  left: clamp(-18px, 1vw, 34px);
+  transform: rotate(-9deg);
+  transform-origin: center bottom;
+}
+
+.investor-scout-right {
+  right: clamp(-18px, 1vw, 34px);
+  transform: scaleX(-1) rotate(-9deg);
+  transform-origin: center bottom;
 }
 
 .angel-total-banner div {
@@ -3340,6 +3442,37 @@ button.unlock-card {
 
   .investor-cards {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .investor-hero {
+    min-height: 204px;
+  }
+
+  .angel-total-banner {
+    min-height: 116px;
+    margin-top: 34px;
+    padding-inline: clamp(48px, 16vw, 82px);
+  }
+
+  .angel-total-banner div {
+    font-size: clamp(22px, 7vw, 31px);
+  }
+
+  .angel-total-banner strong {
+    font-size: clamp(36px, 10vw, 52px);
+  }
+
+  .investor-scout {
+    bottom: 8px;
+    width: clamp(92px, 30vw, 128px);
+  }
+
+  .investor-scout-left {
+    left: -14px;
+  }
+
+  .investor-scout-right {
+    right: -14px;
   }
 
   .investor-confirm-card {

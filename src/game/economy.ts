@@ -1,5 +1,6 @@
 import type {
   AchievementDefinition,
+  AngelInvestorLabels,
   BusinessDefinition,
   BusinessId,
   Currency,
@@ -408,10 +409,11 @@ const getUpgradeDescription = (
   target: UpgradeTarget,
   kind: UpgradeDefinition["kind"],
   value: number,
+  angelInvestorLabels: AngelInvestorLabels,
 ) => {
   switch (kind) {
     case "angelEffectiveness":
-      return `Angel investor effectiveness +${formatUpgradeNumber(value)}%.`;
+      return `${angelInvestorLabels.shortSingular} effectiveness +${formatUpgradeNumber(value)}%.`;
     case "owned":
       return `+${formatUpgradeNumber(value)} ${getTargetName(businesses, target)}.`;
     case "speed":
@@ -435,11 +437,12 @@ const createUpgrades = (
   rows: readonly UpgradeRow[],
   currency: Currency,
   businesses: BusinessDefinition[],
+  angelInvestorLabels: AngelInvestorLabels,
 ) =>
   rows.map<UpgradeDefinition>(([name, target, cost, kind, multiplier], index) => ({
     id: `${currency}-${index + 1}-${slugify(name)}`,
     name,
-    description: getUpgradeDescription(businesses, target, kind, multiplier),
+    description: getUpgradeDescription(businesses, target, kind, multiplier, angelInvestorLabels),
     cost,
     currency,
     target,
@@ -601,7 +604,7 @@ const baseAllBusinessUnlocks: UnlockDefinition[] = [
   { id: "all-1000", name: "Planetary Compute Grid", goal: 1_000, target: "all", kind: "profit", multiplier: 5 },
 ];
 
-export const achievements: AchievementDefinition[] = [
+const createAchievements = (angelInvestorLabels: AngelInvestorLabels): AchievementDefinition[] => [
   {
     id: "first-rig",
     name: "First Block",
@@ -625,12 +628,12 @@ export const achievements: AchievementDefinition[] = [
   {
     id: "first-angel",
     name: "Term Sheet From Heaven",
-    description: "Attract your first angel investor.",
+    description: `Attract your first ${angelInvestorLabels.singular}.`,
   },
   {
     id: "first-prestige",
     name: "Here We Compute Again",
-    description: "Reset once to claim angel investors.",
+    description: `Reset once to claim ${angelInvestorLabels.plural}.`,
   },
   {
     id: "all-automated",
@@ -659,12 +662,20 @@ export const achievements: AchievementDefinition[] = [
   },
 ];
 
+export const achievements = createAchievements({
+  singular: "a16z scout",
+  plural: "a16z scouts",
+  shortSingular: "Scout",
+  shortPlural: "Scouts",
+});
+
 const buildWorld = ({
   id,
   name,
   description,
   currencyName,
   currencySymbol,
+  angelInvestorLabels,
   unlockCost,
   startingCash,
   businesses,
@@ -678,6 +689,7 @@ const buildWorld = ({
   description: string;
   currencyName: string;
   currencySymbol: string;
+  angelInvestorLabels: AngelInvestorLabels;
   unlockCost: WorldUnlockCost;
   startingCash: number;
   businesses: BusinessDefinition[];
@@ -691,14 +703,15 @@ const buildWorld = ({
   description,
   currencyName,
   currencySymbol,
+  angelInvestorLabels,
   unlockCost,
   startingCash,
   businesses,
-  cashUpgrades: createUpgrades(cashUpgradeRows, "cash", businesses),
-  angelUpgrades: createUpgrades(angelUpgradeRows, "angels", businesses),
+  cashUpgrades: createUpgrades(cashUpgradeRows, "cash", businesses, angelInvestorLabels),
+  angelUpgrades: createUpgrades(angelUpgradeRows, "angels", businesses, angelInvestorLabels),
   businessUnlocks: businessUnlocks ?? createBusinessUnlocks(businesses),
   allBusinessUnlocks: allBusinessUnlocks ?? baseAllBusinessUnlocks,
-  achievements,
+  achievements: createAchievements(angelInvestorLabels),
 });
 
 export const siliconValleyWorld = buildWorld({
@@ -707,6 +720,12 @@ export const siliconValleyWorld = buildWorld({
   description: "The original San Francisco compute market.",
   currencyName: "Dollars",
   currencySymbol: "$",
+  angelInvestorLabels: {
+    singular: "a16z scout",
+    plural: "a16z scouts",
+    shortSingular: "Scout",
+    shortPlural: "Scouts",
+  },
   unlockCost: { currency: "free", amount: 0 },
   startingCash: 4,
   businesses: siliconValleyBusinesses,
@@ -722,6 +741,12 @@ export const chinaWorld = buildWorld({
   description: "A yuan-denominated market with China-style pacing.",
   currencyName: "Yuan",
   currencySymbol: "¥",
+  angelInvestorLabels: {
+    singular: "HongShan scout",
+    plural: "HongShan scouts",
+    shortSingular: "Scout",
+    shortPlural: "Scouts",
+  },
   unlockCost: { currency: "megaBucks", amount: 100 },
   startingCash: 0.05,
   businesses: chinaBusinesses,
@@ -737,6 +762,12 @@ export const europeWorld = buildWorld({
   description: "A euro-denominated market with Europe-style pacing.",
   currencyName: "Euros",
   currencySymbol: "€",
+  angelInvestorLabels: {
+    singular: "EQT scout",
+    plural: "EQT scouts",
+    shortSingular: "scout",
+    shortPlural: "scouts",
+  },
   unlockCost: { currency: "siliconValleyCash", amount: 10 }, // MATHEUS
   // unlockCost: { currency: "siliconValleyCash", amount: 100_000_000_000_000 },
   startingCash: 5,
