@@ -25,16 +25,16 @@ import {
   type CSSProperties,
   type ReactNode,
 } from 'react'
-import chinaTravelImage from '../china.png'
-import siliconValleyTravelImage from '../san-francisco.png'
-import europeTravelImage from '../europe.png'
-import welcomeImage from '../welcome.png'
-import jensenPlayerImage from '../jensen_huang_headshot_transparent.png'
-import jackMaImage from '../jack_ma_headshot_transparent.png'
-import siliconValleyScoutImage from '../silicon-valley-scout.png'
-import europeScoutImage from '../europe-scout.png'
-import chinaScoutImage from '../china-scout.png'
-import ursulaPlayerImage from '../ursula_von_der_leyen_headshot_transparent.png'
+import chinaScoutImage from './assets/china-scout.png'
+import chinaTravelImage from './assets/china.png'
+import europeScoutImage from './assets/europe-scout.png'
+import europeTravelImage from './assets/europe.png'
+import jackMaImage from './assets/jack_ma_headshot_transparent.png'
+import jensenPlayerImage from './assets/jensen_huang_headshot_transparent.png'
+import siliconValleyScoutImage from './assets/silicon-valley-scout.png'
+import siliconValleyTravelImage from './assets/san-francisco.png'
+import ursulaPlayerImage from './assets/ursula_von_der_leyen_headshot_transparent.png'
+import welcomeImage from './assets/welcome.png'
 import { businessIconImages } from './assets/businessIcons'
 import quickUpgradeImage from './assets/businesses/quick-upgrade.png'
 import { worldList } from './game/economy'
@@ -476,7 +476,6 @@ const App = () => {
     () => getTotalCashPerSecond(worldState, world),
     [worldState, world],
   )
-  const nextAllUnlock = getNextAllUnlock(worldState, world)
   const quickBuyOption = useMemo(
     () => getQuickBuyOption(worldState, world),
     [worldState, world],
@@ -633,15 +632,6 @@ const App = () => {
               </button>
             </div>
           ) : null}
-
-          <div className="empire-note">
-            <span>Next empire unlock</span>
-            <strong>
-              {nextAllUnlock
-                ? `${nextAllUnlock.goal} of everything: ${nextAllUnlock.name}`
-                : 'All empire unlocks cleared'}
-            </strong>
-          </div>
 
           <section className="investment-grid">
             {world.businesses.map((business) => (
@@ -853,7 +843,7 @@ const Sidebar = ({
         onClick={() => selectPanel('stats')}
         type="button"
       >
-        <span>Shop</span>
+        <span>Stats</span>
         <BadgeDollarSign className="h-11 w-11" />
       </button>
 
@@ -2043,7 +2033,13 @@ const StatsPanel = ({
   onSave,
   onHardReset,
 }: StatsPanelProps) => {
+  const [confirmHardResetOpen, setConfirmHardResetOpen] = useState(false)
   const unlockedAchievements = new Set(state.achievements)
+
+  const confirmHardReset = () => {
+    setConfirmHardResetOpen(false)
+    onHardReset()
+  }
 
   return (
     <div className="space-y-3">
@@ -2081,19 +2077,58 @@ const StatsPanel = ({
         </button>
         <button
           className="adcap-button red flex items-center justify-center gap-2 px-3 py-3"
-          onClick={onHardReset}
+          onClick={() => setConfirmHardResetOpen(true)}
         >
           <Trash2 className="h-4 w-4" />
           Reset
         </button>
       </div>
 
+      {confirmHardResetOpen ? (
+        <div
+          aria-labelledby="stats-reset-confirm-title"
+          aria-modal="true"
+          className="investor-confirm-backdrop"
+          onClick={() => setConfirmHardResetOpen(false)}
+          role="dialog"
+        >
+          <div
+            className="investor-confirm-card"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <span className="investor-confirm-kicker">Hard reset</span>
+            <h3 id="stats-reset-confirm-title">Reset everything?</h3>
+            <strong>All</strong>
+            <p>
+              This clears your current run, saved progress, achievements,
+              unlocks, upgrades, managers, and all market progress.
+            </p>
+            <div className="investor-confirm-actions">
+              <button
+                className="adcap-button green"
+                onClick={() => setConfirmHardResetOpen(false)}
+                type="button"
+              >
+                Cancel
+              </button>
+              <button
+                className="adcap-button red"
+                onClick={confirmHardReset}
+                type="button"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <div>
         <div className="mb-2 flex items-center gap-2 text-xs font-black uppercase text-[#3a2208]">
           <Trophy className="h-4 w-4" />
           Achievements
         </div>
-        <div className="space-y-2">
+        <div className="achievement-list">
           {world.achievements.map((achievement) => {
             const unlocked = unlockedAchievements.has(achievement.id)
 
@@ -2103,13 +2138,13 @@ const StatsPanel = ({
                 key={achievement.id}
               >
                 <div>
-                  <div className="font-black uppercase">{achievement.name}</div>
-                  <div className="text-sm font-bold">
+                  <div className="achievement-title">{achievement.name}</div>
+                  <div className="achievement-description">
                     {achievement.description}
                   </div>
                 </div>
                 {unlocked ? (
-                  <CheckCircle2 className="h-5 w-5 shrink-0" />
+                  <CheckCircle2 className="achievement-check" />
                 ) : null}
               </div>
             )
