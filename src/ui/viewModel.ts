@@ -308,7 +308,7 @@ export const getQuickBuyOption = (
       name: business.managerName,
       description: `Automates ${business.name}`,
       cost: business.managerCost,
-      image: getBusinessImage(business),
+      image: getBusinessImage(world, business),
       badge: 'Mgr',
     }))
   const upgradeOptions: QuickBuyOption[] = world.cashUpgrades

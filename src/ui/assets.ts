@@ -1,6 +1,9 @@
 import jackMaImage from '../assets/portraits/jack-ma.png'
 import jensenPlayerImage from '../assets/portraits/jensen-huang.png'
 import ursulaPlayerImage from '../assets/portraits/ursula-von-der-leyen.png'
+import chinaCurrencyImage from '../assets/currencies/china.png'
+import europeCurrencyImage from '../assets/currencies/europe.png'
+import siliconValleyCurrencyImage from '../assets/currencies/silicon-valley.png'
 import chinaScoutImage from '../assets/scouts/china.png'
 import europeScoutImage from '../assets/scouts/europe.png'
 import siliconValleyScoutImage from '../assets/scouts/silicon-valley.png'
@@ -9,7 +12,6 @@ import chinaTravelImage from '../assets/worlds/china.png'
 import europeTravelImage from '../assets/worlds/europe.png'
 import siliconValleyTravelImage from '../assets/worlds/silicon-valley.png'
 import { businessIconImages } from '../assets/businessIcons'
-import quickUpgradeImageAsset from '../assets/businesses/quick-upgrade.png'
 import type {
   BusinessDefinition,
   BusinessId,
@@ -21,8 +23,13 @@ import type {
 
 const businessImages: Record<string, string> = businessIconImages
 
-export const quickUpgradeImage = quickUpgradeImageAsset
 export const welcomeImage = welcomeImageAsset
+
+export const currencyImages: Record<WorldId, string> = {
+  'silicon-valley': siliconValleyCurrencyImage,
+  china: chinaCurrencyImage,
+  europe: europeCurrencyImage,
+}
 
 export const travelImages: Record<WorldId, string> = {
   'silicon-valley': siliconValleyTravelImage,
@@ -44,8 +51,13 @@ export const scoutImages: Record<WorldId, string> = {
   europe: europeScoutImage,
 }
 
-export const getBusinessImage = (business: BusinessDefinition) =>
-  businessImages[business.imageId ?? business.id] ?? quickUpgradeImage
+export const getCurrencyImage = (world: WorldDefinition) =>
+  currencyImages[world.id]
+
+export const getBusinessImage = (
+  world: WorldDefinition,
+  business: BusinessDefinition,
+) => businessImages[business.imageId ?? business.id] ?? getCurrencyImage(world)
 
 export const getBusinessImageById = (
   world: WorldDefinition,
@@ -53,7 +65,7 @@ export const getBusinessImageById = (
 ) => {
   const business = world.businesses.find((entry) => entry.id === businessId)
 
-  return business ? getBusinessImage(business) : quickUpgradeImage
+  return business ? getBusinessImage(world, business) : getCurrencyImage(world)
 }
 
 export const getUpgradeImage = (
@@ -61,7 +73,7 @@ export const getUpgradeImage = (
   world: WorldDefinition,
 ) => {
   if (upgrade.target === 'all') {
-    return quickUpgradeImage
+    return getCurrencyImage(world)
   }
 
   return getBusinessImageById(world, upgrade.target)
@@ -72,5 +84,5 @@ export const getUnlockImage = (
   world: WorldDefinition,
 ) =>
   unlock.target === 'all'
-    ? quickUpgradeImage
+    ? getCurrencyImage(world)
     : getBusinessImageById(world, unlock.target)

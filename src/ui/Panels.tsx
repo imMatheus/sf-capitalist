@@ -125,7 +125,7 @@ export const ManagersPanel = ({ state, world, onBuy }: ManagersPanelProps) => (
               alt=""
               className="modal-row-icon"
               draggable={false}
-              src={getBusinessImage(business)}
+              src={getBusinessImage(world, business)}
             />
             <div className="min-w-0">
               <div className="font-black uppercase text-[#3a2208]">

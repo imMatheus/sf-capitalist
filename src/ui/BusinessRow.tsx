@@ -252,7 +252,7 @@ export const BusinessRow = ({
               alt=""
               className="business-image"
               draggable={false}
-              src={getBusinessImage(business)}
+              src={getBusinessImage(world, business)}
             />
           </span>
           <span className="business-unlock-copy">
@@ -286,7 +286,7 @@ export const BusinessRow = ({
             alt=""
             className="business-image"
             draggable={false}
-            src={getBusinessImage(business)}
+            src={getBusinessImage(world, business)}
           />
         </button>
         <div
