@@ -2946,10 +2946,10 @@ button.unlock-card {
     width: 100%;
     min-height: 44px;
     margin: 0;
-    border: 3px solid #4a4947;
+    border: 3px solid #4a4037;
     border-radius: 5px 5px 3px 3px;
-    background: linear-gradient(#9a9a96, #737370);
-    color: #fffefa;
+    background: linear-gradient(#fb9e4f, #dc6f31);
+    color: #fff6e9;
     padding: 4px 10px 5px 11px;
     font-size: 24px;
     line-height: 1;
@@ -3352,32 +3352,83 @@ button.unlock-card {
   }
 
   .unlock-card-grid {
-    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
   }
 
   .unlock-card-grid.gallery {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+    padding: 4px 0 0;
   }
 
   .unlock-card {
-    min-height: 210px;
-    padding: 10px 8px;
+    min-height: 126px;
+    border-width: 4px;
+    border-radius: 11px;
+    padding: 7px 4px;
+    box-shadow:
+      inset 0 0 0 2px #fff1be,
+      0 3px 0 rgba(0, 0, 0, 0.12);
   }
 
   .unlock-card.gallery {
-    min-height: 148px;
-    padding: 16px 8px 12px;
+    min-height: 88px;
+    border-width: 3px;
+    border-radius: 9px;
+    padding: 11px 3px 7px;
+    box-shadow:
+      inset 0 0 0 2px #fff1be,
+      0 3px 0 rgba(0, 0, 0, 0.18);
+  }
+
+  .unlock-check {
+    top: 3px;
+    right: 3px;
+    width: 22px;
+    height: 22px;
+    border-width: 2px;
+  }
+
+  .unlock-lock {
+    top: -9px;
+    left: -7px;
+    width: 24px;
+    height: 24px;
+    border-width: 2px;
+    padding: 2px;
+  }
+
+  .unlock-card img {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 3px;
   }
 
   .unlock-card.gallery img {
-    width: 56px;
-    height: 56px;
+    width: 34px;
+    height: 34px;
+    margin: 8px 0 4px;
+  }
+
+  .unlock-card strong {
+    font-size: 19px;
+  }
+
+  .unlock-card.gallery strong {
+    font-size: 18px;
   }
 
   .unlock-card span {
-    font-size: 17px;
+    margin-top: 3px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .unlock-card small {
+    margin-top: 2px;
+    font-size: 10px;
+    line-height: 1;
   }
 
   .unlock-gallery-detail {
@@ -3390,7 +3441,35 @@ button.unlock-card {
   }
 
   .investor-cards {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 4px;
+  }
+
+  .investor-card {
+    min-height: 230px;
+    border-width: 4px;
+    border-radius: 12px;
+    padding: 16px 9px;
+  }
+
+  .investor-card strong {
+    font-size: 32px;
+  }
+
+  .investor-card span {
+    font-size: 23px;
+    line-height: 1;
+  }
+
+  .investor-card em {
+    font-size: 14px;
+  }
+
+  .investor-card .adcap-button {
+    min-height: 50px;
+    padding: 8px 10px;
+    font-size: 24px;
   }
 
   .investor-hero {
@@ -3511,6 +3590,32 @@ button.unlock-card {
   .quick-buy-button {
     min-height: 38px;
     padding: 4px 42px 5px 9px;
+    font-size: 20px;
+  }
+
+  .investor-cards {
+    gap: 7px;
+  }
+
+  .investor-card {
+    min-height: 208px;
+    padding: 13px 7px;
+  }
+
+  .investor-card strong {
+    font-size: 28px;
+  }
+
+  .investor-card span {
+    font-size: 20px;
+  }
+
+  .investor-card em {
+    font-size: 12px;
+  }
+
+  .investor-card .adcap-button {
+    min-height: 44px;
     font-size: 20px;
   }
 
@@ -3718,10 +3823,6 @@ button.unlock-card {
     justify-self: stretch;
     font-size: 22px;
     text-align: center;
-  }
-
-  .unlock-card-grid.gallery {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .unlock-gallery-detail {
