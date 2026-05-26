@@ -95,7 +95,7 @@ export const Sidebar = ({
           draggable={false}
           src={playerPortrait}
         />
-        <div className="ribbon">GPU & Stats</div>
+        <div className="ribbon">SF Capitalist</div>
       </div>
 
       <div
@@ -209,7 +209,12 @@ interface PanelModalProps {
   onClose: () => void
 }
 
-export const PanelModal = ({ panel, children, world, onClose }: PanelModalProps) => {
+export const PanelModal = ({
+  panel,
+  children,
+  world,
+  onClose,
+}: PanelModalProps) => {
   const meta = panelMeta[panel]
   const [showHelp, setShowHelp] = useState(false)
 
