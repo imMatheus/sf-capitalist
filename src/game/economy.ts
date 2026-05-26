@@ -747,7 +747,7 @@ export const chinaWorld = buildWorld({
     shortSingular: "Scout",
     shortPlural: "Scouts",
   },
-  unlockCost: { currency: "siliconValleyCash", amount: 15 },
+  unlockCost: { currency: "siliconValleyCash", amount: 1_000_000 },
   startingCash: 0.05,
   businesses: chinaBusinesses,
   cashUpgradeRows: chinaCashUpgradeRows,
@@ -768,8 +768,7 @@ export const europeWorld = buildWorld({
     shortSingular: "scout",
     shortPlural: "scouts",
   },
-  unlockCost: { currency: "siliconValleyCash", amount: 10 }, // MATHEUS
-  // unlockCost: { currency: "siliconValleyCash", amount: 100_000_000_000_000 },
+  unlockCost: { currency: "siliconValleyCash", amount: 1_000 },
   startingCash: 5,
   businesses: europeBusinesses,
   cashUpgradeRows: europeCashUpgradeRows,

@@ -1295,7 +1295,7 @@ button:disabled {
       rgba(4, 10, 18, 0.38) 120px,
       rgba(0, 0, 0, 0.48)
     );
-  padding: 108px 24px 36px;
+  padding: 100px 24px 34px;
 }
 
 .modal-dismiss-layer {
@@ -1311,8 +1311,8 @@ button:disabled {
   --modal-accent-dark: #b8753b;
   position: relative;
   z-index: 1;
-  width: min(920px, calc(100vw - 48px));
-  min-height: min(820px, calc(100vh - 140px));
+  width: min(860px, calc(100vw - 48px));
+  min-height: min(760px, calc(100vh - 132px));
   border-radius: 8px 8px 12px 12px;
   background:
     repeating-linear-gradient(
@@ -1363,32 +1363,32 @@ button:disabled {
 
 .modal-side-tab {
   position: absolute;
-  top: -48px;
-  width: 235px;
-  height: 92px;
+  top: -44px;
+  width: 216px;
+  height: 84px;
   border-radius: 9px;
   background: var(--modal-accent-dark);
   box-shadow: 0 10px 0 rgba(0, 0, 0, 0.16);
 }
 
 .modal-side-tab.left {
-  left: 82px;
+  left: 76px;
   transform: rotate(-3deg);
 }
 
 .modal-side-tab.right {
-  right: 82px;
+  right: 76px;
   transform: rotate(3deg);
 }
 
 .modal-title-card {
   position: absolute;
-  top: -70px;
+  top: -64px;
   left: 50%;
   z-index: 2;
   display: grid;
-  width: min(520px, calc(100vw - 170px));
-  min-height: 108px;
+  width: min(490px, calc(100vw - 160px));
+  min-height: 98px;
   place-items: center;
   transform: translateX(-50%) rotate(0.5deg);
   border-radius: 8px;
@@ -1405,7 +1405,7 @@ button:disabled {
 
 .modal-title-card h2 {
   margin: 0;
-  font-size: clamp(44px, 7vw, 76px);
+  font-size: clamp(40px, 6.6vw, 68px);
   font-weight: 900;
   letter-spacing: 0;
   line-height: 0.95;
@@ -1414,19 +1414,19 @@ button:disabled {
 
 .modal-close {
   position: absolute;
-  top: -57px;
-  right: -16px;
+  top: -53px;
+  right: -14px;
   z-index: 4;
   display: grid;
-  width: 122px;
-  height: 90px;
+  width: 112px;
+  height: 82px;
   place-items: center;
   transform: rotate(5deg);
   border: 6px solid rgba(255, 255, 255, 0.9);
   border-radius: 50%;
   background: #f5f1ea;
   color: #49433e;
-  font-size: 56px;
+  font-size: 50px;
   font-weight: 900;
   line-height: 1;
   text-shadow: 0 2px 0 #fff;
@@ -1439,18 +1439,18 @@ button:disabled {
 
 .modal-help {
   position: absolute;
-  top: 108px;
-  right: 24px;
+  top: 100px;
+  right: 22px;
   z-index: 3;
   display: grid;
-  width: 58px;
-  height: 58px;
+  width: 52px;
+  height: 52px;
   place-items: center;
   border: 5px solid #4d92bb;
   border-radius: 50%;
   background: #9fcee6;
   color: #2c3f49;
-  font-size: 39px;
+  font-size: 35px;
   font-weight: 900;
   line-height: 1;
   box-shadow:
@@ -1460,16 +1460,16 @@ button:disabled {
 
 .modal-help-popover {
   position: absolute;
-  top: 96px;
-  right: 88px;
+  top: 90px;
+  right: 80px;
   z-index: 6;
-  width: min(360px, calc(100% - 142px));
+  width: min(330px, calc(100% - 132px));
   border: 4px solid #4d92bb;
   border-radius: 10px;
   background: #f7fbff;
   color: #4c4945;
-  padding: 14px 16px;
-  font-size: 17px;
+  padding: 12px 15px;
+  font-size: 16px;
   font-weight: 900;
   line-height: 1.2;
   text-align: center;
@@ -1496,14 +1496,14 @@ button:disabled {
   display: flex;
   min-height: inherit;
   flex-direction: column;
-  padding: 92px 38px 34px;
+  padding: 84px 34px 30px;
 }
 
 .modal-kicker {
-  max-width: 760px;
-  margin: 0 auto 14px;
+  max-width: 700px;
+  margin: 0 auto 12px;
   color: #69645f;
-  font-size: clamp(22px, 3vw, 34px);
+  font-size: clamp(20px, 2.8vw, 30px);
   font-weight: 900;
   line-height: 1.12;
   text-align: center;
@@ -1524,7 +1524,7 @@ button:disabled {
 
 .modal-divider {
   height: 8px;
-  margin: 2px 0 18px;
+  margin: 2px 0 16px;
   border-top: 2px solid rgba(0, 0, 0, 0.08);
   background: linear-gradient(rgba(0, 0, 0, 0.12), transparent);
 }
@@ -1537,18 +1537,18 @@ button:disabled {
 
 .modal-pills {
   display: grid;
-  grid-template-columns: 140px 140px minmax(0, 1fr);
+  grid-template-columns: 130px 130px minmax(0, 1fr);
   align-items: end;
   justify-content: center;
-  gap: 18px;
-  margin: 0 auto 18px;
-  max-width: 620px;
+  gap: 16px;
+  margin: 0 auto 16px;
+  max-width: 580px;
   text-align: center;
 }
 
 .modal-pills button {
   display: grid;
-  min-height: 96px;
+  min-height: 88px;
   place-items: center;
   border: 0;
   background: transparent;
@@ -1559,22 +1559,22 @@ button:disabled {
 
 .modal-pills button svg {
   display: grid;
-  width: 78px;
-  height: 78px;
-  margin-bottom: -16px;
-  border: 8px solid color-mix(in srgb, var(--modal-accent) 75%, #7c4b20);
+  width: 72px;
+  height: 72px;
+  margin-bottom: -15px;
+  border: 7px solid color-mix(in srgb, var(--modal-accent) 75%, #7c4b20);
   border-radius: 50%;
   background: color-mix(in srgb, var(--modal-accent) 60%, #ffffff);
-  padding: 16px;
+  padding: 14px;
   color: #51483f;
 }
 
 .modal-pills button span {
-  min-width: 112px;
+  min-width: 104px;
   border-radius: 8px;
   background: var(--modal-accent);
   padding: 5px 10px 6px;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 900;
 }
 
@@ -1604,7 +1604,7 @@ button:disabled {
   align-self: center;
   overflow: hidden;
   color: #64605b;
-  font-size: clamp(24px, 4vw, 34px);
+  font-size: clamp(22px, 3.7vw, 31px);
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1615,13 +1615,13 @@ button:disabled {
   display: grid;
   grid-template-columns: auto auto minmax(0, 1fr);
   align-items: center;
-  gap: 10px;
-  width: min(620px, 100%);
-  margin: 0 auto 18px;
+  gap: 9px;
+  width: min(580px, 100%);
+  margin: 0 auto 16px;
   border: 5px solid color-mix(in srgb, var(--modal-accent) 70%, #7c4b20);
   border-radius: 12px;
   background: linear-gradient(#fffdf7, #eadbc9);
-  padding: 12px 16px;
+  padding: 10px 15px;
   color: #51483f;
   box-shadow:
     inset 0 2px 0 rgba(255, 255, 255, 0.7),
@@ -1630,8 +1630,8 @@ button:disabled {
 }
 
 .manager-cash-balance svg {
-  width: 34px;
-  height: 34px;
+  width: 31px;
+  height: 31px;
   border-radius: 50%;
   background: linear-gradient(#d8f8b8, #92d653);
   padding: 6px;
@@ -1639,7 +1639,7 @@ button:disabled {
 }
 
 .manager-cash-balance span {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -1649,16 +1649,16 @@ button:disabled {
   overflow: hidden;
   max-width: 100%;
   color: #3f3a36;
-  font-size: clamp(24px, 4vw, 34px);
+  font-size: clamp(22px, 3.6vw, 30px);
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .modal-section-label {
-  margin: 8px 0 12px;
+  margin: 7px 0 11px;
   color: #615c56;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 900;
   text-align: center;
   text-transform: uppercase;
@@ -2022,14 +2022,14 @@ button.unlock-card {
 
 .investor-layout {
   display: grid;
-  gap: 24px;
+  gap: 22px;
 }
 
 .investor-hero {
   position: relative;
   display: grid;
-  width: min(760px, 100%);
-  min-height: 238px;
+  width: min(720px, 100%);
+  min-height: 220px;
   place-items: center;
   margin: 0 auto;
   isolation: isolate;
@@ -2039,8 +2039,8 @@ button.unlock-card {
   position: relative;
   z-index: 1;
   display: grid;
-  width: min(560px, 100%);
-  min-height: 138px;
+  width: min(520px, 100%);
+  min-height: 128px;
   place-items: center;
   margin: 34px auto 0;
   transform: rotate(-1deg);
@@ -2048,7 +2048,7 @@ button.unlock-card {
     linear-gradient(100deg, transparent 0 6%, #f8f8f8 6% 94%, transparent 94%),
     linear-gradient(#ffffff, #e5e5e5);
   color: #363330;
-  padding: 16px clamp(76px, 18vw, 146px);
+  padding: 14px clamp(70px, 17vw, 134px);
   text-align: center;
   box-shadow: 0 9px 0 rgba(0, 0, 0, 0.12);
 }
@@ -2057,7 +2057,7 @@ button.unlock-card {
   position: absolute;
   z-index: 2;
   bottom: 2px;
-  width: clamp(132px, 20vw, 205px);
+  width: clamp(122px, 18vw, 188px);
   height: auto;
   filter: drop-shadow(0 9px 0 rgba(0, 0, 0, 0.12))
     drop-shadow(0 14px 18px rgba(0, 0, 0, 0.16));
@@ -2079,13 +2079,13 @@ button.unlock-card {
 
 .angel-total-banner div {
   color: #a56d98;
-  font-size: clamp(28px, 5vw, 42px);
+  font-size: clamp(26px, 4.7vw, 38px);
   font-weight: 900;
   line-height: 1;
 }
 
 .angel-total-banner strong {
-  font-size: clamp(42px, 8vw, 66px);
+  font-size: clamp(39px, 7.4vw, 60px);
   font-weight: 900;
   line-height: 0.95;
 }
@@ -2093,18 +2093,18 @@ button.unlock-card {
 .investor-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  margin-top: 12px;
+  gap: 16px;
+  margin-top: 10px;
 }
 
 .investor-card {
   display: grid;
-  min-height: 300px;
+  min-height: 276px;
   place-items: center;
   border: 6px solid #d1cabd;
   border-radius: 16px;
   background: #fffefa;
-  padding: 24px 18px;
+  padding: 22px 17px;
   color: #353230;
   text-align: center;
   transform: rotate(-1deg);
@@ -2118,14 +2118,14 @@ button.unlock-card {
 }
 
 .investor-card strong {
-  font-size: clamp(44px, 7vw, 70px);
+  font-size: clamp(40px, 6.5vw, 64px);
   font-weight: 900;
   line-height: 0.95;
 }
 
 .investor-card span {
   color: #84bd47;
-  font-size: clamp(27px, 4.5vw, 43px);
+  font-size: clamp(24px, 4.2vw, 38px);
   font-weight: 900;
   line-height: 1.05;
 }
@@ -2136,15 +2136,15 @@ button.unlock-card {
 
 .investor-card em {
   color: #6a655f;
-  font-size: 18px;
+  font-size: 16px;
   font-style: normal;
   font-weight: 900;
 }
 
 .investor-card .adcap-button {
-  width: min(270px, 100%);
+  width: min(250px, 100%);
   background: linear-gradient(#b87aa5, #965f88);
-  font-size: 34px;
+  font-size: 31px;
 }
 
 .investor-confirm-backdrop {
@@ -2165,7 +2165,7 @@ button.unlock-card {
 
 .investor-confirm-card {
   display: grid;
-  width: min(520px, calc(100vw - 36px));
+  width: min(480px, calc(100vw - 36px));
   gap: 12px;
   justify-items: center;
   border: 6px solid #d1cabd;
@@ -2178,7 +2178,7 @@ button.unlock-card {
     ),
     #fffefa;
   color: #353230;
-  padding: 28px 28px 24px;
+  padding: 24px 26px 22px;
   text-align: center;
   text-shadow: 0 1px 0 #fff;
   box-shadow:
@@ -2189,7 +2189,7 @@ button.unlock-card {
 
 .investor-confirm-kicker {
   color: #a56d98;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
   line-height: 1;
   text-transform: uppercase;
@@ -2198,23 +2198,23 @@ button.unlock-card {
 .investor-confirm-card h3 {
   margin: 0;
   color: #3f3934;
-  font-size: clamp(30px, 5vw, 48px);
+  font-size: clamp(28px, 4.6vw, 44px);
   font-weight: 900;
   line-height: 0.95;
 }
 
 .investor-confirm-card strong {
   color: #a56d98;
-  font-size: clamp(48px, 8vw, 76px);
+  font-size: clamp(44px, 7.4vw, 68px);
   font-weight: 900;
   line-height: 0.9;
 }
 
 .investor-confirm-card p {
-  max-width: 420px;
+  max-width: 390px;
   margin: 0;
   color: #665f58;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 900;
   line-height: 1.18;
 }
@@ -2222,15 +2222,15 @@ button.unlock-card {
 .investor-confirm-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: min(390px, 100%);
+  width: min(360px, 100%);
   gap: 12px;
   margin-top: 8px;
 }
 
 .investor-confirm-actions .adcap-button {
-  min-height: 56px;
+  min-height: 52px;
   padding: 10px 14px;
-  font-size: 20px;
+  font-size: 19px;
 }
 
 .paper-button,
@@ -2283,7 +2283,7 @@ button.unlock-card {
 
 .adcap-modal .shop-row,
 .adcap-modal .achievement-row {
-  min-height: 104px;
+  min-height: 96px;
   border: 0;
   border-radius: 0;
   background:
@@ -2294,7 +2294,7 @@ button.unlock-card {
       rgba(255, 255, 255, 0.94) 82%
     ),
     rgba(255, 255, 255, 0.72);
-  padding: 12px 16px;
+  padding: 10px 14px;
   box-shadow: none;
 }
 
@@ -2306,15 +2306,20 @@ button.unlock-card {
 .adcap-modal .shop-row .font-black:first-child,
 .adcap-modal .achievement-row .font-black:first-child {
   color: var(--modal-accent-dark) !important;
-  font-size: clamp(22px, 3vw, 34px);
+  font-size: clamp(20px, 2.8vw, 30px);
   line-height: 1;
   text-transform: none;
 }
 
+.adcap-modal .shop-row .min-w-0 .text-sm,
+.adcap-modal .achievement-row > div:first-child .text-sm {
+  font-size: 13px;
+}
+
 .travel-panel {
   display: grid;
-  gap: 22px;
-  padding: 4px 6px 42px;
+  gap: 20px;
+  padding: 4px 5px 38px;
 }
 
 .travel-cash-balance {
@@ -2322,21 +2327,21 @@ button.unlock-card {
   justify-self: end;
   width: fit-content;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   border: 3px solid #52613a;
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 7px 11px;
   background: linear-gradient(#fcffe9, #b9d573);
   color: #405127;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
 }
 
 .travel-destinations {
   display: grid;
-  gap: 66px;
-  padding-top: 16px;
+  gap: 58px;
+  padding-top: 14px;
 }
 
 .travel-choice {
@@ -2348,8 +2353,8 @@ button.unlock-card {
   position: relative;
   display: block;
   width: 100%;
-  border: 8px solid var(--travel-accent);
-  border-radius: 20px;
+  border: 7px solid var(--travel-accent);
+  border-radius: 18px;
   background: #26283a;
   padding: 0;
   color: #fffdf5;
@@ -2408,7 +2413,7 @@ button.unlock-card {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 11px;
+  border-radius: 10px;
   object-fit: cover;
   user-select: none;
 }
@@ -2427,15 +2432,15 @@ button.unlock-card {
 .travel-choice-ribbon {
   position: absolute;
   z-index: 2;
-  top: -28px;
-  left: 28px;
-  min-width: 238px;
+  top: -26px;
+  left: 24px;
+  min-width: 220px;
   transform: rotate(-1.4deg);
   border-radius: 6px 6px 3px 3px;
   background: var(--travel-ribbon);
-  padding: 10px 28px 12px;
+  padding: 9px 25px 11px;
   color: #fffdf5;
-  font-size: 38px;
+  font-size: 34px;
   font-weight: 900;
   line-height: 1;
   text-align: left;
@@ -2448,15 +2453,15 @@ button.unlock-card {
 .travel-choice-status {
   position: absolute;
   z-index: 3;
-  right: max(22%, 92px);
-  bottom: -40px;
-  left: max(22%, 92px);
+  right: max(22%, 86px);
+  bottom: -36px;
+  left: max(22%, 86px);
   border: 5px solid #6e8d3d;
   border-radius: 8px;
   background: var(--travel-button);
-  padding: 11px 18px 13px;
+  padding: 10px 16px 12px;
   color: #fffdf5;
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 900;
   line-height: 1;
   text-shadow: 0 3px 0 rgba(44, 69, 28, 0.34);
@@ -2488,8 +2493,8 @@ button.unlock-card {
   top: 50%;
   left: 50%;
   display: inline-grid;
-  width: 96px;
-  height: 96px;
+  width: 88px;
+  height: 88px;
   place-items: center;
   border: 5px solid rgba(255, 253, 245, 0.88);
   border-radius: 50%;
@@ -2504,8 +2509,8 @@ button.unlock-card {
 }
 
 .travel-lock-svg {
-  width: 68px;
-  height: 68px;
+  width: 62px;
+  height: 62px;
   filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.22));
   stroke-width: 2.8;
 }
@@ -2625,9 +2630,9 @@ button.unlock-card {
 }
 
 .modal-row-icon {
-  width: 86px;
-  height: 86px;
-  flex: 0 0 86px;
+  width: 78px;
+  height: 78px;
+  flex: 0 0 78px;
   border-radius: 12px;
   object-fit: contain;
   transform: rotate(-2deg);
@@ -2635,10 +2640,10 @@ button.unlock-card {
 }
 
 .adcap-modal .adcap-button {
-  min-width: 120px;
-  min-height: 60px;
+  min-width: 112px;
+  min-height: 56px;
   border-color: #4f4b47;
-  font-size: 25px;
+  font-size: 23px;
 }
 
 .adcap-modal .adcap-button:not(:disabled) {
@@ -2771,7 +2776,7 @@ button.unlock-card {
 
 .achievement-title {
   color: #4c443d;
-  font-size: clamp(19px, 2.5vw, 27px);
+  font-size: clamp(18px, 2.3vw, 25px);
   font-weight: 900;
   line-height: 1;
 }
@@ -3309,28 +3314,28 @@ button.unlock-card {
   }
 
   .modal-backdrop {
-    padding: 82px 10px 24px;
+    padding: 78px 10px 22px;
   }
 
   .adcap-modal {
     width: min(100%, calc(100vw - 20px));
-    min-height: calc(100vh - 112px);
+    min-height: calc(100vh - 106px);
   }
 
   .modal-title-card {
-    top: -54px;
-    width: min(420px, calc(100vw - 118px));
-    min-height: 82px;
+    top: -50px;
+    width: min(390px, calc(100vw - 112px));
+    min-height: 76px;
   }
 
   .modal-title-card h2 {
-    font-size: clamp(36px, 10vw, 58px);
+    font-size: clamp(34px, 9.4vw, 54px);
   }
 
   .modal-side-tab {
-    top: -36px;
-    width: 160px;
-    height: 70px;
+    top: -34px;
+    width: 148px;
+    height: 64px;
   }
 
   .modal-side-tab.left {
@@ -3342,35 +3347,35 @@ button.unlock-card {
   }
 
   .modal-close {
-    top: -45px;
-    right: -6px;
-    width: 88px;
-    height: 68px;
-    font-size: 42px;
+    top: -42px;
+    right: -5px;
+    width: 82px;
+    height: 62px;
+    font-size: 38px;
   }
 
   .modal-help {
-    top: 78px;
+    top: 72px;
     right: 12px;
-    width: 48px;
-    height: 48px;
-    font-size: 32px;
+    width: 44px;
+    height: 44px;
+    font-size: 29px;
   }
 
   .modal-help-popover {
-    top: 70px;
-    right: 66px;
-    width: min(300px, calc(100% - 96px));
-    font-size: 15px;
+    top: 66px;
+    right: 60px;
+    width: min(280px, calc(100% - 88px));
+    font-size: 14px;
   }
 
   .modal-content {
-    padding: 76px 14px 22px;
+    padding: 70px 13px 20px;
   }
 
   .travel-panel {
-    gap: 18px;
-    padding: 0 0 40px;
+    gap: 16px;
+    padding: 0 0 36px;
   }
 
   .travel-cash-balance {
@@ -3378,8 +3383,8 @@ button.unlock-card {
   }
 
   .travel-destinations {
-    gap: 56px;
-    padding-top: 10px;
+    gap: 50px;
+    padding-top: 8px;
   }
 
   .travel-choice {
@@ -3392,36 +3397,36 @@ button.unlock-card {
   }
 
   .travel-choice-ribbon {
-    top: -22px;
+    top: -20px;
     left: 14px;
-    min-width: 156px;
-    padding: 8px 20px 10px;
-    font-size: 28px;
+    min-width: 144px;
+    padding: 7px 18px 9px;
+    font-size: 25px;
   }
 
   .travel-choice-lock {
-    width: 76px;
-    height: 76px;
+    width: 70px;
+    height: 70px;
     border-width: 4px;
   }
 
   .travel-lock-svg {
-    width: 54px;
-    height: 54px;
+    width: 50px;
+    height: 50px;
   }
 
   .travel-choice-status {
-    right: max(16%, 60px);
-    bottom: -33px;
-    left: max(16%, 60px);
+    right: max(16%, 56px);
+    bottom: -30px;
+    left: max(16%, 56px);
     border-width: 4px;
     padding: 10px 12px 11px;
-    font-size: 28px;
+    font-size: 25px;
   }
 
   .modal-pills {
-    grid-template-columns: repeat(2, minmax(110px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(2, minmax(102px, 1fr));
+    gap: 10px;
   }
 
   .unlock-view-tabs {
@@ -3491,26 +3496,26 @@ button.unlock-card {
   }
 
   .investor-hero {
-    min-height: 204px;
+    min-height: 188px;
   }
 
   .angel-total-banner {
-    min-height: 116px;
+    min-height: 108px;
     margin-top: 34px;
-    padding-inline: clamp(48px, 16vw, 82px);
+    padding-inline: clamp(44px, 15vw, 76px);
   }
 
   .angel-total-banner div {
-    font-size: clamp(22px, 7vw, 31px);
+    font-size: clamp(20px, 6.5vw, 29px);
   }
 
   .angel-total-banner strong {
-    font-size: clamp(36px, 10vw, 52px);
+    font-size: clamp(33px, 9.5vw, 48px);
   }
 
   .investor-scout {
     bottom: 8px;
-    width: clamp(92px, 30vw, 128px);
+    width: clamp(86px, 28vw, 118px);
   }
 
   .investor-scout-left {
@@ -3522,11 +3527,11 @@ button.unlock-card {
   }
 
   .investor-confirm-card {
-    padding: 22px 18px 20px;
+    padding: 20px 17px 18px;
   }
 
   .investor-confirm-card p {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .investor-confirm-actions {
@@ -3534,21 +3539,21 @@ button.unlock-card {
   }
 
   .modal-row-icon {
-    width: 64px;
-    height: 64px;
-    flex-basis: 64px;
+    width: 60px;
+    height: 60px;
+    flex-basis: 60px;
   }
 
   .adcap-modal .shop-row,
   .adcap-modal .achievement-row {
-    min-height: 84px;
-    padding: 10px;
+    min-height: 78px;
+    padding: 9px;
   }
 
   .adcap-modal .adcap-button {
-    min-width: 92px;
-    min-height: 52px;
-    font-size: 20px;
+    min-width: 86px;
+    min-height: 48px;
+    font-size: 18px;
   }
 }
 
@@ -3764,11 +3769,11 @@ button.unlock-card {
 
   .travel-cash-balance {
     padding: 6px 9px;
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .travel-destinations {
-    gap: 44px;
+    gap: 40px;
   }
 
   .travel-choice {
@@ -3777,33 +3782,33 @@ button.unlock-card {
   }
 
   .travel-choice-ribbon {
-    top: -18px;
+    top: -17px;
     left: 8px;
-    min-width: 104px;
-    padding: 7px 14px 8px;
-    font-size: 22px;
+    min-width: 98px;
+    padding: 6px 13px 7px;
+    font-size: 20px;
     box-shadow:
       0 4px 0 rgba(42, 32, 51, 0.28),
       -28px 8px 0 -6px color-mix(in srgb, var(--travel-ribbon) 78%, #1f1d24);
   }
 
   .travel-choice-lock {
-    width: 58px;
-    height: 58px;
+    width: 54px;
+    height: 54px;
     border-width: 3px;
   }
 
   .travel-lock-svg {
-    width: 42px;
-    height: 42px;
+    width: 39px;
+    height: 39px;
   }
 
   .travel-choice-status {
-    right: 38px;
-    bottom: -28px;
-    left: 38px;
-    padding: 8px 8px 9px;
-    font-size: 22px;
+    right: 34px;
+    bottom: -26px;
+    left: 34px;
+    padding: 7px 8px 8px;
+    font-size: 20px;
   }
 
   .manager-cash-balance {
@@ -3815,7 +3820,7 @@ button.unlock-card {
   .manager-cash-balance strong {
     grid-column: 1 / -1;
     justify-self: stretch;
-    font-size: 24px;
+    font-size: 22px;
     text-align: center;
   }
 
