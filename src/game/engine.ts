@@ -91,7 +91,6 @@ export const createInitialGameState = (now = Date.now()): GameState => ({
   createdAt: now,
   lastSavedAt: now,
   activeWorldId: primaryWorldId,
-  megaBucks: 100,
   unlockedWorldIds: [primaryWorldId],
   worlds: Object.fromEntries(
     worldList.map((world) => [world.id, createInitialWorldState(world)]),
@@ -192,7 +191,6 @@ export const hydrateGameState = (saved: Partial<GameState> | null, now = Date.no
     ...saved,
     version: SAVE_VERSION,
     activeWorldId,
-    megaBucks: Math.max(0, Number(saved.megaBucks ?? initial.megaBucks) || 0),
     unlockedWorldIds: [...unlockedWorldIds],
     worlds: hydratedWorlds,
   };
@@ -206,8 +204,6 @@ export const getWorldUnlockBalance = (state: GameState, world: WorldDefinition) 
   switch (world.unlockCost.currency) {
     case "free":
       return 0;
-    case "megaBucks":
-      return state.megaBucks;
     case "siliconValleyCash":
       return state.worlds[primaryWorldId].cash;
   }
@@ -817,32 +813,25 @@ export const unlockWorld = (state: GameState, worldId: WorldId): GameState => {
     return state;
   }
 
-  if (world.unlockCost.currency === "siliconValleyCash") {
-    return {
-      ...state,
-      unlockedWorldIds: [...state.unlockedWorldIds, worldId],
-      worlds: {
-        ...state.worlds,
-        [primaryWorldId]: {
-          ...state.worlds[primaryWorldId],
-          cash: state.worlds[primaryWorldId].cash - world.unlockCost.amount,
+  switch (world.unlockCost.currency) {
+    case "siliconValleyCash":
+      return {
+        ...state,
+        unlockedWorldIds: [...state.unlockedWorldIds, worldId],
+        worlds: {
+          ...state.worlds,
+          [primaryWorldId]: {
+            ...state.worlds[primaryWorldId],
+            cash: state.worlds[primaryWorldId].cash - world.unlockCost.amount,
+          },
         },
-      },
-    };
+      };
+    case "free":
+      return {
+        ...state,
+        unlockedWorldIds: [...state.unlockedWorldIds, worldId],
+      };
   }
-
-  if (world.unlockCost.currency === "free") {
-    return {
-      ...state,
-      unlockedWorldIds: [...state.unlockedWorldIds, worldId],
-    };
-  }
-
-  return {
-    ...state,
-    megaBucks: state.megaBucks - world.unlockCost.amount,
-    unlockedWorldIds: [...state.unlockedWorldIds, worldId],
-  };
 };
 
 export const switchWorld = (state: GameState, worldId: WorldId): GameState => {

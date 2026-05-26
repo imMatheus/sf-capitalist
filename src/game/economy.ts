@@ -747,7 +747,7 @@ export const chinaWorld = buildWorld({
     shortSingular: "Scout",
     shortPlural: "Scouts",
   },
-  unlockCost: { currency: "megaBucks", amount: 100 },
+  unlockCost: { currency: "siliconValleyCash", amount: 15 },
   startingCash: 0.05,
   businesses: chinaBusinesses,
   cashUpgradeRows: chinaCashUpgradeRows,

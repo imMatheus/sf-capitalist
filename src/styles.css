@@ -2317,7 +2317,7 @@ button.unlock-card {
   padding: 4px 6px 42px;
 }
 
-.mega-bucks-balance {
+.travel-cash-balance {
   display: inline-flex;
   justify-self: end;
   width: fit-content;
@@ -3373,7 +3373,7 @@ button.unlock-card {
     padding: 0 0 40px;
   }
 
-  .mega-bucks-balance {
+  .travel-cash-balance {
     justify-self: center;
   }
 
@@ -3762,7 +3762,7 @@ button.unlock-card {
     font-size: 15px;
   }
 
-  .mega-bucks-balance {
+  .travel-cash-balance {
     padding: 6px 9px;
     font-size: 12px;
   }

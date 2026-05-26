@@ -1519,10 +1519,7 @@ const getTravelUnlockLabel = (world: WorldDefinition, prefix = false) => {
     return 'Free'
   }
 
-  const cost =
-    world.unlockCost.currency === 'megaBucks'
-      ? `${formatCompact(world.unlockCost.amount, 0)} MB`
-      : formatMoney(world.unlockCost.amount, '$')
+  const cost = formatMoney(world.unlockCost.amount, '$')
 
   return prefix ? `Unlock ${cost}` : cost
 }
@@ -1535,6 +1532,10 @@ const TravelPanel = ({
 }: TravelPanelProps) => {
   const [unlockingWorldId, setUnlockingWorldId] = useState<WorldId | null>(null)
   const unlockTimerRef = useRef<number | null>(null)
+  const travelWorldOrder: WorldId[] = ['silicon-valley', 'europe', 'china']
+  const travelWorlds = travelWorldOrder
+    .map((worldId) => worldList.find((world) => world.id === worldId))
+    .filter((world): world is WorldDefinition => Boolean(world))
 
   useEffect(
     () => () => {
@@ -1560,17 +1561,16 @@ const TravelPanel = ({
 
   return (
     <div className="travel-panel">
-      <div className="mega-bucks-balance">
+      <div className="travel-cash-balance">
         <Globe2 className="h-5 w-5" />
-        <span>{formatCompact(gameState.megaBucks, 0)} Mega Bucks</span>
         <span>
-          {formatMoney(gameState.worlds['silicon-valley'].cash, '$')} Silicon
-          Valley cash
+          {formatMoney(gameState.worlds['silicon-valley'].cash, '$')} Earth
+          dollars
         </span>
       </div>
 
       <div className="travel-destinations">
-        {worldList.map((world) => {
+        {travelWorlds.map((world) => {
           const active = activeWorldId === world.id
           const unlocked = gameState.unlockedWorldIds.includes(world.id)
           const canUnlock = canUnlockWorld(gameState, world)

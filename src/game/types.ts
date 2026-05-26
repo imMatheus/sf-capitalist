@@ -12,7 +12,6 @@ export type UpgradeTarget = BusinessId | "all";
 
 export type WorldUnlockCost =
   | { currency: "free"; amount: 0 }
-  | { currency: "megaBucks"; amount: number }
   | { currency: "siliconValleyCash"; amount: number };
 
 export interface BusinessDefinition {
@@ -106,7 +105,6 @@ export interface GameState {
   createdAt: number;
   lastSavedAt: number;
   activeWorldId: WorldId;
-  megaBucks: number;
   unlockedWorldIds: WorldId[];
   worlds: Record<WorldId, WorldState>;
 }
