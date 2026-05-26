@@ -677,19 +677,19 @@ Pipe Dream|9750|Profit x3
 };
 
 export const siliconValleyAllBusinessUnlockRows = parseRows("all", `
-Isn't That Vierd?|1|5 Free Gold
+Isn't That Vierd?|1|Profit Speed Doubled
 Mogul|25|Profit Speed Doubled
 Oligarch|50|Profit Speed Doubled
 Pull-Vault|50|1 spin on the Slot Machine
 Tycoon|100|Profit Speed Doubled
-I Am Ya Fahza!|100|5 Free Gold
+I Am Ya Fahza!|100|Profit Speed Doubled
 Adam Smith Award|200|Profit Speed Doubled
 Jack Pot O'Gold|200|1 spin on the Slot Machine
 Universal Capitalist|300|Profit Speed Doubled
 Theoretical Economist|400|Profit Speed Doubled
 Casino Royale with Cheese|400|1 spin on the Slot Machine
 The One True Investor|500|Profit Doubled
-Shigar Und A Waffle?|500|10 Free Gold
+Shigar Und A Waffle?|500|Profit Speed Doubled
 Game Of Loans|600|Profit Doubled
 That Can't Be Good|666|Profit Doubled
 Black Ink Inc|700|Profit Doubled
@@ -698,7 +698,7 @@ Can You Slot Me In?|777|1 spin on the Slot Machine
 Lord Of Lobbyists|800|Profit Doubled
 Midas|900|Profit Doubled
 Literally Can't Even|1000|Profit Doubled
-Yesh, Dat Is A Keepah!|1000|15 Free Gold
+Yesh, Dat Is A Keepah!|1000|Profit Speed Doubled
 Psyche!|1100|Profit Doubled
 There Can Only Be Ones|1111|Profit Doubled
 The Hang Of It|1200|Profit Doubled
@@ -718,7 +718,7 @@ Punctual Launches|2200|Profit Doubled
 Audience Rapport|2300|Profit Doubled
 A Top Hat Is You|2400|Profit Doubled
 A True AdVenture Capitalist|2500|Profit Doubled
-Toite Like A Toiger|2500|20 Free Gold
+Toite Like A Toiger|2500|Profit Speed Doubled
 Good Gracious|2600|Profit Doubled
 Gold Pressed Latinum|2700|Profit Doubled
 FASTER!|2800|Profit Doubled
@@ -737,7 +737,7 @@ Where's The Roof On This?|3700|Profit Doubled
 Symphon-Economics|3800|Profit Doubled
 Pecunia Vincit Omnia|3900|Profit Doubled
 The Legend Continues|4000|Profit Doubled
-An Amster-dam Good Time|4000|30 Free Gold
+An Amster-dam Good Time|4000|Profit Speed Doubled
 12th Cup of Coffee|4000|1 spin on the Slot Machine
 Who Writes These Things?|4100|Profit Doubled
 Humongous Numbers|4200|Profit Doubled
@@ -750,5 +750,5 @@ And Live In Harmony|4700|Profit Doubled
 Battery Eater|4800|Profit Doubled
 Never Give Up|4900|Profit Doubled
 Achievement|5000|Profit Doubled
-I Love GOOOOOOLD!|5000|50 Free Gold
+I Love GOOOOOOLD!|5000|Profit Speed Doubled
 `);
