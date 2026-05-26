@@ -10,10 +10,10 @@ import {
 import { formatDuration, formatMoney } from './game/format'
 import type { BusinessId, BuyMode } from './game/types'
 import { useGame } from './game/useGame'
-import { playerPortraits, welcomeImage } from './ui/assets'
+import { playerPortraits } from './ui/assets'
 import { BusinessRow } from './ui/BusinessRow'
 import { GamePanelContent } from './ui/Panels'
-import { LevelToastView, PanelModal, Sidebar, StartupLoader } from './ui/Shell'
+import { LevelToastView, PanelModal, Sidebar } from './ui/Shell'
 import { CapitalHeader } from './ui/TopBar'
 import type { LevelToast, Panel } from './ui/types'
 import {
@@ -32,7 +32,6 @@ const App = () => {
   const [buyMode, setBuyMode] = useState<BuyMode>(1)
   const [panel, setPanel] = useState<Panel | null>(null)
   const [levelToast, setLevelToast] = useState<LevelToast | null>(null)
-  const [showStartupLoader, setShowStartupLoader] = useState(true)
   const levelToastTimerRef = useRef<number | null>(null)
   const levelToastKeyRef = useRef(0)
   const claimableAngels = getClaimableAngels(worldState)
@@ -121,14 +120,6 @@ const App = () => {
     },
     [],
   )
-
-  useEffect(() => {
-    const startupLoaderTimer = window.setTimeout(() => {
-      setShowStartupLoader(false)
-    }, 1_900)
-
-    return () => window.clearTimeout(startupLoaderTimer)
-  }, [])
 
   return (
     <div
@@ -219,7 +210,6 @@ const App = () => {
       {levelToast ? (
         <LevelToastView key={levelToast.key} toast={levelToast} />
       ) : null}
-      {showStartupLoader ? <StartupLoader image={welcomeImage} /> : null}
     </div>
   )
 }

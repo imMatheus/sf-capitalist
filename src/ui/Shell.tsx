@@ -4,38 +4,6 @@ import type { WorldDefinition } from '../game/types'
 import { getPanelHelp, getPanelKicker, panelMeta, panelTabs } from './viewModel'
 import type { LevelToast, Panel } from './types'
 
-export const StartupLoader = ({ image }: { image: string }) => (
-  <div
-    aria-label="Loading Silicon Valley"
-    className="startup-loader"
-    role="status"
-  >
-    <img
-      alt=""
-      className="startup-loader-image"
-      draggable={false}
-      src={image}
-    />
-    <svg
-      aria-hidden="true"
-      className="startup-loader-title"
-      preserveAspectRatio="xMidYMid meet"
-      viewBox="0 0 900 260"
-    >
-      <path d="M 120 160 Q 450 62 780 160" fill="none" id="startup-title-arc" />
-      <text>
-        <textPath
-          href="#startup-title-arc"
-          startOffset="50%"
-          textAnchor="middle"
-        >
-          SF Capitalist
-        </textPath>
-      </text>
-    </svg>
-  </div>
-)
-
 export const LevelToastView = ({ toast }: { toast: LevelToast }) => (
   <div className="level-toast" role="status">
     <img alt="" draggable={false} src={toast.image} />
