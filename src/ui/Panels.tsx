@@ -1,6 +1,7 @@
 import {
   BadgeDollarSign,
   CheckCircle2,
+  Github,
   Globe2,
   LayoutGrid,
   Lock,
@@ -682,6 +683,16 @@ export const StatsPanel = ({
 
   return (
     <div className="space-y-3">
+      <a
+        className="stats-repo-link"
+        href="https://github.com/imMatheus/sf-capitalist"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        <Github className="h-4 w-4" />
+        View source on GitHub
+      </a>
+
       <div className="stats-grid">
         <StatTile
           label="Session"
